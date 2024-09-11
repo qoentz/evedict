@@ -19,24 +19,14 @@ func main() {
 		log.Fatalf("Error fetching data from GDELT: %v", err)
 	}
 
-	sum, err := replicate.GenerateSummary(newsapi.CreatePromptFromHeadlines(data))
+	url, err := replicate.InitiateStream(newsapi.CreatePromptFromHeadlines(data))
 	if err != nil {
-		log.Fatalf("Error generating summary: %v", err)
+		log.Fatalf("Error initiating stream: %v", err)
 	}
 
-	fmt.Println(sum)
-
-	//getURL := "https://api.replicate.com/v1/predictions/ddn8k254ssrj20chvttr8jv264"
-	//
-	//// Check the status of the prediction
-	//predictionResult, err := replicate.CheckPredictionStatus(getURL)
-	//if err != nil {
-	//	log.Fatalf("Error getting prediction result: %v", err)
-	//}
-	//
-	//// Format the prediction nicely
-	//formattedPrediction := replicate.FormatPrediction(predictionResult)
-	//
-	//// Print the formatted prediction result
-	//fmt.Println(formattedPrediction)
+	err = replicate.HandleStream(url)
+	if err != nil {
+		fmt.Println("Error handling stream:", err)
+		return
+	}
 }

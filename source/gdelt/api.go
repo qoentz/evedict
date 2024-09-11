@@ -1,8 +1,9 @@
 package gdelt
 
 import (
-	"cashnew/httputil"
 	"encoding/json"
+	"evedict/httputil"
+	"io"
 	"os"
 )
 
@@ -11,9 +12,15 @@ func Fetch() ([]Article, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer resp.Close()
+
+	resBody, err := io.ReadAll(resp)
+	if err != nil {
+		return nil, err
+	}
 
 	var data Response
-	if err = json.Unmarshal(resp, &data); err != nil {
+	if err = json.Unmarshal(resBody, &data); err != nil {
 		return nil, err
 	}
 

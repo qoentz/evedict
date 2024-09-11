@@ -2,11 +2,12 @@ package httputil
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"net/http"
 )
 
-func PostRequest(url string, reqBody []byte, apiKey string) ([]byte, error) {
+func PostRequest(url string, reqBody []byte, apiKey string) (io.ReadCloser, error) {
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(reqBody))
 	if err != nil {
 		return nil, err
@@ -20,26 +21,23 @@ func PostRequest(url string, reqBody []byte, apiKey string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
 
-	resBody, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-	return resBody, nil
+	//if resp.StatusCode != http.StatusOK {
+	//	return resp.Body, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+	//}
+
+	return resp.Body, nil
 }
 
-func GetRequest(url string) ([]byte, error) {
+func GetRequest(url string) (io.ReadCloser, error) {
 	resp, err := http.Get(url)
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
 
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
+	if resp.StatusCode != http.StatusOK {
+		return resp.Body, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
 	}
 
-	return body, nil
+	return resp.Body, nil
 }
