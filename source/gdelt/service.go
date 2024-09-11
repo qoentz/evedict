@@ -1,7 +1,7 @@
 package gdelt
 
 import (
-	"cashnew/llm/hugface"
+	"evedict/llm/hugface"
 	"fmt"
 	"log"
 	"os"

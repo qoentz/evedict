@@ -1,9 +1,10 @@
 package hugface
 
 import (
-	"cashnew/httputil"
 	"encoding/json"
+	"evedict/httputil"
 	"fmt"
+	"io"
 	"os"
 )
 
@@ -41,11 +42,15 @@ func GenerateSummary(prompt string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	defer resp.Close()
 
-	fmt.Println(string(resp))
+	respBody, err := io.ReadAll(resp)
+	if err != nil {
+		return "", err
+	}
 
 	var responsePayload []ResponsePayload
-	if err = json.Unmarshal(resp, &responsePayload); err != nil {
+	if err = json.Unmarshal(respBody, &responsePayload); err != nil {
 		return "", fmt.Errorf("error parsing response: %v", err)
 	}
 

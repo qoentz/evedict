@@ -1,8 +1,9 @@
 package hugface
 
 import (
-	"cashnew/httputil"
 	"encoding/json"
+	"evedict/httputil"
+	"io"
 	"os"
 )
 
@@ -13,9 +14,15 @@ func TranslateHeadline(headline string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	defer resp.Close()
+
+	respBody, err := io.ReadAll(resp)
+	if err != nil {
+		return "", err
+	}
 
 	var result []map[string]string
-	if err = json.Unmarshal(resp, &result); err != nil {
+	if err = json.Unmarshal(respBody, &result); err != nil {
 		return "", err
 	}
 
