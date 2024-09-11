@@ -105,19 +105,20 @@ func HandleStream(streamURL string) error {
 			return fmt.Errorf("error reading stream: %v", err)
 		}
 
-		line = strings.TrimSpace(line) // Clean up the line
+		line = strings.TrimSpace(line)
 
-		if strings.HasPrefix(line, "event:") {
-			// Received an event (ignore for now)
-		} else if strings.HasPrefix(line, "data:") {
+		if strings.HasPrefix(line, "data:") {
 			data := strings.TrimPrefix(line, "data: ")
+			data = strings.ReplaceAll(data, "data:", "") // Remove any "data:" inside the text
+			if data == "{}" || data == "" {
+				continue // Skip empty or irrelevant data
+			}
+			// Accumulate text
 			output.WriteString(data)
-			// Simulate typing effect for the data
-			typeOutText(data)
-		} else if strings.HasPrefix(line, "id:") {
-			// Ignore event ids, but you could log or process them if needed
-		} else if line == "" {
-			// Empty line indicates end of an event chunk; could be ignored.
+		} else if line == "" && output.Len() > 0 {
+			// When we hit an empty line, output the accumulated text
+			typeOutText(output.String()) // Print with typing effect
+			output.Reset()               // Reset for the next chunk
 		}
 	}
 
@@ -127,6 +128,6 @@ func HandleStream(streamURL string) error {
 func typeOutText(text string) {
 	for _, char := range text {
 		fmt.Printf("%c", char)
-		time.Sleep(50 * time.Millisecond) // Adjust delay as needed (50ms per character)
+		time.Sleep(25 * time.Millisecond)
 	}
 }
