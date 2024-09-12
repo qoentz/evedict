@@ -2,7 +2,6 @@ package httputil
 
 import (
 	"bytes"
-	"fmt"
 	"io"
 	"net/http"
 )
@@ -35,9 +34,9 @@ func GetRequest(url string) (io.ReadCloser, error) {
 		return nil, err
 	}
 
-	if resp.StatusCode != http.StatusOK {
-		return resp.Body, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
-	}
+	//if resp.StatusCode != http.StatusOK {
+	//	return resp.Body, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+	//}
 
 	return resp.Body, nil
 }
