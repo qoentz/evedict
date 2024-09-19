@@ -23,17 +23,23 @@ func GetNews(promptTemplate *promptgen.PromptTemplate) http.HandlerFunc {
 			return
 		}
 
-		url, err := replicate.InitiateStream(prompt)
+		predictions, err := replicate.GetPredictions(prompt)
 		if err != nil {
-			http.Error(w, fmt.Sprintf("Error initiating stream: %v", err), http.StatusInternalServerError)
+			http.Error(w, fmt.Sprintf("Error getting response: %v", err), http.StatusInternalServerError)
 			return
 		}
 
-		predictions, err := replicate.HandleStream(url)
-		if err != nil {
-			http.Error(w, fmt.Sprintf("Error processing stream: %v", err), http.StatusInternalServerError)
-			return
-		}
+		//url, err := replicate.InitiateStream(prompt)
+		//if err != nil {
+		//	http.Error(w, fmt.Sprintf("Error initiating stream: %v", err), http.StatusInternalServerError)
+		//	return
+		//}
+		//
+		//predictions, err := replicate.HandleStream(url)
+		//if err != nil {
+		//	http.Error(w, fmt.Sprintf("Error processing stream: %v", err), http.StatusInternalServerError)
+		//	return
+		//}
 
 		w.Header().Set("Content-Type", "application/json")
 		err = json.NewEncoder(w).Encode(predictions)

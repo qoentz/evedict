@@ -1,0 +1,24 @@
+predict_events: |
+  Based on the following articles, predict two future events that are likely to take place. 
+  Output the prediction as a JSON object with exactly two key-value pairs, each containing 
+  a "title" and "content" field. Do not explain or reference the articles, just give the 
+  predictions as structured JSON. Use the following format:
+
+  {
+    "predictions": [
+      {
+        "title": "Prediction Title 1",
+        "content": "Details of the first predicted event."
+      },
+      {
+        "title": "Prediction Title 2",
+        "content": "Details of the second predicted event."
+      }
+    ]
+  }
+
+  Here are the articles:
+  {{range .Articles}}
+  - Title: {{.Title}}
+    Content: {{.Content}}
+  {{end}}
