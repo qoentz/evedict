@@ -2,7 +2,7 @@ package gdelt
 
 import (
 	"encoding/json"
-	"evedict/httputil"
+	"evedict/internal/httputil"
 	"io"
 	"os"
 )

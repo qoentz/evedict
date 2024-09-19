@@ -2,7 +2,8 @@ package server
 
 import (
 	"errors"
-	"evedict/handler"
+	"evedict/config"
+	"evedict/internal/handler"
 	"fmt"
 	"github.com/gorilla/mux"
 	"log"
@@ -10,12 +11,12 @@ import (
 	"net/http"
 )
 
-func initialize() *mux.Router {
+func initialize(config *config.SystemConfig) *mux.Router {
 	router := mux.NewRouter().StrictSlash(true)
 
 	api := router.PathPrefix("/api").Subrouter()
 
-	api.Handle("/news", http.HandlerFunc(handler.GetNews)).Methods("GET")
+	api.Handle("/news", handler.GetNews(config.PromptTemplate)).Methods("GET")
 
 	router.NotFoundHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "", http.StatusNotFound)
@@ -25,8 +26,8 @@ func initialize() *mux.Router {
 
 }
 
-func ServeRouter() *http.Server {
-	r := initialize()
+func ServeRouter(config *config.SystemConfig) *http.Server {
+	r := initialize(config)
 
 	serverAddr := fmt.Sprintf("0.0.0.0:%s", "8080")
 

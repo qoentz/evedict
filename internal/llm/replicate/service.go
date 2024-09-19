@@ -3,7 +3,7 @@ package replicate
 import (
 	"bufio"
 	"encoding/json"
-	"evedict/httputil"
+	"evedict/internal/httputil"
 	"fmt"
 	"log"
 	"net/http"
