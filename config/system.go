@@ -31,7 +31,7 @@ func ConfigureSystem() (*SystemConfig, error) {
 
 	envConfig := NewEnvConfig()
 
-	promptTemplate, err := promptgen.LoadPromptTemplate("config/prompts.yaml")
+	promptTemplate, err := promptgen.LoadPromptTemplate("internal/promptgen/prompts.yaml")
 	if err != nil {
 		return nil, fmt.Errorf("error loading prompt template: %v", err)
 	}
