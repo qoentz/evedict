@@ -2,14 +2,14 @@ package handler
 
 import (
 	"encoding/json"
-	"evedict/internal/llm/replicate"
+	"evedict/internal/llm"
 	"evedict/internal/promptgen"
 	"evedict/internal/source/newsapi"
 	"fmt"
 	"net/http"
 )
 
-func GetNews(newsAPI *newsapi.Service, replicate *replicate.Service, template *promptgen.PromptTemplate) http.HandlerFunc {
+func GetNews(newsAPI *newsapi.Service, ai llm.Service, template *promptgen.PromptTemplate) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		data, err := newsAPI.Fetch()
 		if err != nil {
@@ -23,7 +23,7 @@ func GetNews(newsAPI *newsapi.Service, replicate *replicate.Service, template *p
 			return
 		}
 
-		predictions, err := replicate.GetPredictions(prompt)
+		predictions, err := ai.GetPredictions(prompt)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Error getting response: %v", err), http.StatusInternalServerError)
 			return

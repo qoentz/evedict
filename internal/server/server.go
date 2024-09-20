@@ -24,7 +24,6 @@ func InitRouter(config *config.SystemConfig, reg *registry.Registry) *mux.Router
 	})
 
 	return router
-
 }
 
 func ServeHTTP(r *mux.Router) *http.Server {
