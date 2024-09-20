@@ -25,12 +25,3 @@ type URLs struct {
 	Get    string `json:"get"`
 	Stream string `json:"stream"`
 }
-
-type Predictions struct {
-	Predictions []Prediction `json:"predictions"`
-}
-
-type Prediction struct {
-	Title   string `json:"title"`
-	Content string `json:"content"`
-}

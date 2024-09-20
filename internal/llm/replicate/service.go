@@ -3,6 +3,7 @@ package replicate
 import (
 	"bytes"
 	"encoding/json"
+	"evedict/internal/llm"
 	"fmt"
 	"io"
 	"net/http"
@@ -16,6 +17,8 @@ type Service struct {
 	APIKey     string
 }
 
+var _ llm.Service = &Service{}
+
 func NewReplicateService(client *http.Client, modelURL string, apiKey string) *Service {
 	return &Service{
 		HTTPClient: client,
@@ -24,7 +27,7 @@ func NewReplicateService(client *http.Client, modelURL string, apiKey string) *S
 	}
 }
 
-func (r *Service) GetPredictions(prompt string) (*Predictions, error) {
+func (r *Service) GetPredictions(prompt string) (*llm.Predictions, error) {
 	if len(prompt) == 0 {
 		return nil, fmt.Errorf("empty prompt provided")
 	}
@@ -121,7 +124,7 @@ func (r *Service) GetPredictions(prompt string) (*Predictions, error) {
 	outputStr = strings.TrimSpace(outputStr)
 
 	// Parse the output JSON into Predictions struct
-	var predictions Predictions
+	var predictions llm.Predictions
 	err = json.Unmarshal([]byte(outputStr), &predictions)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing prediction output: %v\nOutput Data:\n%s", err, outputStr)
