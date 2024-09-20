@@ -3,8 +3,8 @@ package main
 import (
 	"context"
 	"evedict/config"
+	"evedict/internal/registry"
 	"evedict/internal/server"
-	"github.com/joho/godotenv"
 	"log"
 	"os"
 	"os/signal"
@@ -13,17 +13,14 @@ import (
 )
 
 func main() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatalf("Error loading .env file: %v", err)
-	}
-
 	systemConfig, err := config.ConfigureSystem()
 	if err != nil {
 		log.Fatalf("Error configuring system: %v", err)
 	}
 
-	httpServer := server.ServeRouter(systemConfig)
+	reg := registry.NewRegistry(systemConfig)
+
+	httpServer := server.ServeHTTP(server.InitRouter(systemConfig, reg))
 
 	shutdown := make(chan os.Signal, 1)
 	signal.Notify(shutdown, os.Interrupt, syscall.SIGTERM)

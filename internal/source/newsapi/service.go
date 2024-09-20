@@ -4,11 +4,22 @@ import (
 	"encoding/json"
 	"evedict/internal/httputil"
 	"io"
-	"os"
 )
 
-func Fetch() ([]Article, error) {
-	resp, err := httputil.GetRequest(os.Getenv("NEWS_API_URL") + os.Getenv("NEWS_API_KEY"))
+type Service struct {
+	APIKey  string
+	BaseURL string
+}
+
+func NewNewsAPIService(apiKey, baseURL string) *Service {
+	return &Service{
+		APIKey:  apiKey,
+		BaseURL: baseURL,
+	}
+}
+
+func (n *Service) Fetch() ([]Article, error) {
+	resp, err := httputil.GetRequest(n.BaseURL + n.APIKey)
 	if err != nil {
 		return nil, err
 	}
