@@ -2,9 +2,9 @@ package main
 
 import (
 	"context"
-	"evedict/config"
-	"evedict/internal/registry"
-	"evedict/internal/server"
+	"github.com/qoentz/evedict/config"
+	"github.com/qoentz/evedict/internal/registry"
+	"github.com/qoentz/evedict/internal/server"
 	"log"
 	"os"
 	"os/signal"

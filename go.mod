@@ -1,4 +1,4 @@
-module evedict
+module github.com/qoentz/evedict
 
 go 1.21
 

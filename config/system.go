@@ -1,9 +1,9 @@
 package config
 
 import (
-	"evedict/internal/promptgen"
 	"fmt"
 	"github.com/joho/godotenv"
+	"github.com/qoentz/evedict/internal/promptgen"
 	"log"
 	"net/http"
 	"os"

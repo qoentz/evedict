@@ -3,8 +3,8 @@ package replicate
 import (
 	"bytes"
 	"encoding/json"
-	"evedict/internal/llm"
 	"fmt"
+	"github.com/qoentz/evedict/internal/llm"
 	"io"
 	"net/http"
 	"strings"

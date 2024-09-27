@@ -1,9 +1,9 @@
 package registry
 
 import (
-	"evedict/config"
-	"evedict/internal/llm/replicate"
-	"evedict/internal/source/newsapi"
+	"github.com/qoentz/evedict/config"
+	"github.com/qoentz/evedict/internal/eventfeed/newsapi"
+	"github.com/qoentz/evedict/internal/llm/replicate"
 )
 
 type Registry struct {

@@ -1,7 +1,7 @@
 package promptgen
 
 import (
-	"evedict/internal/source/newsapi"
+	"github.com/qoentz/evedict/internal/eventfeed/newsapi"
 	"gopkg.in/yaml.v2"
 	"os"
 	"strings"

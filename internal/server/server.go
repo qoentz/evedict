@@ -2,11 +2,11 @@ package server
 
 import (
 	"errors"
-	"evedict/config"
-	"evedict/internal/handler"
-	"evedict/internal/registry"
 	"fmt"
 	"github.com/gorilla/mux"
+	"github.com/qoentz/evedict/config"
+	"github.com/qoentz/evedict/internal/handler"
+	"github.com/qoentz/evedict/internal/registry"
 	"log"
 	"net"
 	"net/http"

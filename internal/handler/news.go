@@ -2,10 +2,10 @@ package handler
 
 import (
 	"encoding/json"
-	"evedict/internal/llm"
-	"evedict/internal/promptgen"
-	"evedict/internal/source/newsapi"
 	"fmt"
+	"github.com/qoentz/evedict/internal/eventfeed/newsapi"
+	"github.com/qoentz/evedict/internal/llm"
+	"github.com/qoentz/evedict/internal/promptgen"
 	"net/http"
 )
 

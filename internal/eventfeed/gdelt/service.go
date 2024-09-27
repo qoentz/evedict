@@ -1,8 +1,8 @@
 package gdelt
 
 import (
-	"evedict/internal/llm/hugface"
 	"fmt"
+	"github.com/qoentz/evedict/internal/llm/hugface"
 	"log"
 	"os"
 	"strings"

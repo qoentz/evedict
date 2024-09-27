@@ -2,7 +2,7 @@ package hugface
 
 import (
 	"encoding/json"
-	"evedict/internal/httputil"
+	"github.com/qoentz/evedict/internal/httputil"
 	"io"
 	"os"
 )

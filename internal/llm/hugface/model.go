@@ -2,8 +2,8 @@ package hugface
 
 import (
 	"encoding/json"
-	"evedict/internal/httputil"
 	"fmt"
+	"github.com/qoentz/evedict/internal/httputil"
 	"io"
 	"os"
 )
