@@ -15,6 +15,9 @@ import (
 func InitRouter(config *config.SystemConfig, reg *registry.Registry) *mux.Router {
 	router := mux.NewRouter().StrictSlash(true)
 
+	router.HandleFunc("/", handler.MainFeed()).Methods("GET")
+	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static/"))))
+
 	api := router.PathPrefix("/api").Subrouter()
 
 	api.Handle("/news", handler.GetNews(reg.NewsAPIService, reg.ReplicateService, config.PromptTemplate)).Methods("GET")

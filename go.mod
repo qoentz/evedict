@@ -7,3 +7,5 @@ require (
 	github.com/joho/godotenv v1.5.1
 	gopkg.in/yaml.v2 v2.4.0
 )
+
+require github.com/a-h/templ v0.2.778 // indirect

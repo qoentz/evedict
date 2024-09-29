@@ -1,0 +1,21 @@
+package view
+
+import (
+    "github.com/qoentz/evedict/internal/llm"
+)
+
+templ NewsFeed(predictions []llm.Prediction) {
+    <div>
+        <ul>
+        for _, p := range predictions {
+            <li class="news-item">
+                <h2>{ p.Title }</h2>
+                <p>{ p.Content }</p>
+                <img src="/static/placeholder.jpg" alt="Placeholder image" class="news-image" />
+            </li>
+        }
+        </ul>
+    </div>
+}
+
+

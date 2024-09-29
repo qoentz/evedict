@@ -1,0 +1,21 @@
+.news-item {
+    margin-bottom: 20px;
+    padding: 15px;
+    border-bottom: 1px solid #ccc;
+}
+
+.news-item h2 {
+    font-size: 24px;
+    margin: 0;
+}
+
+.news-item p {
+    font-size: 16px;
+    margin: 10px 0;
+}
+
+.news-image {
+    width: 100px;
+    height: 100px;
+    display: block;
+}
