@@ -1,21 +1,96 @@
-.news-item {
-    margin-bottom: 20px;
-    padding: 15px;
-    border-bottom: 1px solid #ccc;
+/* Center the news feed, give it a max width, and add side borders */
+.event-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    border-left: 2px solid #e0e0e0;  /* Left border */
+    border-right: 2px solid #e0e0e0; /* Right border */
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    background-color: #fafafa;       /* Optional background for better contrast */
 }
 
-.news-item h2 {
-    font-size: 24px;
+/* Each news item has a full-width image, headline, and content */
+.event-item {
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 20px;
+}
+
+/* Full-width image */
+.event-image {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
+
+/* Bold, large headline */
+.event-headline {
+    font-size: 35px;
+    font-weight: 700;
+    color: #000;
+    margin: 15px 0;
+}
+
+/* Smaller, readable content text */
+.event-content {
+    font-size: 18px;
+    line-height: 1.6;
+    color: #333;
+}
+
+/* Add some spacing between articles */
+.event-item + .event-item {
+    margin-top: 40px;
+}
+
+/* Basic reset */
+* {
     margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-.news-item p {
-    font-size: 16px;
-    margin: 10px 0;
+/* Fixed header */
+.fixed-header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background-color: #333;
+    color: white;
+    padding: 10px 0;
+    z-index: 1000;
+    box-shadow: 0 4px 2px -2px gray;
 }
 
-.news-image {
-    width: 100px;
-    height: 100px;
-    display: block;
+.fixed-header .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
+
+.fixed-header nav a {
+    color: white;
+    text-decoration: none;
+    margin: 0 15px;
+}
+
+.fixed-header nav a:hover {
+    text-decoration: underline;
+}
+
+/* Main content styling */
+.content {
+    padding-top: 80px; /* To avoid overlap with the fixed header */
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* News feed styling */
+.event-feed {
+    margin-top: 20px;
+}
+

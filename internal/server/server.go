@@ -15,12 +15,15 @@ import (
 func InitRouter(config *config.SystemConfig, reg *registry.Registry) *mux.Router {
 	router := mux.NewRouter().StrictSlash(true)
 
-	router.HandleFunc("/", handler.MainFeed()).Methods("GET")
-	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static/"))))
+	router.HandleFunc("/", handler.EventFeedHandler()).Methods("GET")
+	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
+		http.FileServer(http.Dir("./static/")).ServeHTTP(w, r)
+	})))
 
 	api := router.PathPrefix("/api").Subrouter()
 
-	api.Handle("/news", handler.GetNews(reg.NewsAPIService, reg.ReplicateService, config.PromptTemplate)).Methods("GET")
+	api.Handle("/events", handler.GetEvents(reg.NewsAPIService, reg.ReplicateService, config.PromptTemplate)).Methods("GET")
 
 	router.NotFoundHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "", http.StatusNotFound)

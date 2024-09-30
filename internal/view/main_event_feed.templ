@@ -1,0 +1,36 @@
+package view
+
+import "github.com/qoentz/evedict/internal/llm"
+
+templ MainEventFeed() {
+    @BaseLayout(LoadEventFeed())
+}
+
+templ LoadEventFeed() {
+    <div class="event-feed">
+        <!-- HTMX will dynamically load the news feed content -->
+        <div id="news-feed" hx-get="/api/events" hx-trigger="load">
+            <!-- HTMX will load the news feed here -->
+        </div>
+    </div>
+}
+
+templ EventFeed(predictions []llm.Prediction) {
+    <div class="event-container">
+        for _, p := range predictions {
+            <div class="event-item">
+                <img src="/static/placeholder.jpg" alt="Event image" class="event-image" />
+                <h2 class="event-headline">{ p.Title }</h2>
+                <p class="event-content">{ p.Content }</p>
+            </div>
+        }
+    </div>
+}
+
+
+
+
+
+
+
+

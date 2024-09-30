@@ -9,7 +9,7 @@ import (
 	"net/http"
 )
 
-func GetNews(newsAPI *newsapi.Service, ai llm.Service, template *promptgen.PromptTemplate) http.HandlerFunc {
+func GetEvents(newsAPI *newsapi.Service, ai llm.Service, template *promptgen.PromptTemplate) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		data, err := newsAPI.Fetch()
 		if err != nil {
@@ -29,8 +29,21 @@ func GetNews(newsAPI *newsapi.Service, ai llm.Service, template *promptgen.Promp
 			return
 		}
 
+		//predictions := &llm.Predictions{
+		//	Predictions: []llm.Prediction{
+		//		{
+		//			Title:   "Boar's Head Listeria Outbreak Investigation Concludes",
+		//			Content: "The investigation into the Boar's Head listeria outbreak that killed 10 people will conclude and results will be made public.",
+		//		},
+		//		{
+		//			Title:   "San Jose, California Approves Sixth Costco Location",
+		//			Content: "The San Jose city council will approve the construction of a sixth Costco location in the city, making it the first US city to have six Costco stores.",
+		//		},
+		//	},
+		//}
+
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		err = view.NewsFeed(predictions.Predictions).Render(r.Context(), w)
+		err = view.EventFeed(predictions.Predictions).Render(r.Context(), w)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Error rendering template: %v", err), http.StatusInternalServerError)
 			return

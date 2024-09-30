@@ -1,0 +1,40 @@
+package view
+
+templ BaseLayout(contents templ.Component) {
+    <html lang="">
+        <head>
+            <title>Evedict</title>
+            <link rel="stylesheet" href="/static/styles.css">
+            <script src="https://unpkg.com/htmx.org"></script>
+        </head>
+        <body>
+            <header class="fixed-header">
+                <div class="container">
+                    <h1>Evedict</h1>
+                    <nav>
+                        <a href="/">Home</a>
+                        <a href="/about">About</a>
+                        <a href="/contact">Contact</a>
+                    </nav>
+                </div>
+            </header>
+            <main class="content">
+                @contents <!-- Inject the dynamic content passed to BaseLayout -->
+            </main>
+            <footer>
+                <p>&copy; 2024 Evedict</p>
+            </footer>
+        </body>
+    </html>
+}
+
+
+
+
+
+
+
+
+
+
+
