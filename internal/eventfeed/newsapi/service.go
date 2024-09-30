@@ -2,30 +2,37 @@ package newsapi
 
 import (
 	"encoding/json"
-	"github.com/qoentz/evedict/internal/httputil"
 	"io"
+	"net/http"
 )
 
 type Service struct {
-	APIKey  string
-	BaseURL string
+	HTTPClient *http.Client
+	APIKey     string
+	BaseURL    string
 }
 
-func NewNewsAPIService(apiKey, baseURL string) *Service {
+func NewNewsAPIService(client *http.Client, apiKey, baseURL string) *Service {
 	return &Service{
-		APIKey:  apiKey,
-		BaseURL: baseURL,
+		HTTPClient: client,
+		APIKey:     apiKey,
+		BaseURL:    baseURL,
 	}
 }
 
 func (n *Service) Fetch() ([]Article, error) {
-	resp, err := httputil.GetRequest(n.BaseURL + n.APIKey)
+	req, err := http.NewRequest("GET", n.BaseURL+n.APIKey, nil)
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Close()
 
-	respBody, err := io.ReadAll(resp)
+	resp, err := n.HTTPClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}

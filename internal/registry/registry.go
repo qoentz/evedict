@@ -13,7 +13,7 @@ type Registry struct {
 
 func NewRegistry(c *config.SystemConfig) *Registry {
 	replicateService := replicate.NewReplicateService(c.HTTPClient, c.EnvConfig.ReplicateModel, c.EnvConfig.ReplicateAPIKey)
-	newsAPIService := newsapi.NewNewsAPIService(c.EnvConfig.NewsAPIKey, c.EnvConfig.NewsAPIURL)
+	newsAPIService := newsapi.NewNewsAPIService(c.HTTPClient, c.EnvConfig.NewsAPIKey, c.EnvConfig.NewsAPIURL)
 	return &Registry{
 		ReplicateService: replicateService,
 		NewsAPIService:   newsAPIService,

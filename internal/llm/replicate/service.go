@@ -77,13 +77,13 @@ func (r *Service) GetPredictions(prompt string) (*llm.Predictions, error) {
 		time.Sleep(2 * time.Second)
 
 		// Get the prediction status
-		req, err := http.NewRequest("GET", prediction.URLs.Get, nil)
+		req, err = http.NewRequest("GET", prediction.URLs.Get, nil)
 		if err != nil {
 			return nil, fmt.Errorf("error creating GET request: %v", err)
 		}
 		req.Header.Set("Authorization", "Bearer "+r.APIKey)
 
-		resp, err := r.HTTPClient.Do(req)
+		resp, err = r.HTTPClient.Do(req)
 		if err != nil {
 			return nil, fmt.Errorf("error making GET request: %v", err)
 		}
