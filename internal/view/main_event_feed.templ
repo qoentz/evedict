@@ -10,7 +10,7 @@ templ EventFeed(predictions []llm.Prediction) {
     <div class="event-container">
         for _, p := range predictions {
             <div class="event-item">
-                <img src="/static/placeholder.jpg" alt="Event image" class="event-image" />
+                <img src="/static/images/placeholder.jpg" alt="Event image" class="event-image" />
                 <h2 class="event-headline">{ p.Title }</h2>
                 <p class="event-content">{ p.Content }</p>
             </div>

@@ -21,6 +21,10 @@ func InitRouter(config *config.SystemConfig, reg *registry.Registry) *mux.Router
 		http.FileServer(http.Dir("./static/")).ServeHTTP(w, r)
 	})))
 
+	router.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "./static/favicon.ico")
+	}).Methods("GET")
+
 	api := router.PathPrefix("/api").Subrouter()
 
 	api.Handle("/events", handler.GetEvents(reg.NewsAPIService, reg.ReplicateService, config.PromptTemplate)).Methods("GET")
