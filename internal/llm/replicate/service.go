@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/qoentz/evedict/internal/eventfeed/newsapi"
 	"github.com/qoentz/evedict/internal/llm"
 	"io"
 	"net/http"
@@ -27,7 +28,7 @@ func NewReplicateService(client *http.Client, modelURL string, apiKey string) *S
 	}
 }
 
-func (r *Service) GetPredictions(prompt string) (*llm.Predictions, error) {
+func (r *Service) GetPredictions(prompt string, articles []newsapi.Article) (*llm.Predictions, error) {
 	if len(prompt) == 0 {
 		return nil, fmt.Errorf("empty prompt provided")
 	}
@@ -128,6 +129,10 @@ func (r *Service) GetPredictions(prompt string) (*llm.Predictions, error) {
 	err = json.Unmarshal([]byte(outputStr), &predictions)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing prediction output: %v\nOutput Data:\n%s", err, outputStr)
+	}
+
+	for i := range predictions.Predictions {
+		predictions.Predictions[i].ImageURL = articles[i].URLToImage
 	}
 
 	return &predictions, nil

@@ -10,7 +10,13 @@ templ Header() {
                     <img src="/static/images/hand.png" alt="Hand" class="hand-image">
 
                     <!-- Clickable area with HTMX and hover -->
-                    <a href="#" hx-get="/api/events" hx-target="#event-feed" hx-trigger="click" hx-indicator="#loading-indicator">
+                    <a href="#"
+                       hx-get="/api/events"
+                       hx-target="#event-feed"
+                       hx-trigger="click"
+                       hx-indicator="#loading-indicator"
+                       hx-swap="innerHTML"
+                       hx-on::before-request="this.closest('body').querySelector('#event-feed').innerHTML = ''">
                         <img src="/static/images/crystal_ball.png" alt="Spinning Crystal Ball" class="spinning-ball">
                     </a>
                 </div>
@@ -24,3 +30,5 @@ templ Header() {
         </div>
     </header>
 }
+
+

@@ -1,7 +1,9 @@
 package llm
 
+import "github.com/qoentz/evedict/internal/eventfeed/newsapi"
+
 type Service interface {
-	GetPredictions(prompt string) (*Predictions, error)
+	GetPredictions(prompt string, articles []newsapi.Article) (*Predictions, error)
 }
 
 type Predictions struct {
@@ -9,6 +11,7 @@ type Predictions struct {
 }
 
 type Prediction struct {
-	Title   string `json:"title"`
-	Content string `json:"content"`
+	Title    string `json:"title"`
+	Content  string `json:"content"`
+	ImageURL string `json:"imageUrl"`
 }

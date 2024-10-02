@@ -2,10 +2,12 @@ package view
 
 templ Home() {
     @Base() {
+        <div id="loading-indicator" class="htmx-indicator">
+            <div class="spinner"></div> <!-- A spinner animation -->
+        </div>
+
         <div id="event-feed">
-            <div id="loading-indicator" class="htmx-indicator">
-                <div class="spinner"></div>  <!-- A spinner animation -->
-            </div>
+            <!-- Event feed content will be dynamically loaded here -->
         </div>
     }
 }
