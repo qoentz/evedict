@@ -6,13 +6,11 @@ import (
 	"net/http"
 )
 
-func EventFeedHandler() http.HandlerFunc {
+func Home() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		// Set content type to HTML
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 
-		// Render the main site with the templ component
-		err := view.MainEventFeed().Render(r.Context(), w)
+		err := view.Home().Render(r.Context(), w)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Error rendering main site: %v", err), http.StatusInternalServerError)
 			return

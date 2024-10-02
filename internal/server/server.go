@@ -15,7 +15,7 @@ import (
 func InitRouter(config *config.SystemConfig, reg *registry.Registry) *mux.Router {
 	router := mux.NewRouter().StrictSlash(true)
 
-	router.HandleFunc("/", handler.EventFeedHandler()).Methods("GET")
+	router.HandleFunc("/", handler.Home()).Methods("GET")
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
 		http.FileServer(http.Dir("./static/")).ServeHTTP(w, r)

@@ -2,10 +2,6 @@ package view
 
 import "github.com/qoentz/evedict/internal/llm"
 
-templ MainEventFeed() {
-    @BaseLayout()  <!-- The BaseLayout will handle rendering -->
-}
-
 templ EventFeed(predictions []llm.Prediction) {
     <div class="event-container">
         for _, p := range predictions {
@@ -17,11 +13,3 @@ templ EventFeed(predictions []llm.Prediction) {
         }
     </div>
 }
-
-
-
-
-
-
-
-
