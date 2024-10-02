@@ -131,8 +131,23 @@ func (r *Service) GetPredictions(prompt string, articles []newsapi.Article) (*ll
 		return nil, fmt.Errorf("error parsing prediction output: %v\nOutput Data:\n%s", err, outputStr)
 	}
 
+	usedImages := make(map[string]bool) // Map to track used images
+
 	for i := range predictions.Predictions {
-		predictions.Predictions[i].ImageURL = articles[i].URLToImage
+		// Assign the image directly if it's available and hasn't been used
+		if articles[i].URLToImage != "" && !usedImages[articles[i].URLToImage] {
+			predictions.Predictions[i].ImageURL = articles[i].URLToImage
+			usedImages[articles[i].URLToImage] = true // Mark image as used
+		} else {
+			// Try to find another available image that hasn't been used
+			for y := range articles {
+				if articles[y].URLToImage != "" && !usedImages[articles[y].URLToImage] {
+					predictions.Predictions[i].ImageURL = articles[y].URLToImage
+					usedImages[articles[y].URLToImage] = true // Mark image as used
+					break
+				}
+			}
+		}
 	}
 
 	return &predictions, nil
