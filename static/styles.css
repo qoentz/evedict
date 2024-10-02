@@ -60,7 +60,7 @@
     color: white;
     padding: 10px 0;
     z-index: 1000;
-    box-shadow: 0 4px 2px -2px gray;
+    box-shadow: 0 4px 2px -2px rgb(128, 128, 128);
 }
 
 .fixed-header .container {
@@ -81,6 +81,53 @@
 .fixed-header nav a:hover {
     text-decoration: underline;
 }
+
+/* Container for title and logo */
+.title-and-logo {
+    display: flex;
+    align-items: center;
+}
+
+/* Title */
+.title-and-logo h1 {
+    margin-right: 15px; /* Add some space between the title and the logo */
+    font-size: 40px;
+    color: white;
+}
+
+/* Container for hand and spinning ball */
+.logo-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    margin: 0; /* Remove extra margins */
+    padding: 0;
+}
+
+/* Static hand image */
+.hand-image {
+    z-index: 1;
+    height: 100px;
+    position: relative;
+}
+
+
+/* Spinning crystal ball */
+.spinning-ball {
+    position: absolute;
+    height: 60px; /* Ensure it matches the hand size */
+    width: 60px;
+    animation: rotation 8s linear infinite; /* Infinite rotation */
+    transform-origin: center;
+    top: -1px; /* Adjust this to align the ball over the hand */
+    left: 19px;
+    z-index: 2;
+}
+@keyframes rotation {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(359deg); }
+}
+
 
 /* Main content styling */
 .content {

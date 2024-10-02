@@ -10,7 +10,16 @@ templ BaseLayout(contents templ.Component) {
         <body>
             <header class="fixed-header">
                 <div class="container">
-                    <h1>Evedict</h1>
+                    <div class="title-and-logo">
+                        <h1>Evedict</h1>
+                        <!-- Logo container next to title -->
+                        <div class="logo-container">
+                            <!-- Static Hand Image -->
+                            <img src="/static/hand.png" alt="Hand" class="hand-image">
+                            <!-- Spinning Crystal Ball -->
+                            <img src="/static/crystal_ball.png" alt="Spinning Crystal Ball" class="spinning-ball">
+                        </div>
+                    </div>
                     <nav>
                         <a href="/">Home</a>
                         <a href="/about">About</a>
