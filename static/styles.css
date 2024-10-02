@@ -7,7 +7,7 @@
     border-right: 2px solid #e0e0e0; /* Right border */
     display: flex;
     flex-direction: column;
-    gap: 40px;
+    gap: 20px;
     background-color: #fafafa;       /* Optional background for better contrast */
 }
 
@@ -41,7 +41,7 @@
 
 /* Add some spacing between articles */
 .event-item + .event-item {
-    margin-top: 40px;
+    margin-top: 0;
 }
 
 /* Basic reset */
@@ -49,6 +49,12 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
 /* Fixed header */
@@ -94,6 +100,7 @@
     margin-left: 20px; /* Add some space between the title and the logo */
     font-size: 50px;
     color: white;
+    font-family: "Palatino", "Palatino Linotype", "Book Antiqua", serif;
 }
 
 /* Container for hand and spinning ball */
@@ -102,41 +109,99 @@
     display: inline-block;
 }
 
+.logo-container a {
+    position: absolute;
+    display: block;
+    height: 55px;
+    width: 55px;
+    top: -20px;
+    left: 16px;
+    z-index: 2;
+}
+
 /* Static hand image */
 .hand-image {
-    z-index: 2;
-    height: 45px;
+    z-index: 3;
+    height: 50px;
     position: relative;
-    top: 15px;
+    top: 17px;
+    pointer-events: none;
 }
 
 
 /* Spinning crystal ball */
 .spinning-ball {
     position: absolute;
-    height: 50px; /* Ensure it matches the hand size */
-    width: 50px;
+    height: 55px; /* Ensure it matches the hand size */
+    width: 55px;
     animation: rotation 10s linear infinite; /* Infinite rotation */
     transform-origin: center;
-    top: -15px; /* Adjust this to align the ball over the hand */
-    left: 9px;
+    top: 4px; /* Adjust this to align the ball over the hand */
+    left: -6px;
     z-index: 1;
+    pointer-events: all;
+    cursor: pointer;
 }
+
+.spinner {
+    border: 4px solid rgba(0, 0, 0, 0.2);  /* Light border */
+    border-top: 4px solid black;           /* Darker top border for the spinner effect */
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    animation: rotation 1s linear infinite;
+    margin: 0 auto;
+}
+
+/* Hide spinner initially with opacity */
+.htmx-indicator {
+    opacity: 0;
+    transition: opacity 500ms ease-in;  /* Smooth transition for fade-in/out */
+    position: absolute;  /* Absolutely position the spinner */
+    top: 50%;  /* Adjust to 50% of the height of the parent container */
+    left: 50%;  /* Center horizontally */
+    transform: translate(-50%, -50%);  /* Perfect centering */
+    z-index: 999;  /* Make sure it's above other elements */
+}
+
+/* Show spinner when a request is in progress */
+.htmx-request .htmx-indicator {
+    opacity: 1;  /* Make spinner visible */
+}
+
+#event-feed {
+    margin-top: 20px;
+    position: relative;  /* Required to position spinner inside this container */
+    min-height: 600px;  /* Ensure enough height for spinner positioning */
+}
+
 @keyframes rotation {
     from { transform: rotate(0deg); }
     to { transform: rotate(359deg); }
 }
 
+/* Hover effect on the spinning ball */
+.logo-container a:hover .spinning-ball {
+    filter: brightness(80%); /* Slightly dim the colors */
+    transform: scale(1.05); /* Slightly enlarge the ball on hover */
+    transition: transform 0.2s, filter 0.2s ease-in-out;
+}
+
 
 /* Main content styling */
 .content {
+    flex: 1;
     padding-top: 80px; /* To avoid overlap with the fixed header */
     max-width: 800px;
     margin: 0 auto;
 }
 
-/* News feed styling */
-.event-feed {
-    margin-top: 20px;
+footer {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 20px 0;
+    width: 100%;
+    margin-top: auto;  /* Push the footer to the bottom */
 }
 

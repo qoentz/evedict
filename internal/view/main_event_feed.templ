@@ -3,16 +3,7 @@ package view
 import "github.com/qoentz/evedict/internal/llm"
 
 templ MainEventFeed() {
-    @BaseLayout(LoadEventFeed())
-}
-
-templ LoadEventFeed() {
-    <div class="event-feed">
-        <!-- HTMX will dynamically load the news feed content -->
-        <div id="news-feed" hx-get="/api/events" hx-trigger="load">
-            <!-- HTMX will load the news feed here -->
-        </div>
-    </div>
+    @BaseLayout()  <!-- The BaseLayout will handle rendering -->
 }
 
 templ EventFeed(predictions []llm.Prediction) {

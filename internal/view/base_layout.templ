@@ -1,6 +1,7 @@
 package view
 
-templ BaseLayout(contents templ.Component) {
+templ BaseLayout() {
+<!DOCTYPE html>
     <html lang="">
         <head>
             <title>Evedict</title>
@@ -15,8 +16,11 @@ templ BaseLayout(contents templ.Component) {
                         <div class="logo-container">
                             <!-- Static Hand Image -->
                             <img src="/static/hand.png" alt="Hand" class="hand-image">
-                            <!-- Spinning Crystal Ball -->
-                            <img src="/static/crystal_ball.png" alt="Spinning Crystal Ball" class="spinning-ball">
+
+                            <!-- Clickable area with HTMX and hover -->
+                            <a href="#" hx-get="/api/events" hx-target="#event-feed" hx-trigger="click" hx-indicator="#loading-indicator">
+                                <img src="/static/crystal_ball.png" alt="Spinning Crystal Ball" class="spinning-ball">
+                            </a>
                         </div>
                         <h1>Evedict</h1>
                     </div>
@@ -28,7 +32,13 @@ templ BaseLayout(contents templ.Component) {
                 </div>
             </header>
             <main class="content">
-                @contents <!-- Inject the dynamic content passed to BaseLayout -->
+                <!-- Placeholder for event feed that will be populated when the ball is clicked -->
+                <div id="event-feed">
+                    <!-- Loading animation -->
+                    <div id="loading-indicator" class="htmx-indicator">
+                        <div class="spinner"></div> <!-- A spinner animation -->
+                    </div>
+                </div>
             </main>
             <footer>
                 <p>&copy; 2024 Evedict</p>
@@ -36,6 +46,8 @@ templ BaseLayout(contents templ.Component) {
         </body>
     </html>
 }
+
+
 
 
 
