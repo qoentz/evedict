@@ -29,3 +29,5 @@ go.work.sum
 
 # Templ generated
 *_templ.go
+
+.DS_Store
