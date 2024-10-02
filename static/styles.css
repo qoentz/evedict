@@ -91,7 +91,7 @@
 
 /* Title */
 .title-and-logo h1 {
-    margin-right: 15px; /* Add some space between the title and the logo */
+    margin-left: 20px; /* Add some space between the title and the logo */
     font-size: 50px;
     color: white;
 }
@@ -104,22 +104,23 @@
 
 /* Static hand image */
 .hand-image {
-    z-index: 1;
-    height: 55px;
+    z-index: 2;
+    height: 45px;
     position: relative;
+    top: 15px;
 }
 
 
 /* Spinning crystal ball */
 .spinning-ball {
     position: absolute;
-    height: 45px; /* Ensure it matches the hand size */
-    width: 45px;
-    animation: rotation 8s linear infinite; /* Infinite rotation */
+    height: 50px; /* Ensure it matches the hand size */
+    width: 50px;
+    animation: rotation 10s linear infinite; /* Infinite rotation */
     transform-origin: center;
     top: -15px; /* Adjust this to align the ball over the hand */
-    left: 16px;
-    z-index: 2;
+    left: 9px;
+    z-index: 1;
 }
 @keyframes rotation {
     from { transform: rotate(0deg); }
