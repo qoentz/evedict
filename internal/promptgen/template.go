@@ -9,7 +9,8 @@ import (
 )
 
 type PromptTemplate struct {
-	PredictEvents string `yaml:"predict_events"`
+	PredictEvents   string `yaml:"predict_events"`
+	ExtractKeywords string `yaml:"extract_keywords"`
 }
 
 type ArticleData struct {
@@ -17,7 +18,7 @@ type ArticleData struct {
 	Content string
 }
 
-func (p *PromptTemplate) CreatePromptWithArticles(articles []newsapi.Article) (string, error) {
+func (p *PromptTemplate) CreatePredictionPrompt(articles []newsapi.Article) (string, error) {
 	var articleData []ArticleData
 	for i, article := range articles {
 		if i >= 5 {
@@ -40,6 +41,25 @@ func (p *PromptTemplate) CreatePromptWithArticles(articles []newsapi.Article) (s
 	err = tmpl.Execute(&result, map[string]interface{}{
 		"Articles": articleData,
 	})
+	if err != nil {
+		return "", err
+	}
+
+	return result.String(), nil
+}
+
+func (p *PromptTemplate) CreateKeywordExtractionPrompt(article newsapi.Article) (string, error) {
+	articleData := ArticleData{
+		Title:   article.Title,
+		Content: article.Description,
+	}
+
+	tmpl, err := template.New("keywordPrompt").Parse(p.ExtractKeywords)
+	if err != nil {
+		return "", err
+	}
+	var result strings.Builder
+	err = tmpl.Execute(&result, articleData)
 	if err != nil {
 		return "", err
 	}

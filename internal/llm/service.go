@@ -4,6 +4,7 @@ import "github.com/qoentz/evedict/internal/eventfeed/newsapi"
 
 type Service interface {
 	GetPredictions(prompt string, articles []newsapi.Article) (*Predictions, error)
+	ExtractKeywords(prompt string) ([]string, error)
 }
 
 type Predictions struct {

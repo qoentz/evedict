@@ -16,3 +16,11 @@ predict_events: |
     Content: {{.Content}}
   {{end}}
 
+extract_keywords: |
+  Given the following news article, extract the two most important keywords that represent the central topics of the article:
+
+  Title: {{.Title}}
+  Content: {{.Content}}
+
+  Return exactly two keywords, separated by a comma, with no extra text or explanation.
+

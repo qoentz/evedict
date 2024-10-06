@@ -153,6 +153,111 @@ func (r *Service) GetPredictions(prompt string, articles []newsapi.Article) (*ll
 	return &predictions, nil
 }
 
+func (r *Service) ExtractKeywords(prompt string) ([]string, error) {
+	// Payload for the request
+	payload := RequestPayload{
+		Stream: false,
+		Input: Input{
+			Prompt:    prompt,
+			MaxTokens: 50, // Smaller max token size for keyword extraction
+		},
+	}
+
+	reqBody, err := json.Marshal(payload)
+	if err != nil {
+		return nil, fmt.Errorf("error marshaling request body: %v", err)
+	}
+
+	// Start the keyword extraction request (POST)
+	req, err := http.NewRequest("POST", r.ModelURL, bytes.NewBuffer(reqBody))
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+r.APIKey)
+
+	resp, err := r.HTTPClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
+		body, _ := io.ReadAll(resp.Body)
+		return nil, fmt.Errorf("unexpected status code: %d\nResponse Body:\n%s", resp.StatusCode, string(body))
+	}
+
+	// Decode the initial response to get the prediction status and URLs
+	var prediction ResponsePayload
+	err = json.NewDecoder(resp.Body).Decode(&prediction)
+	if err != nil {
+		return nil, fmt.Errorf("error parsing response JSON: %v", err)
+	}
+
+	// Polling for the prediction result
+	for prediction.Status != "succeeded" && prediction.Status != "failed" {
+		time.Sleep(2 * time.Second) // Wait before polling again
+
+		// Poll the status using the "get" URL
+		req, err = http.NewRequest("GET", prediction.URLs.Get, nil)
+		if err != nil {
+			return nil, fmt.Errorf("error creating GET request: %v", err)
+		}
+		req.Header.Set("Authorization", "Bearer "+r.APIKey)
+
+		resp, err = r.HTTPClient.Do(req)
+		if err != nil {
+			return nil, fmt.Errorf("error making GET request: %v", err)
+		}
+		defer resp.Body.Close()
+
+		if resp.StatusCode != http.StatusOK {
+			body, _ := io.ReadAll(resp.Body)
+			return nil, fmt.Errorf("unexpected status code: %d\nResponse Body:\n%s", resp.StatusCode, string(body))
+		}
+
+		// Update the prediction with the new status
+		err = json.NewDecoder(resp.Body).Decode(&prediction)
+		if err != nil {
+			return nil, fmt.Errorf("error parsing prediction JSON: %v", err)
+		}
+	}
+
+	// Handle the case where prediction.Output is an array of strings
+	var outputStr string
+	switch v := prediction.Output.(type) {
+	case string:
+		outputStr = v
+	case []interface{}:
+		// Concatenate the strings in the array
+		var builder strings.Builder
+		for _, item := range v {
+			if str, ok := item.(string); ok {
+				builder.WriteString(str)
+			} else {
+				return nil, fmt.Errorf("prediction output array contains non-string elements")
+			}
+		}
+		outputStr = builder.String()
+	default:
+		return nil, fmt.Errorf("unexpected type for prediction output: %T", prediction.Output)
+	}
+
+	// Split the output string by commas to extract the two keywords
+	keywords := strings.Split(strings.TrimSpace(outputStr), ",")
+	if len(keywords) != 2 {
+		return nil, fmt.Errorf("expected 2 keywords, got %d: %v", len(keywords), keywords)
+	}
+
+	// Trim any extra spaces around the keywords
+	for i := range keywords {
+		keywords[i] = strings.TrimSpace(keywords[i])
+	}
+
+	return keywords, nil
+}
+
 //func InitiateStream(prompt string) (string, error) {
 //	if len(prompt) == 0 {
 //		return "", fmt.Errorf("empty prompt provided")

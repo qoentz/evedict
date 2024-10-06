@@ -49,13 +49,13 @@ func ConfigureSystem() (*SystemConfig, error) {
 func NewEnvConfig() *EnvConfig {
 	replicateModel := os.Getenv("REPLICATE_MODEL")
 	replicateKey := os.Getenv("REPLICATE_KEY")
-	newsAPIUrl := os.Getenv("NEWS_API_URL")
+	baseNewsAPIURL := os.Getenv("NEWS_API_URL")
 	newsAPIKey := os.Getenv("NEWS_API_KEY")
 
 	return &EnvConfig{
 		ReplicateModel:  replicateModel,
 		ReplicateAPIKey: replicateKey,
-		NewsAPIURL:      newsAPIUrl,
+		NewsAPIURL:      baseNewsAPIURL,
 		NewsAPIKey:      newsAPIKey,
 	}
 

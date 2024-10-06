@@ -7,7 +7,7 @@ type Response struct {
 }
 
 type Article struct {
-	Source      Source `json:"eventfeed"`
+	Source      Source `json:"source"`
 	Author      string `json:"author"`
 	Title       string `json:"title"`
 	Description string `json:"description"`
