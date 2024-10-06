@@ -67,6 +67,24 @@ func GetGeneralPredictions(newsAPI *newsapi.Service, ai llm.Service, template *p
 			predictions = append(predictions, *prediction)
 		}
 
+		//predictions := []llm.Prediction{
+		//	{
+		//		Headline: "Tropical Storm Milton to Impact Florida",
+		//		Summary:  "Tropical Storm Milton is forecast to strengthen into a hurricane and head towards Florida, potentially impacting the western coast.",
+		//		Outcomes: []llm.Outcome{
+		//			{
+		//				Content:         "Milton makes landfall in Florida as a hurricane, causing significant damage and disruption.",
+		//				ConfidenceLevel: 85,
+		//			},
+		//			{
+		//				Content:         "Milton weakens before reaching Florida, resulting in minimal damage and impact",
+		//				ConfidenceLevel: 40,
+		//			},
+		//		},
+		//		ImageURL: "https://assets1.cbsnewsstatic.com/hub/i/r/2024/10/05/d93be9e3-3d8a-465b-b7c3-12e046e601d6/thumbnail/1200x630/2cc76f942edcd5b45a3ff75d6ae1fb8b/milton.jpg?v=0736ad3ef1e9ddfe1218648fe91d6c9b",
+		//	},
+		//}
+
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 		err = view.PredictionFeed(predictions).Render(r.Context(), w)
 		if err != nil {

@@ -11,9 +11,16 @@ type Prediction struct {
 	Summary  string    `json:"summary"`
 	Outcomes []Outcome `json:"outcomes"`
 	ImageURL string
+	Sources  []Source
 }
 
 type Outcome struct {
 	Content         string `json:"content"`
 	ConfidenceLevel int    `json:"confidenceLevel"`
+}
+
+type Source struct {
+	Name  string
+	Title string
+	URL   string
 }

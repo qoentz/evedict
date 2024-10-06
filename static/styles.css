@@ -11,17 +11,30 @@
     background-color: #fafafa;       /* Optional background for better contrast */
 }
 
-/* Each news item has a full-width image, headline, and content */
+/* Flex layout for each prediction item */
 .prediction-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch; /* Align both sides to stretch the height equally */
+    gap: 30px; /* Space between the article and the outcomes */
     border-bottom: 1px solid #e0e0e0;
     padding-bottom: 20px;
 }
 
-/* Full-width image */
+/* Full article content (image, headline, summary) on the left */
+.prediction-content {
+    display: flex;
+    flex-direction: column;
+    flex: 2;
+    margin-top: 20px; /* Add space above the article content */
+}
+
+/* Full-width image inside content */
 .prediction-image {
     width: 100%;
     height: auto;
     border-radius: 8px;
+    margin-bottom: 15px; /* Add space below the image */
 }
 
 /* Bold, large headline */
@@ -39,36 +52,95 @@
     color: #333;
 }
 
-/* Container for outcomes */
+/* Container for outcomes, positioned on the right side */
 .outcomes-container {
-    margin-top: 20px;
-    padding-left: 15px;  /* Indent for outcomes */
-    border-left: 3px solid #ddd;  /* Visual separation for outcomes */
+    margin-top: 15px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch; /* Stretch outcome items to remove any bottom gap */
+    justify-content: center; /* Center outcome items vertically */
+    gap: 20px; /* Reduced space between outcome items */
+    padding: 15px; /* Reduced padding inside container */
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid #ddd;
 }
 
-/* Each outcome item */
+/* Each outcome item with card-like design */
 .outcome-item {
-    margin-bottom: 10px;
+    text-align: center;
+    padding: 15px; /* Reduced padding inside each card */
+    border-radius: 10px;
+    font-weight: bold;
+    font-size: 18px; /* Maintained original font size */
+    background-color: #ffffff;
+    box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.05); /* Lighter shadow */
+    width: 100%;
+    margin-bottom: 5px; /* Reduced bottom margin */
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border-left: 3px solid; /* Thinner left border */
+}
+
+/* Very subtle card hover effect */
+.outcome-item:hover {
+    transform: translateY(-1px); /* Minimal lift on hover */
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.08); /* Slight shadow change */
+}
+
+/* Specific color themes based on confidence levels */
+.high {
+    background-color: #e6f4ea;
+    color: #2e7d32;
+    border-color: #2e7d32;
+}
+
+.medium {
+    background-color: #fff3e0;
+    color: #ef6c00;
+    border-color: #ef6c00;
+}
+
+.low {
+    background-color: #ffebee;
+    color: #c62828;
+    border-color: #c62828;
+}
+
+/* Prominent percentage display */
+.percentage-display {
+    font-size: 24px; /* Maintained original font size */
+    font-weight: bold;
+    margin-bottom: 8px; /* Reduced margin */
+    color: inherit;
 }
 
 /* Outcome content */
 .outcome-content {
-    font-size: 16px;
-    line-height: 1.5;
-    color: #555;
+    font-size: 16px; /* Maintained original font size */
+    line-height: 1.5; /* Maintained original line height */
+    color: #333;
 }
 
-/* Confidence level */
+/* Outcome badge */
+.outcome-badge {
+    font-size: 12px; /* Maintained original font size for badge */
+    padding: 2px 8px; /* Kept compact padding */
+    margin-top: 10px; /* Reduced space from content */
+    color: #fff;
+    background-color: #555;
+    border-radius: 10px;
+    text-transform: uppercase;
+}
+
+/* Confidence level with dynamic color and icons */
 .confidence-level {
-    font-size: 14px;
-    color: #888;
-    margin-top: 5px;
+    font-size: 16px; /* Maintained original font size */
+    font-weight: bold;
+    color: inherit;
 }
 
-/* Add some spacing between articles */
-.prediction-item + .prediction-item {
-    margin-top: 0;
-}
 
 /* Basic reset */
 * {

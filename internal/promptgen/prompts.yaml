@@ -10,6 +10,9 @@ predict_events: |
   - Title: {{.Title}}
     Description: {{.Description}}
   {{end}}
+  
+  Ensure that the headline, summary, and each outcome are written in complete sentences with proper punctuation. 
+  All sentences should be grammatically correct and free of spelling errors.
 
   Output the predictions as a single JSON object exactly matching the following format. 
   Do not include any additional text or explanations. Ensure that the JSON is compact, with 
