@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/qoentz/evedict/internal/eventfeed/newsapi"
 	"github.com/qoentz/evedict/internal/llm"
 	"io"
 	"net/http"
@@ -28,12 +27,68 @@ func NewReplicateService(client *http.Client, modelURL string, apiKey string) *S
 	}
 }
 
-func (r *Service) GetPredictions(prompt string, articles []newsapi.Article) (*llm.Predictions, error) {
-	if len(prompt) == 0 {
-		return nil, fmt.Errorf("empty prompt provided")
+func (s *Service) GetPrediction(prompt string) (*llm.Prediction, error) {
+	output, err := s.processRequest(prompt, 1024)
+	if err != nil {
+		return nil, err
 	}
 
-	maxTokens := 1024
+	var result llm.Prediction
+	err = json.Unmarshal([]byte(output), &result)
+	if err != nil {
+		return nil, fmt.Errorf("error parsing prediction output: %v\nOutput Data:\n%s", err, output)
+	}
+
+	return &result, nil
+}
+
+func (s *Service) SelectArticles(prompt string) ([]int, error) {
+	outputStr, err := s.processRequest(prompt, 100)
+	if err != nil {
+		return nil, err
+	}
+
+	type SelectionResponse struct {
+		Selected []int `json:"selected"`
+	}
+
+	var selection SelectionResponse
+	err = json.Unmarshal([]byte(outputStr), &selection)
+	if err != nil {
+		return nil, fmt.Errorf("error parsing selection output: %v\nOutput Data:\n%s", err, outputStr)
+	}
+
+	if len(selection.Selected) < 2 {
+		return nil, fmt.Errorf("expected 2 selected articles, got %d: %v", len(selection.Selected), selection.Selected)
+	}
+
+	return selection.Selected, nil
+}
+
+func (s *Service) ExtractKeywords(prompt string) ([]string, error) {
+	outputStr, err := s.processRequest(prompt, 50)
+	if err != nil {
+		return nil, err
+	}
+
+	keywords := strings.Split(strings.TrimSpace(outputStr), ",")
+	if len(keywords) != 2 {
+		return nil, fmt.Errorf("expected 2 keywords, got %d: %v", len(keywords), keywords)
+	}
+
+	for i := range keywords {
+		keywords[i] = strings.TrimSpace(keywords[i])
+	}
+
+	return keywords, nil
+}
+
+func (s *Service) processRequest(prompt string, maxTokens int) (string, error) {
+	if len(prompt) == 0 {
+		return "", fmt.Errorf("empty prompt provided")
+	}
+
+	// Construct the payload for the request
 	payload := RequestPayload{
 		Stream: false,
 		Input: Input{
@@ -44,187 +99,66 @@ func (r *Service) GetPredictions(prompt string, articles []newsapi.Article) (*ll
 
 	reqBody, err := json.Marshal(payload)
 	if err != nil {
-		return nil, fmt.Errorf("error marshaling request body: %v", err)
+		return "", fmt.Errorf("error marshaling request body: %v", err)
 	}
 
-	// Start the prediction
-	req, err := http.NewRequest("POST", r.ModelURL, bytes.NewBuffer(reqBody))
+	// Make the POST request
+	req, err := http.NewRequest("POST", s.ModelURL, bytes.NewBuffer(reqBody))
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Bearer "+r.APIKey)
+	req.Header.Set("Authorization", "Bearer "+s.APIKey)
 
-	resp, err := r.HTTPClient.Do(req)
+	resp, err := s.HTTPClient.Do(req)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
 		body, _ := io.ReadAll(resp.Body)
-		return nil, fmt.Errorf("unexpected status code: %d\nResponse Body:\n%s", resp.StatusCode, string(body))
-	}
-
-	var prediction ResponsePayload
-	err = json.NewDecoder(resp.Body).Decode(&prediction)
-	if err != nil {
-		return nil, fmt.Errorf("error parsing response JSON: %v", err)
-	}
-
-	// Poll for prediction completion using the "get" URL from the response
-	for prediction.Status != "succeeded" && prediction.Status != "failed" {
-		time.Sleep(2 * time.Second)
-
-		// Get the prediction status
-		req, err = http.NewRequest("GET", prediction.URLs.Get, nil)
-		if err != nil {
-			return nil, fmt.Errorf("error creating GET request: %v", err)
-		}
-		req.Header.Set("Authorization", "Bearer "+r.APIKey)
-
-		resp, err = r.HTTPClient.Do(req)
-		if err != nil {
-			return nil, fmt.Errorf("error making GET request: %v", err)
-		}
-		defer resp.Body.Close()
-
-		if resp.StatusCode != http.StatusOK {
-			body, _ := io.ReadAll(resp.Body)
-			return nil, fmt.Errorf("unexpected status code: %d\nResponse Body:\n%s", resp.StatusCode, string(body))
-		}
-
-		err = json.NewDecoder(resp.Body).Decode(&prediction)
-		if err != nil {
-			return nil, fmt.Errorf("error parsing prediction JSON: %v", err)
-		}
-	}
-
-	// Handle the case where prediction.Output is an array of strings
-	var outputStr string
-	switch v := prediction.Output.(type) {
-	case string:
-		outputStr = v
-	case []interface{}:
-		// Concatenate the strings in the array
-		var builder strings.Builder
-		for _, item := range v {
-			if str, ok := item.(string); ok {
-				builder.WriteString(str)
-			} else {
-				return nil, fmt.Errorf("prediction output array contains non-string elements")
-			}
-		}
-		outputStr = builder.String()
-	default:
-		return nil, fmt.Errorf("unexpected type for prediction output: %T", prediction.Output)
-	}
-
-	// Clean up the output string (optional)
-	outputStr = strings.TrimSpace(outputStr)
-
-	// Parse the output JSON into Predictions struct
-	var predictions llm.Predictions
-	err = json.Unmarshal([]byte(outputStr), &predictions)
-	if err != nil {
-		return nil, fmt.Errorf("error parsing prediction output: %v\nOutput Data:\n%s", err, outputStr)
-	}
-
-	usedImages := make(map[string]bool) // Map to track used images
-
-	for i := range predictions.Predictions {
-		// Assign the image directly if it's available and hasn't been used
-		if articles[i].URLToImage != "" && !usedImages[articles[i].URLToImage] {
-			predictions.Predictions[i].ImageURL = articles[i].URLToImage
-			usedImages[articles[i].URLToImage] = true // Mark image as used
-		} else {
-			// Try to find another available image that hasn't been used
-			for y := range articles {
-				if articles[y].URLToImage != "" && !usedImages[articles[y].URLToImage] {
-					predictions.Predictions[i].ImageURL = articles[y].URLToImage
-					usedImages[articles[y].URLToImage] = true // Mark image as used
-					break
-				}
-			}
-		}
-	}
-
-	return &predictions, nil
-}
-
-func (r *Service) ExtractKeywords(prompt string) ([]string, error) {
-	// Payload for the request
-	payload := RequestPayload{
-		Stream: false,
-		Input: Input{
-			Prompt:    prompt,
-			MaxTokens: 50, // Smaller max token size for keyword extraction
-		},
-	}
-
-	reqBody, err := json.Marshal(payload)
-	if err != nil {
-		return nil, fmt.Errorf("error marshaling request body: %v", err)
-	}
-
-	// Start the keyword extraction request (POST)
-	req, err := http.NewRequest("POST", r.ModelURL, bytes.NewBuffer(reqBody))
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Bearer "+r.APIKey)
-
-	resp, err := r.HTTPClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
-		body, _ := io.ReadAll(resp.Body)
-		return nil, fmt.Errorf("unexpected status code: %d\nResponse Body:\n%s", resp.StatusCode, string(body))
+		return "", fmt.Errorf("unexpected status code: %d\nResponse Body:\n%s", resp.StatusCode, string(body))
 	}
 
 	// Decode the initial response to get the prediction status and URLs
 	var prediction ResponsePayload
 	err = json.NewDecoder(resp.Body).Decode(&prediction)
 	if err != nil {
-		return nil, fmt.Errorf("error parsing response JSON: %v", err)
+		return "", fmt.Errorf("error parsing response JSON: %v", err)
 	}
 
-	// Polling for the prediction result
+	// Poll for completion if needed
 	for prediction.Status != "succeeded" && prediction.Status != "failed" {
-		time.Sleep(2 * time.Second) // Wait before polling again
+		time.Sleep(2 * time.Second)
 
 		// Poll the status using the "get" URL
 		req, err = http.NewRequest("GET", prediction.URLs.Get, nil)
 		if err != nil {
-			return nil, fmt.Errorf("error creating GET request: %v", err)
+			return "", fmt.Errorf("error creating GET request: %v", err)
 		}
-		req.Header.Set("Authorization", "Bearer "+r.APIKey)
+		req.Header.Set("Authorization", "Bearer "+s.APIKey)
 
-		resp, err = r.HTTPClient.Do(req)
+		resp, err = s.HTTPClient.Do(req)
 		if err != nil {
-			return nil, fmt.Errorf("error making GET request: %v", err)
+			return "", fmt.Errorf("error making GET request: %v", err)
 		}
 		defer resp.Body.Close()
 
 		if resp.StatusCode != http.StatusOK {
 			body, _ := io.ReadAll(resp.Body)
-			return nil, fmt.Errorf("unexpected status code: %d\nResponse Body:\n%s", resp.StatusCode, string(body))
+			return "", fmt.Errorf("unexpected status code: %d\nResponse Body:\n%s", resp.StatusCode, string(body))
 		}
 
 		// Update the prediction with the new status
 		err = json.NewDecoder(resp.Body).Decode(&prediction)
 		if err != nil {
-			return nil, fmt.Errorf("error parsing prediction JSON: %v", err)
+			return "", fmt.Errorf("error parsing prediction JSON: %v", err)
 		}
 	}
 
-	// Handle the case where prediction.Output is an array of strings
+	// Handle the output
 	var outputStr string
 	switch v := prediction.Output.(type) {
 	case string:
@@ -236,149 +170,13 @@ func (r *Service) ExtractKeywords(prompt string) ([]string, error) {
 			if str, ok := item.(string); ok {
 				builder.WriteString(str)
 			} else {
-				return nil, fmt.Errorf("prediction output array contains non-string elements")
+				return "", fmt.Errorf("prediction output array contains non-string elements")
 			}
 		}
 		outputStr = builder.String()
 	default:
-		return nil, fmt.Errorf("unexpected type for prediction output: %T", prediction.Output)
+		return "", fmt.Errorf("unexpected type for prediction output: %T", prediction.Output)
 	}
 
-	// Split the output string by commas to extract the two keywords
-	keywords := strings.Split(strings.TrimSpace(outputStr), ",")
-	if len(keywords) != 2 {
-		return nil, fmt.Errorf("expected 2 keywords, got %d: %v", len(keywords), keywords)
-	}
-
-	// Trim any extra spaces around the keywords
-	for i := range keywords {
-		keywords[i] = strings.TrimSpace(keywords[i])
-	}
-
-	return keywords, nil
+	return strings.TrimSpace(outputStr), nil
 }
-
-//func InitiateStream(prompt string) (string, error) {
-//	if len(prompt) == 0 {
-//		return "", fmt.Errorf("empty prompt provided")
-//	}
-//
-//	maxTokens := 1024
-//	payload := RequestPayload{
-//		Stream: false,
-//		Input: Input{
-//			Prompt:    prompt,
-//			MaxTokens: maxTokens,
-//		},
-//	}
-//
-//	reqBody, err := json.Marshal(payload)
-//	if err != nil {
-//		return "", fmt.Errorf("error marshaling request body: %v", err)
-//	}
-//
-//	resp, err := httputil.PostRequest(os.Getenv("REPLICA_MODEL"), reqBody, os.Getenv("REPLICA_KEY"))
-//	if err != nil {
-//		return "", err
-//	}
-//	defer resp.Close()
-//
-//	body, _ := io.ReadAll(resp)
-//	fmt.Println("HERE: ", string(body))
-//
-//	var response ResponsePayload
-//	err = json.NewDecoder(resp).Decode(&response)
-//	if err != nil {
-//		return "", fmt.Errorf("error decoding API response: %v", err)
-//	}
-//
-//	if response.URLs.Stream == "" {
-//		return "", fmt.Errorf("no stream URL found in the response")
-//	}
-//
-//	return response.URLs.Stream, nil
-//}
-//
-//func HandleStream(streamURL string) (*Predictions, error) {
-//	req, err := http.NewRequest("GET", streamURL, nil)
-//	if err != nil {
-//		return nil, fmt.Errorf("error creating request: %v", err)
-//	}
-//
-//	req.Header.Set("Accept", "text/event-stream")
-//	req.Header.Set("Cache-Control", "no-store")
-//
-//	resp, err := http.DefaultClient.Do(req)
-//	if err != nil {
-//		return nil, fmt.Errorf("error connecting to stream: %v", err)
-//	}
-//	defer resp.Body.Close()
-//
-//	if resp.StatusCode != http.StatusOK {
-//		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
-//	}
-//
-//	reader := bufio.NewReader(resp.Body)
-//	var output strings.Builder
-//
-//	for {
-//		line, err := reader.ReadString('\n')
-//		if err != nil {
-//			if err.Error() == "EOF" {
-//				break
-//			}
-//			return nil, fmt.Errorf("error reading stream: %v", err)
-//		}
-//
-//		// Accumulate and simulate writing out each "data:" line in real time
-//		line = strings.TrimSpace(line)
-//		if strings.HasPrefix(line, "data:") {
-//			data := strings.TrimPrefix(line, "data:")
-//			output.WriteString(data)
-//		} else if strings.HasPrefix(line, "event: done") {
-//			break
-//		}
-//	}
-//
-//	// Log the raw accumulated JSON data
-//	jsonString := output.String()
-//	fmt.Println("Accumulated JSON data:", jsonString)
-//
-//	// Use regex to clean up the keys (remove extra spaces around key names)
-//	re := regexp.MustCompile(`"\s*(\w+)\s*"\s*:`)
-//	jsonString = re.ReplaceAllString(jsonString, `"$1":`)
-//
-//	// Convert the cleaned JSON string to a struct
-//	var predictions Predictions
-//	err = json.Unmarshal([]byte(jsonString), &predictions)
-//	if err != nil {
-//		log.Printf("Error unmarshaling JSON: %v", err)
-//		log.Printf("Cleaned JSON: %s", jsonString) // Output the cleaned JSON for troubleshooting
-//		return nil, fmt.Errorf("error unmarshaling JSON: %v", err)
-//	}
-//
-//	// Post-process and clean up extra spaces in fields
-//	// Regex to remove extra spaces before punctuation
-//	spaceBeforePunct := regexp.MustCompile(`\s+([.,])`)
-//	multipleSpaces := regexp.MustCompile(`\s{2,}`)
-//
-//	for i := range predictions.Predictions {
-//		// Remove extra spaces between words and before punctuation in title and content
-//		predictions.Predictions[i].Title = spaceBeforePunct.ReplaceAllString(predictions.Predictions[i].Title, "$1")
-//		predictions.Predictions[i].Title = multipleSpaces.ReplaceAllString(predictions.Predictions[i].Title, " ")
-//		predictions.Predictions[i].Content = spaceBeforePunct.ReplaceAllString(predictions.Predictions[i].Content, "$1")
-//		predictions.Predictions[i].Content = multipleSpaces.ReplaceAllString(predictions.Predictions[i].Content, " ")
-//	}
-//
-//	// Marshal it back to a clean and formatted JSON string
-//	//cleanedJSON, err := json.MarshalIndent(predictions, "", "    ")
-//	//if err != nil {
-//	//	log.Printf("Error marshaling cleaned JSON: %v", err)
-//	//	return nil, fmt.Errorf("error marshaling cleaned JSON: %v", err)
-//	//}
-//
-//	// Output the polished JSON
-//	//fmt.Println(string(cleanedJSON))
-//
-//	return &predictions, nil
-//}

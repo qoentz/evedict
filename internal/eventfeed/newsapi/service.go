@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"strings"
 )
 
 type Service struct {
@@ -38,6 +39,33 @@ func (s *Service) FetchTopHeadlines(category Category) ([]Article, error) {
 	}
 
 	return articles, nil
+}
+
+func (s *Service) FetchWithKeywords(keywords []string) ([]Article, error) {
+	if len(keywords) == 0 {
+		return nil, fmt.Errorf("no keywords provided")
+	}
+
+	query := strings.Join(keywords, " ")
+
+	params := map[string]string{
+		"q":        query,
+		"pageSize": "10",
+		"sortBy":   "publishedAt",
+	}
+
+	path, err := s.ConstructURL(Everything, params)
+	if err != nil {
+		return nil, err
+	}
+
+	articles, err := s.Fetch(path)
+	if err != nil {
+		return nil, err
+	}
+
+	return articles, nil
+
 }
 
 func (s *Service) ConstructURL(endpoint Endpoint, params map[string]string) (string, error) {

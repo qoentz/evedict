@@ -1,6 +1,7 @@
 package promptgen
 
 import (
+	"fmt"
 	"github.com/qoentz/evedict/internal/eventfeed/newsapi"
 	"gopkg.in/yaml.v2"
 	"os"
@@ -10,56 +11,65 @@ import (
 
 type PromptTemplate struct {
 	PredictEvents   string `yaml:"predict_events"`
+	SelectArticles  string `yaml:"select_articles"`
 	ExtractKeywords string `yaml:"extract_keywords"`
 }
 
-type ArticleData struct {
-	Title   string
-	Content string
+func (p *PromptTemplate) CreatePredictionPrompt(mainArticle newsapi.Article, relatedArticles []newsapi.Article) (string, error) {
+	if mainArticle.Title == "" || mainArticle.Description == "" {
+		return "", fmt.Errorf("main article is missing title or description")
+	}
+
+	t, err := template.New("predictionPrompt").Parse(p.PredictEvents)
+	if err != nil {
+		return "", fmt.Errorf("error parsing template: %v", err)
+	}
+
+	data := struct {
+		MainArticle     newsapi.Article
+		RelatedArticles []newsapi.Article
+	}{
+		MainArticle:     mainArticle,
+		RelatedArticles: relatedArticles,
+	}
+
+	var promptBuilder strings.Builder
+	err = t.Execute(&promptBuilder, data)
+	if err != nil {
+		return "", fmt.Errorf("error executing template: %v", err)
+	}
+
+	return promptBuilder.String(), nil
 }
 
-func (p *PromptTemplate) CreatePredictionPrompt(articles []newsapi.Article) (string, error) {
-	var articleData []ArticleData
-	for i, article := range articles {
-		if i >= 5 {
-			break
-		}
-
-		if article.Description != "" {
-			articleData = append(articleData, ArticleData{
-				Title:   article.Title,
-				Content: article.Description,
-			})
-		}
-	}
-
-	tmpl, err := template.New("prompt").Parse(p.PredictEvents)
+func (p *PromptTemplate) CreateArticleSelectionPrompt(articles []newsapi.Article) (string, error) {
+	tmpl, err := template.New("selectionPrompt").Parse(p.SelectArticles)
 	if err != nil {
-		return "", err
-	}
-	var result strings.Builder
-	err = tmpl.Execute(&result, map[string]interface{}{
-		"Articles": articleData,
-	})
-	if err != nil {
-		return "", err
+		return "", fmt.Errorf("error parsing template: %v", err)
 	}
 
-	return result.String(), nil
+	data := struct {
+		Articles []newsapi.Article
+	}{
+		Articles: articles,
+	}
+
+	var promptBuilder strings.Builder
+	err = tmpl.Execute(&promptBuilder, data)
+	if err != nil {
+		return "", fmt.Errorf("error executing template: %v", err)
+	}
+
+	return promptBuilder.String(), nil
 }
 
 func (p *PromptTemplate) CreateKeywordExtractionPrompt(article newsapi.Article) (string, error) {
-	articleData := ArticleData{
-		Title:   article.Title,
-		Content: article.Description,
-	}
-
 	tmpl, err := template.New("keywordPrompt").Parse(p.ExtractKeywords)
 	if err != nil {
 		return "", err
 	}
 	var result strings.Builder
-	err = tmpl.Execute(&result, articleData)
+	err = tmpl.Execute(&result, article)
 	if err != nil {
 		return "", err
 	}

@@ -1,26 +1,60 @@
 predict_events: |
-  Based on the following articles, predict two future events that are likely to take place. 
+  Based on the following main news article, generate a summary prediction along with two possible outcomes, each with a confidence level between 0 and 100. 
+  Focus on the main article, but also consider related articles to provide more context.
+
+  Main Article Title: {{.MainArticle.Title}}
+  Main Article Content: {{.MainArticle.Content}}
+
+  Here are the related articles:
+  {{range .RelatedArticles}}
+  - Title: {{.Title}}
+    Description: {{.Description}}
+  {{end}}
+
   Output the predictions as a single JSON object exactly matching the following format. 
   Do not include any additional text or explanations. Ensure that the JSON is compact, with 
   field names and values properly formatted without extra spaces or line breaks. Do not include 
   any extra spaces before or after colons or field names.
+  
+  {
+    "headline": "Prediction Headline",
+    "summary": "Summary of the prediction",
+    "outcomes": [
+      {
+        "content": "First possible outcome",
+        "confidenceLevel": 80
+      },
+      {
+        "content": "Second possible outcome",
+        "confidenceLevel": 60
+      }
+    ]
+  }
 
-  Example:
+select_articles: |
+  Based on the following articles, select two articles that would make for interesting predictions.
 
-  {"predictions":[{"title":"Prediction Title 1","content":"Details of the first predicted event."},
-                  {"title":"Prediction Title 2","content":"Details of the second predicted event."}]}
-
-  Here are the articles:
-  {{range .Articles}}
-  - Title: {{.Title}}
-    Content: {{.Content}}
+  Articles:
+  {{range $index, $article := .Articles}}
+  {{$index}}. Title: {{ $article.Title }}
+     Description: {{ $article.Description }}
   {{end}}
+  
+  Return only the array positions (indices) of the two chosen articles as a single JSON object exactly matching the following format. 
+  Do not include any additional text or explanations. Ensure that the JSON is compact, with 
+  field names and values properly formatted without extra spaces or line breaks. Do not include 
+  any extra spaces before or after colons or field names.
+  
+  {
+    "selected": [index1, index2]
+  }
+
 
 extract_keywords: |
   Given the following news article, extract the two most important keywords that represent the central topics of the article:
 
   Title: {{.Title}}
-  Content: {{.Content}}
+  Description: {{.Description}}
 
   Return exactly two keywords, separated by a comma, with no extra text or explanation.
 

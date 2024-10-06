@@ -1,33 +1,31 @@
 package handler
 
 import (
-	"fmt"
 	"github.com/qoentz/evedict/internal/eventfeed/newsapi"
 	"github.com/qoentz/evedict/internal/llm"
 	"github.com/qoentz/evedict/internal/promptgen"
-	"github.com/qoentz/evedict/internal/view"
 	"net/http"
 )
 
 func GetEvents(newsAPI *newsapi.Service, ai llm.Service, template *promptgen.PromptTemplate) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		data, err := newsAPI.Fetch("e")
-		if err != nil {
-			http.Error(w, fmt.Sprintf("Error fetching data from GDELT: %v", err), http.StatusInternalServerError)
-			return
-		}
-
-		prompt, err := template.CreatePredictionPrompt(data)
-		if err != nil {
-			http.Error(w, fmt.Sprintf("Error building prompt: %v", err), http.StatusInternalServerError)
-			return
-		}
-
-		predictions, err := ai.GetPredictions(prompt, data)
-		if err != nil {
-			http.Error(w, fmt.Sprintf("Error getting response: %v", err), http.StatusInternalServerError)
-			return
-		}
+		//data, err := newsAPI.Fetch("e")
+		//if err != nil {
+		//	http.Error(w, fmt.Sprintf("Error fetching data from GDELT: %v", err), http.StatusInternalServerError)
+		//	return
+		//}
+		//
+		//prompt, err := template.CreatePredictionPrompt(data)
+		//if err != nil {
+		//	http.Error(w, fmt.Sprintf("Error building prompt: %v", err), http.StatusInternalServerError)
+		//	return
+		//}
+		//
+		//predictions, err := ai.GetGeneralPredictions(prompt, data)
+		//if err != nil {
+		//	http.Error(w, fmt.Sprintf("Error getting response: %v", err), http.StatusInternalServerError)
+		//	return
+		//}
 
 		//predictions := &llm.Predictions{
 		//	Predictions: []llm.Prediction{
@@ -42,12 +40,12 @@ func GetEvents(newsAPI *newsapi.Service, ai llm.Service, template *promptgen.Pro
 		//	},
 		//}
 
-		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		err = view.EventFeed(predictions.Predictions).Render(r.Context(), w)
-		if err != nil {
-			http.Error(w, fmt.Sprintf("Error rendering template: %v", err), http.StatusInternalServerError)
-			return
-		}
+		//w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		//err = view.EventFeed(predictions.Predictions).Render(r.Context(), w)
+		//if err != nil {
+		//	http.Error(w, fmt.Sprintf("Error rendering template: %v", err), http.StatusInternalServerError)
+		//	return
+		//}
 
 		//w.Header().Set("Content-Type", "application/json")
 		//err = json.NewEncoder(w).Encode(predictions)

@@ -1,18 +1,19 @@
 package llm
 
-import "github.com/qoentz/evedict/internal/eventfeed/newsapi"
-
 type Service interface {
-	GetPredictions(prompt string, articles []newsapi.Article) (*Predictions, error)
+	GetPrediction(prompt string) (*Prediction, error)
+	SelectArticles(prompt string) ([]int, error)
 	ExtractKeywords(prompt string) ([]string, error)
 }
 
-type Predictions struct {
-	Predictions []Prediction `json:"predictions"`
+type Prediction struct {
+	Headline string    `json:"headline"`
+	Summary  string    `json:"summary"`
+	Outcomes []Outcome `json:"outcomes"`
+	ImageURL string
 }
 
-type Prediction struct {
-	Title    string `json:"title"`
-	Content  string `json:"content"`
-	ImageURL string `json:"imageUrl"`
+type Outcome struct {
+	Content         string `json:"content"`
+	ConfidenceLevel int    `json:"confidenceLevel"`
 }
