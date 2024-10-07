@@ -1,6 +1,8 @@
 predict_events: |
-  Based on the following main news article, generate a comprehensive summary prediction along with two possible outcomes, each with a confidence level between 0 and 100. 
-  Focus on the main article, but also consider related articles to provide a broader context. The summary should capture key points from the main article and include relevant details from the related articles.
+  Based on the following main news article, generate a reflective summary prediction that substantiates two possible outcomes, each with a confidence level between 0 and 100.
+  
+  The summary should provide insightful support for the outcomes by incorporating key points from the main article and adding context from related articles. 
+  Craft a headline that highlights the most intriguing aspect of the prediction, focusing on the most captivating outcome rather than the one with the highest confidence level.
 
   Main Article Title: {{.MainArticle.Title}}
   Main Article Content: {{.MainArticle.Content}}
@@ -11,8 +13,8 @@ predict_events: |
     Description: {{.Description}}
   {{end}}
   
-  Ensure that the headline, summary, and each outcome are written in complete sentences with proper punctuation. 
-  The summary should be at least two to three sentences long, providing sufficient detail to make it more substantial than the outcomes.
+  Ensure the headline, summary, and each outcome are written in complete sentences with proper punctuation. 
+  The summary should be at least two to three sentences long, providing a detailed and reflective account that supports the outcomes.
   
   Output the predictions as a single JSON object exactly matching the following format. 
   Do not include any additional text or explanations. Ensure that the JSON is compact, with 
