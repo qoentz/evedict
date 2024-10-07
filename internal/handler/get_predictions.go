@@ -77,7 +77,19 @@ func GetPredictions(newsAPI *newsapi.Service, ai llm.Service, template *promptge
 			prediction.ImageURL = mainArticle.URLToImage
 
 			var sources []llm.Source
+
+			mainSource := llm.Source{
+				Name:  mainArticle.Source.Name,
+				Title: mainArticle.Title,
+				URL:   mainArticle.URL,
+			}
+			sources = append(sources, mainSource)
+
 			for _, article := range articles {
+				if article.URL == mainArticle.URL {
+					continue
+				}
+
 				source := llm.Source{
 					Name:  article.Source.Name,
 					Title: article.Title,
