@@ -15,7 +15,7 @@
 .prediction-item {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start; /* Align both sides to stretch the height equally */
+    align-items: stretch; /* Align both sides to stretch the height equally */
     gap: 30px; /* Space between the article and the outcomes */
     border-bottom: 1px solid #e0e0e0;
     padding-bottom: 20px;

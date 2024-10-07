@@ -11,7 +11,7 @@ import (
 
 func GetGeneralPredictions(newsAPI *newsapi.Service, ai llm.Service, template *promptgen.PromptTemplate) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		headlines, err := newsAPI.FetchTopHeadlines(newsapi.Entertainment)
+		headlines, err := newsAPI.FetchTopHeadlines(newsapi.General)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Error fetching headlines from NewsAPI: %v", err), http.StatusInternalServerError)
 			return
