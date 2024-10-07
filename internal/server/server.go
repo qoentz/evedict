@@ -26,8 +26,7 @@ func InitRouter(config *config.SystemConfig, reg *registry.Registry) *mux.Router
 	}).Methods("GET")
 
 	api := router.PathPrefix("/api").Subrouter()
-
-	api.Handle("/predictions/general", handler.GetGeneralPredictions(reg.NewsAPIService, reg.ReplicateService, config.PromptTemplate)).Methods("GET")
+	api.Handle("/predictions", handler.GetPredictions(reg.NewsAPIService, reg.ReplicateService, config.PromptTemplate)).Methods("GET")
 
 	router.NotFoundHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "", http.StatusNotFound)

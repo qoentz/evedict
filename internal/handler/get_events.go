@@ -21,7 +21,7 @@ func GetEvents(newsAPI *newsapi.Service, ai llm.Service, template *promptgen.Pro
 		//	return
 		//}
 		//
-		//predictions, err := ai.GetGeneralPredictions(prompt, data)
+		//predictions, err := ai.GetPredictions(prompt, data)
 		//if err != nil {
 		//	http.Error(w, fmt.Sprintf("Error getting response: %v", err), http.StatusInternalServerError)
 		//	return

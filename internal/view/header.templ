@@ -8,10 +8,8 @@ templ Header() {
                 <div class="logo-container">
                     <!-- Static Hand Image -->
                     <img src="/static/images/hand.png" alt="Hand" class="hand-image">
-
-                    <!-- Clickable area with HTMX and hover -->
                     <a href="#"
-                       hx-get="/api/predictions/general"
+                       hx-get="/api/predictions?category=general"
                        hx-target="#prediction-feed"
                        hx-trigger="click"
                        hx-indicator="#loading-indicator"
@@ -24,6 +22,24 @@ templ Header() {
             </div>
             <nav>
                 <a href="/">Home</a>
+                <div class="category-dropdown">
+                    <form hx-get="/api/predictions"
+                          hx-trigger="change"
+                          hx-target="#prediction-feed"
+                          hx-indicator="#loading-indicator"
+                          hx-on::before-request="this.closest('body').querySelector('#prediction-feed').innerHTML = ''">
+                        <select id="category-select" name="category">
+                            <option value="" selected hidden>Category</option>
+                            <option value="general">General</option>
+                            <option value="business">Business</option>
+                            <option value="entertainment">Entertainment</option>
+                            <option value="health">Health</option>
+                            <option value="science">Science</option>
+                            <option value="sports">Sports</option>
+                            <option value="technology">Technology</option>
+                        </select>
+                    </form>
+                </div>
                 <a href="/about">About</a>
                 <a href="/contact">Contact</a>
             </nav>

@@ -9,9 +9,20 @@ import (
 	"net/http"
 )
 
-func GetGeneralPredictions(newsAPI *newsapi.Service, ai llm.Service, template *promptgen.PromptTemplate) http.HandlerFunc {
+func GetPredictions(newsAPI *newsapi.Service, ai llm.Service, template *promptgen.PromptTemplate) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		headlines, err := newsAPI.FetchTopHeadlines(newsapi.General)
+		category := r.URL.Query().Get("category")
+		if category == "" {
+			category = "general"
+		}
+
+		newsCategory, err := newsAPI.ParseCategory(category)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Invalid category: %v", err), http.StatusBadRequest)
+			return
+		}
+
+		headlines, err := newsAPI.FetchTopHeadlines(newsCategory)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Error fetching headlines from NewsAPI: %v", err), http.StatusInternalServerError)
 			return
