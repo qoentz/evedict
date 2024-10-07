@@ -11,7 +11,7 @@ import (
 
 func GetGeneralPredictions(newsAPI *newsapi.Service, ai llm.Service, template *promptgen.PromptTemplate) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		headlines, err := newsAPI.FetchTopHeadlines(newsapi.General)
+		headlines, err := newsAPI.FetchTopHeadlines(newsapi.Entertainment)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Error fetching headlines from NewsAPI: %v", err), http.StatusInternalServerError)
 			return
@@ -69,19 +69,34 @@ func GetGeneralPredictions(newsAPI *newsapi.Service, ai llm.Service, template *p
 
 		//predictions := []llm.Prediction{
 		//	{
-		//		Headline: "Tropical Storm Milton to Impact Florida",
-		//		Summary:  "Tropical Storm Milton is forecast to strengthen into a hurricane and head towards Florida, potentially impacting the western coast.",
+		//		Headline: "CM Punk's Victory at WWE Bad Blood 2024 Sets Stage for Future Rivalries",
+		//		Summary:  "With CM Punk's win over Drew McIntyre at WWE Bad Blood 2024, the stage is set for future grudge matches and potential rivalries, including a possible feud with Judgment Day.",
 		//		Outcomes: []llm.Outcome{
 		//			{
-		//				Content:         "Milton makes landfall in Florida as a hurricane, causing significant damage and disruption.",
+		//				Content:         "CM Punk will face Damian Priest in a future premium live event, reigniting their rivalry and leading to a potential title shot.",
 		//				ConfidenceLevel: 85,
 		//			},
 		//			{
-		//				Content:         "Milton weakens before reaching Florida, resulting in minimal damage and impact",
-		//				ConfidenceLevel: 40,
+		//				Content:         "Nia Jax's retention of the WWE Women's Championship will lead to a prolonged feud with Bayley, with Tiffany Stratton potentially playing a key role in the storyline.",
+		//				ConfidenceLevel: 70,
 		//			},
 		//		},
-		//		ImageURL: "https://assets1.cbsnewsstatic.com/hub/i/r/2024/10/05/d93be9e3-3d8a-465b-b7c3-12e046e601d6/thumbnail/1200x630/2cc76f942edcd5b45a3ff75d6ae1fb8b/milton.jpg?v=0736ad3ef1e9ddfe1218648fe91d6c9b",
+		//		ImageURL: "https://sportshub.cbsistatic.com/i/r/2024/10/03/15b4e4b1-860c-4c7b-a10f-52ff3c4a3544/thumbnail/1200x675/ccbcc8e93f34a6b94258f1b400b7c4f9/cm-punk-cage.jpg",
+		//	},
+		//	{
+		//		Headline: "Joker 2's Box Office Performance to Suffer Due to Poor Reception",
+		//		Summary:  "The sequel to the critically acclaimed Joker film has received a historically low CinemaScore, indicating a poor reception from audiences, which may negatively impact its box office performance.",
+		//		Outcomes: []llm.Outcome{
+		//			{
+		//				Content:         "Joker 2 will fail to reach the $200 million mark in its domestic box office run, leading to a significant financial loss for the studio.",
+		//				ConfidenceLevel: 80,
+		//			},
+		//			{
+		//				Content:         "Despite the poor reception, Joker 2 will still manage to gross over $300 million domestically, but its performance will be considered a disappointment compared to its predecessor.",
+		//				ConfidenceLevel: 60,
+		//			},
+		//		},
+		//		ImageURL: "https://variety.com/wp-content/uploads/2024/04/Screen-Shot-2024-04-09-at-9.01.48-PM.png?w=1000&h=563&crop=1",
 		//	},
 		//}
 

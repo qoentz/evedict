@@ -7,7 +7,7 @@
     border-right: 2px solid #e0e0e0; /* Right border */
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 10px;
     background-color: #fafafa;       /* Optional background for better contrast */
 }
 
@@ -15,10 +15,11 @@
 .prediction-item {
     display: flex;
     justify-content: space-between;
-    align-items: stretch; /* Align both sides to stretch the height equally */
+    align-items: flex-start; /* Align both sides to stretch the height equally */
     gap: 30px; /* Space between the article and the outcomes */
     border-bottom: 1px solid #e0e0e0;
     padding-bottom: 20px;
+    margin-top: 15px;
 }
 
 /* Full article content (image, headline, summary) on the left */
@@ -26,7 +27,6 @@
     display: flex;
     flex-direction: column;
     flex: 2;
-    margin-top: 20px; /* Add space above the article content */
 }
 
 /* Full-width image inside content */
@@ -52,20 +52,23 @@
     color: #333;
 }
 
-/* Container for outcomes, positioned on the right side */
 .outcomes-container {
-    margin-top: 15px;
     flex: 1;
     display: flex;
     flex-direction: column;
-    align-items: stretch; /* Stretch outcome items to remove any bottom gap */
-    justify-content: center; /* Center outcome items vertically */
-    gap: 20px; /* Reduced space between outcome items */
-    padding: 15px; /* Reduced padding inside container */
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 15px;
     background-color: #f9f9f9;
     border-radius: 10px;
-    box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.1);
-    border: 1px solid #ddd;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15); /* Slightly more visible shadow */
+    border: 1.5px solid #ccc; /* A bit thicker and darker border for clarity */
+}
+
+
+.outcome-item + .outcome-item {
+    margin-top: 5px; /* Increase spacing between outcome items */
 }
 
 /* Each outcome item with card-like design */
@@ -77,8 +80,8 @@
     font-size: 18px; /* Maintained original font size */
     background-color: #ffffff;
     box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.05); /* Lighter shadow */
+    flex-grow: 1; /* Stretch outcome items to evenly fill space */
     width: 100%;
-    margin-bottom: 5px; /* Reduced bottom margin */
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     border-left: 3px solid; /* Thinner left border */
 }
@@ -121,17 +124,20 @@
     font-size: 16px; /* Maintained original font size */
     line-height: 1.5; /* Maintained original line height */
     color: #333;
+    flex-grow: 1; /* Ensures content fills the available space within each item */
 }
 
-/* Outcome badge */
-.outcome-badge {
-    font-size: 12px; /* Maintained original font size for badge */
-    padding: 2px 8px; /* Kept compact padding */
-    margin-top: 10px; /* Reduced space from content */
-    color: #fff;
-    background-color: #555;
-    border-radius: 10px;
+.outcomes-title {
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+    text-align: center;
     text-transform: uppercase;
+    letter-spacing: 1px; /* Slight letter spacing for elegance */
+    border-bottom: 2px solid #ddd; /* Optional: underlined for emphasis */
+    padding-bottom: 5px; /* Padding under the text for border separation */
+    width: 100%; /* Full width to align with container */
+    margin-bottom: 0;
 }
 
 /* Confidence level with dynamic color and icons */

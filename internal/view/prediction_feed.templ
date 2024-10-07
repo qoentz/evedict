@@ -18,13 +18,13 @@ templ PredictionFeed(predictions []llm.Prediction) {
                 </div> <!-- End of prediction-content -->
 
                 <div class="outcomes-container">
+                    <h3 class="outcomes-title">Outcomes</h3>
                     for _, outcome := range p.Outcomes {
                         <div class={ "outcome-item", confidenceClass(outcome.ConfidenceLevel) }>
                             <div class="percentage-display">
                                 { fmt.Sprintf("%d", outcome.ConfidenceLevel) }%
                             </div>
                             <p class="outcome-content">{ outcome.Content }</p>
-                            <span class="outcome-badge">Outcome</span>
                         </div>
                     }
                 </div>
