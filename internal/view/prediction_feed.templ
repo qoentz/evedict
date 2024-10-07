@@ -14,10 +14,12 @@ templ PredictionFeed(predictions []llm.Prediction) {
                     <div class="prediction-details">
                         <h2 class="prediction-headline">{ p.Headline }</h2>
                         <p class="prediction-summary">{ p.Summary }</p>
-                    </div> <!-- End of prediction-details -->
-                </div> <!-- End of prediction-content -->
+                    </div>
+                </div>
 
+                <!-- Outcomes container with page fold effect button -->
                 <div class="outcomes-container">
+                    <div class="toggle-button" onclick="toggleSources(this)" title="Sources"></div>
                     <h3 class="outcomes-title">Outcomes</h3>
                     for _, outcome := range p.Outcomes {
                         <div class={ "outcome-item", confidenceClass(outcome.ConfidenceLevel) }>
@@ -28,10 +30,27 @@ templ PredictionFeed(predictions []llm.Prediction) {
                         </div>
                     }
                 </div>
-            </div> <!-- End of prediction-item -->
+
+                <!-- Sources list with identical styling and back button -->
+                <div class="sources-list hidden">
+                    <div class="toggle-button" onclick="toggleSources(this)" title="Outcomes"></div>
+                    <h3 class="sources-title">Sources</h3>
+                    <ul>
+                            for _, source := range p.Sources {
+                                <li>
+                                    <a href={ templ.URL(source.URL) } target="_blank" class="source-title">{ source.Title }</a>
+                                    <span class="source-name"> - <em>{ source.Name }</em></span>
+                                </li>
+                            }
+                        </ul>
+                </div>
+            </div>
         }
-    </div> <!-- End of prediction-container -->
+    </div>
 }
+
+
+
 
 func confidenceClass(confidence int) string {
     if confidence >= 70 {

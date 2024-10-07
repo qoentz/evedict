@@ -50,7 +50,7 @@ func (s *Service) FetchWithKeywords(keywords []string) ([]Article, error) {
 
 	params := map[string]string{
 		"q":        query,
-		"pageSize": "10",
+		"pageSize": "8",
 		"sortBy":   "publishedAt",
 	}
 

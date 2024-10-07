@@ -1,6 +1,6 @@
 predict_events: |
-  Based on the following main news article, generate a summary prediction along with two possible outcomes, each with a confidence level between 0 and 100. 
-  Focus on the main article, but also consider related articles to provide more context.
+  Based on the following main news article, generate a comprehensive summary prediction along with two possible outcomes, each with a confidence level between 0 and 100. 
+  Focus on the main article, but also consider related articles to provide a broader context. The summary should capture key points from the main article and include relevant details from the related articles.
 
   Main Article Title: {{.MainArticle.Title}}
   Main Article Content: {{.MainArticle.Content}}
@@ -12,8 +12,8 @@ predict_events: |
   {{end}}
   
   Ensure that the headline, summary, and each outcome are written in complete sentences with proper punctuation. 
-  All sentences should be grammatically correct and free of spelling errors.
-
+  The summary should be at least two to three sentences long, providing sufficient detail to make it more substantial than the outcomes.
+  
   Output the predictions as a single JSON object exactly matching the following format. 
   Do not include any additional text or explanations. Ensure that the JSON is compact, with 
   field names and values properly formatted without extra spaces or line breaks. Do not include 
@@ -21,7 +21,7 @@ predict_events: |
   
   {
     "headline": "Prediction Headline",
-    "summary": "Summary of the prediction",
+    "summary": "Detailed summary of the prediction",
     "outcomes": [
       {
         "content": "First possible outcome",
@@ -33,6 +33,7 @@ predict_events: |
       }
     ]
   }
+
 
 select_articles: |
   Based on the following articles, select two articles that would make for interesting predictions.

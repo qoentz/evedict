@@ -75,6 +75,19 @@ func GetPredictions(newsAPI *newsapi.Service, ai llm.Service, template *promptge
 			}
 
 			prediction.ImageURL = mainArticle.URLToImage
+
+			var sources []llm.Source
+			for _, article := range articles {
+				source := llm.Source{
+					Name:  article.Source.Name,
+					Title: article.Title,
+					URL:   article.URL,
+				}
+
+				sources = append(sources, source)
+			}
+
+			prediction.Sources = sources
 			predictions = append(predictions, *prediction)
 		}
 
@@ -93,6 +106,13 @@ func GetPredictions(newsAPI *newsapi.Service, ai llm.Service, template *promptge
 		//			},
 		//		},
 		//		ImageURL: "https://sportshub.cbsistatic.com/i/r/2024/10/03/15b4e4b1-860c-4c7b-a10f-52ff3c4a3544/thumbnail/1200x675/ccbcc8e93f34a6b94258f1b400b7c4f9/cm-punk-cage.jpg",
+		//		Sources: []llm.Source{
+		//			{
+		//				Title: "M4 MacBook Pro: Four things to expect with Apple’s next Pro laptop",
+		//				Name:  "9to5Mac",
+		//				URL:   "https://9to5mac.com/2024/10/06/m4-macbook-pro-roundup/",
+		//			},
+		//		},
 		//	},
 		//	{
 		//		Headline: "Joker 2's Box Office Performance to Suffer Due to Poor Reception",
