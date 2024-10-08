@@ -9,6 +9,9 @@ templ PredictionFeed(predictions []llm.Prediction) {
     <div class="prediction-container">
         for _, p := range predictions {
             <div class="prediction-item">
+            <div class="timestamp">
+                 { p.Timestamp.Format("02 Jan 2006, 15:04") }
+            </div>
                 <div class="prediction-content">
                     <img src={ p.ImageURL } alt="Prediction image" class="prediction-image" />
                     <div class="prediction-details">

@@ -23,6 +23,18 @@
     flex-wrap: wrap; /* Enables wrapping for sources at the bottom */
 }
 
+.timestamp {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-size: 0.8em; /* Slightly larger font for readability */
+    font-weight: normal;
+    color: #ccc; /* Lighter gray for better contrast */
+    background-color: rgba(0, 0, 0, 0.7); /* Darker background for more contrast */
+    padding: 2px 5px;
+    border-radius: 3px;
+}
+
 /* Full article content (image, headline, summary) on the left */
 .prediction-content {
     display: flex;

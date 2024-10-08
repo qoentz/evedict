@@ -1,5 +1,7 @@
 package llm
 
+import "time"
+
 type Service interface {
 	GetPrediction(prompt string) (*Prediction, error)
 	SelectArticles(prompt string) ([]int, error)
@@ -7,11 +9,12 @@ type Service interface {
 }
 
 type Prediction struct {
-	Headline string    `json:"headline"`
-	Summary  string    `json:"summary"`
-	Outcomes []Outcome `json:"outcomes"`
-	ImageURL string
-	Sources  []Source
+	Headline  string    `json:"headline"`
+	Summary   string    `json:"summary"`
+	Outcomes  []Outcome `json:"outcomes"`
+	ImageURL  string
+	Sources   []Source
+	Timestamp time.Time
 }
 
 type Outcome struct {

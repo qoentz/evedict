@@ -7,6 +7,7 @@ import (
 	"github.com/qoentz/evedict/internal/promptgen"
 	"github.com/qoentz/evedict/internal/view"
 	"net/http"
+	"time"
 )
 
 func GetPredictions(newsAPI *newsapi.Service, ai llm.Service, template *promptgen.PromptTemplate) http.HandlerFunc {
@@ -100,6 +101,7 @@ func GetPredictions(newsAPI *newsapi.Service, ai llm.Service, template *promptge
 			}
 
 			prediction.Sources = sources
+			prediction.Timestamp = time.Now()
 			predictions = append(predictions, *prediction)
 		}
 
@@ -125,6 +127,7 @@ func GetPredictions(newsAPI *newsapi.Service, ai llm.Service, template *promptge
 		//				URL:   "https://9to5mac.com/2024/10/06/m4-macbook-pro-roundup/",
 		//			},
 		//		},
+		//		Timestamp: time.Now(),
 		//	},
 		//	{
 		//		Headline: "Joker 2's Box Office Performance to Suffer Due to Poor Reception",
@@ -139,7 +142,8 @@ func GetPredictions(newsAPI *newsapi.Service, ai llm.Service, template *promptge
 		//				ConfidenceLevel: 60,
 		//			},
 		//		},
-		//		ImageURL: "https://variety.com/wp-content/uploads/2024/04/Screen-Shot-2024-04-09-at-9.01.48-PM.png?w=1000&h=563&crop=1",
+		//		ImageURL:  "https://variety.com/wp-content/uploads/2024/04/Screen-Shot-2024-04-09-at-9.01.48-PM.png?w=1000&h=563&crop=1",
+		//		Timestamp: time.Now(),
 		//	},
 		//}
 
