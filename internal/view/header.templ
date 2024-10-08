@@ -3,10 +3,12 @@ package view
 templ Header() {
     <header class="fixed-header">
         <div class="container">
+            <!-- Hamburger menu icon on the left side -->
+            <div class="menu-icon" onclick="toggleMenu()">&#9776;</div>
+
             <div class="title-and-logo">
                 <!-- Logo container next to title -->
                 <div class="logo-container">
-                    <!-- Static Hand Image -->
                     <img src="/static/images/hand.png" alt="Hand" class="hand-image">
                     <a href="#"
                        hx-get="/api/predictions"
@@ -20,7 +22,8 @@ templ Header() {
                 </div>
                 <h1>Evedict</h1>
             </div>
-            <nav>
+
+            <nav class="nav-menu">
                 <a href="/">Home</a>
                 <div class="category-dropdown">
                     <form hx-get="/api/predictions"

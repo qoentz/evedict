@@ -1,0 +1,67 @@
+/* Hide menu icon on larger screens */
+.menu-icon {
+    display: none;
+    font-size: 30px;
+    cursor: pointer;
+    color: white;
+}
+
+/* Navigation styles */
+.nav-menu {
+    display: flex;
+    gap: 15px;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    /* Display the hamburger menu icon on mobile */
+    .menu-icon {
+        display: block;
+        position: absolute;
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 1001; /* Keep above nav menu */
+    }
+
+    /* Increase padding on the header to accommodate the logo */
+    .fixed-header {
+        padding: 50px 0;
+    }
+
+    /* Center title and logo within the header */
+    .title-and-logo {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .title-and-logo h1 {
+        font-size: 45px;
+        margin-left: 15px;
+    }
+
+    /* Nav menu sliding under the header */
+    .nav-menu {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        position: fixed;
+        top: 100px; /* Set to header height */
+        left: 0;
+        height: calc(100% - 70px); /* Full height minus header */
+        background-color: #333;
+        width: 250px;
+        padding: 20px;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease-in-out;
+        z-index: 999; /* Ensure it stays under the header */
+    }
+
+    .nav-menu.active {
+        transform: translateX(0);
+    }
+}

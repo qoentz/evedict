@@ -1,0 +1,46 @@
+/* Ensure the dropdown aligns nicely with nav items */
+.category-dropdown {
+    margin: 0 15px;
+    display: inline-block;
+}
+
+/* Dark background for the dropdown to match the header */
+.category-dropdown select {
+    appearance: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    border: 1px solid #555;
+    background-color: #444; /* Dark background to match header */
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%23FFF' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 12px;
+    padding-right: 30px;
+}
+
+/* Hover effect to match other header links */
+.category-dropdown select:hover {
+    background-color: #555;
+    border-color: #666;
+}
+
+/* Custom placeholder color */
+.category-dropdown select option[value=""][hidden] {
+    display: none;
+}
+
+.category-dropdown select:invalid {
+    color: #aaa; /* Lighter placeholder color */
+}
+
+.category-dropdown select:not(:invalid) {
+    color: white;
+}
+
+/* Nav link hover effect */
+.fixed-header nav a:hover, .category-dropdown select:hover {
+    color: #ddd;
+}
