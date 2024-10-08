@@ -3,9 +3,9 @@
 @import url('base/animations.css');
 
 @import url('components/header.css');
+@import url('components/dropdown.css');
 @import url('components/menu.css');
 @import url('components/logo.css');
 @import url('components/feed.css');
 @import url('components/spinner.css');
 @import url('components/footer.css');
-@import url('components/dropdown.css');
