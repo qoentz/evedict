@@ -11,7 +11,7 @@ COPY . .
 RUN go mod download
 
 # Build the Go app from the /evedict/cmd directory and place the output binary in /evedict
-RUN go build -o /evedict/main /evedict/cmd/main.go
+RUN go build -o /evedict/main /evedict/cmd/app/main.go
 
 # Expose port 8080
 EXPOSE 8080
