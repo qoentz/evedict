@@ -20,15 +20,15 @@ func main() {
 		log.Fatalf("Error configuring system: %v", err)
 	}
 
-	database, err := db.InitDB(systemConfig.EnvConfig.DatabaseConfig.ConfigureDSN())
+	database, err := db.InitDB(systemConfig.EnvConfig.DatabaseConfig.ConfigureDSN(config.KeyValueFormat))
 	if err != nil {
 		log.Fatalf("Error initilizing database: %v", err)
 	}
 	defer func(db *sqlx.DB) { _ = db.Close() }(database)
 
-	reg := registry.NewRegistry(systemConfig)
+	reg := registry.NewRegistry(systemConfig, database)
 
-	httpServer := server.ServeHTTP(server.InitRouter(systemConfig, reg))
+	httpServer := server.ServeHTTP(server.InitRouter(reg))
 
 	shutdown := make(chan os.Signal, 1)
 	signal.Notify(shutdown, os.Interrupt, syscall.SIGTERM)

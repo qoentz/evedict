@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/gorilla/mux"
-	"github.com/qoentz/evedict/config"
 	"github.com/qoentz/evedict/internal/handler"
 	"github.com/qoentz/evedict/internal/registry"
 	"log"
@@ -12,7 +11,7 @@ import (
 	"net/http"
 )
 
-func InitRouter(config *config.SystemConfig, reg *registry.Registry) *mux.Router {
+func InitRouter(reg *registry.Registry) *mux.Router {
 	router := mux.NewRouter().StrictSlash(true)
 
 	router.HandleFunc("/", handler.Home()).Methods("GET")
@@ -26,7 +25,9 @@ func InitRouter(config *config.SystemConfig, reg *registry.Registry) *mux.Router
 	}).Methods("GET")
 
 	api := router.PathPrefix("/api").Subrouter()
-	api.Handle("/predictions", handler.GetPredictions(reg.NewsAPIService, reg.ReplicateService, config.PromptTemplate)).Methods("GET")
+	api.Handle("/predictions", handler.GetPredictions(reg.PredictionService)).Methods("GET")
+
+	api.Handle("/gen", handler.GeneratePredictions(reg.PredictionService)).Methods("GET")
 
 	router.NotFoundHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "", http.StatusNotFound)

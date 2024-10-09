@@ -121,7 +121,7 @@ func (s *Service) Fetch(url string) ([]Article, error) {
 	return data.Articles, nil
 }
 
-func (s *Service) ParseCategory(category string) (Category, error) {
+func ValidateCategory(category string) (Category, error) {
 	switch Category(category) {
 	case Business, Entertainment, General, Health, Science, Sports, Technology:
 		return Category(category), nil

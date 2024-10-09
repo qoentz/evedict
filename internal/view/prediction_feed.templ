@@ -2,10 +2,10 @@ package view
 
 import (
     "fmt"
-    "github.com/qoentz/evedict/internal/llm"
+    "github.com/qoentz/evedict/internal/dto"
 )
 
-templ PredictionFeed(predictions []llm.Prediction) {
+templ PredictionFeed(predictions []dto.Prediction) {
     <div class="prediction-container">
         for _, p := range predictions {
             <div class="prediction-item">

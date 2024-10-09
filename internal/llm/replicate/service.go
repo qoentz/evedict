@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/qoentz/evedict/internal/dto"
 	"github.com/qoentz/evedict/internal/llm"
 	"io"
 	"net/http"
@@ -27,13 +28,13 @@ func NewReplicateService(client *http.Client, modelURL string, apiKey string) *S
 	}
 }
 
-func (s *Service) GetPrediction(prompt string) (*llm.Prediction, error) {
+func (s *Service) GetPrediction(prompt string) (*dto.Prediction, error) {
 	output, err := s.processRequest(prompt, 1024)
 	if err != nil {
 		return nil, err
 	}
 
-	var result llm.Prediction
+	var result dto.Prediction
 	err = json.Unmarshal([]byte(output), &result)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing prediction output: %v\nOutput Data:\n%s", err, output)
