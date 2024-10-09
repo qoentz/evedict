@@ -2,7 +2,9 @@ package main
 
 import (
 	"context"
+	"github.com/jmoiron/sqlx"
 	"github.com/qoentz/evedict/config"
+	"github.com/qoentz/evedict/internal/db"
 	"github.com/qoentz/evedict/internal/registry"
 	"github.com/qoentz/evedict/internal/server"
 	"log"
@@ -17,6 +19,12 @@ func main() {
 	if err != nil {
 		log.Fatalf("Error configuring system: %v", err)
 	}
+
+	database, err := db.InitDB(systemConfig.EnvConfig.DatabaseConfig.ConfigureDSN())
+	if err != nil {
+		log.Fatalf("Error initilizing database: %v", err)
+	}
+	defer func(db *sqlx.DB) { _ = db.Close() }(database)
 
 	reg := registry.NewRegistry(systemConfig)
 

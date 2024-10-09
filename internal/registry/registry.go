@@ -12,8 +12,8 @@ type Registry struct {
 }
 
 func NewRegistry(c *config.SystemConfig) *Registry {
-	replicateService := replicate.NewReplicateService(c.HTTPClient, c.EnvConfig.ReplicateModel, c.EnvConfig.ReplicateAPIKey)
-	newsAPIService := newsapi.NewNewsAPIService(c.HTTPClient, c.EnvConfig.NewsAPIKey, c.EnvConfig.NewsAPIURL)
+	replicateService := replicate.NewReplicateService(c.HTTPClient, c.EnvConfig.ExternalServiceConfig.ReplicateModel, c.EnvConfig.ExternalServiceConfig.ReplicateAPIKey)
+	newsAPIService := newsapi.NewNewsAPIService(c.HTTPClient, c.EnvConfig.ExternalServiceConfig.NewsAPIKey, c.EnvConfig.ExternalServiceConfig.NewsAPIURL)
 	return &Registry{
 		ReplicateService: replicateService,
 		NewsAPIService:   newsAPIService,
