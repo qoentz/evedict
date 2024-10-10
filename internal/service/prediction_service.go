@@ -86,7 +86,7 @@ func (s *PredictionService) GeneratePredictions(category newsapi.Category) ([]dt
 		sources = append(sources, mainSource)
 
 		for _, article := range articles {
-			if article.URL == mainArticle.URL {
+			if article.URL == mainArticle.URL || article.Title == "[Removed]" {
 				continue
 			}
 
