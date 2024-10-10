@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/qoentz/evedict/internal/dto"
+	"github.com/qoentz/evedict/internal/api/dto"
 	"github.com/qoentz/evedict/internal/llm"
 	"io"
 	"net/http"

@@ -40,5 +40,11 @@ func GeneratePredictions(s *service.PredictionService) http.HandlerFunc {
 			http.Error(w, fmt.Sprintf("Error rendering template: %v", err), http.StatusInternalServerError)
 			return
 		}
+
+		//w.Header().Set("Content-Type", "application/json")
+		//err = json.NewEncoder(w).Encode(predictions)
+		//if err != nil {
+		//	return
+		//}
 	}
 }

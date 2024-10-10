@@ -2,19 +2,19 @@ package gdelt
 
 import (
 	"encoding/json"
-	"github.com/qoentz/evedict/internal/httputil"
 	"io"
+	"net/http"
 	"os"
 )
 
 func Fetch() ([]Article, error) {
-	resp, err := httputil.GetRequest(os.Getenv("GDELT_URL"))
+	resp, err := http.Get(os.Getenv("GDELT_URL"))
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Close()
+	defer resp.Body.Close()
 
-	resBody, err := io.ReadAll(resp)
+	resBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}

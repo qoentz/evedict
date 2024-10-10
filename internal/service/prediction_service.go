@@ -3,9 +3,9 @@ package service
 import (
 	"fmt"
 	"github.com/google/uuid"
+	"github.com/qoentz/evedict/internal/api/dto"
 	"github.com/qoentz/evedict/internal/db/model"
 	"github.com/qoentz/evedict/internal/db/repository"
-	"github.com/qoentz/evedict/internal/dto"
 	"github.com/qoentz/evedict/internal/eventfeed/newsapi"
 	"github.com/qoentz/evedict/internal/llm"
 	"github.com/qoentz/evedict/internal/llm/replicate"

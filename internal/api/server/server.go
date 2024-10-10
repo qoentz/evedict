@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/gorilla/mux"
-	"github.com/qoentz/evedict/internal/handler"
+	"github.com/qoentz/evedict/internal/api/handler"
 	"github.com/qoentz/evedict/internal/registry"
 	"log"
 	"net"

@@ -1,7 +1,7 @@
 package llm
 
 import (
-	"github.com/qoentz/evedict/internal/dto"
+	"github.com/qoentz/evedict/internal/api/dto"
 )
 
 type Service interface {
