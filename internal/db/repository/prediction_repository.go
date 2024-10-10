@@ -19,7 +19,11 @@ func NewPredictionRepository(db *sqlx.DB) *PredictionRepository {
 
 func (r *PredictionRepository) GetPredictions() ([]model.Prediction, error) {
 	var predictions []model.Prediction
-	err := r.DB.Select(&predictions, `SELECT id, headline, summary, image_url, timestamp FROM prediction`)
+	err := r.DB.Select(&predictions, `
+		SELECT id, headline, summary, image_url, timestamp 
+		FROM prediction 
+		ORDER BY timestamp DESC
+	`)
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch predictions: %v", err)
 	}

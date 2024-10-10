@@ -2,6 +2,7 @@ package view
 
 import (
     "fmt"
+    "time"
     "github.com/qoentz/evedict/internal/dto"
 )
 
@@ -9,8 +10,8 @@ templ PredictionFeed(predictions []dto.Prediction) {
     <div class="prediction-container">
         for _, p := range predictions {
             <div class="prediction-item">
-            <div class="timestamp">
-                 { p.Timestamp.Format("02 Jan 2006, 15:04") }
+            <div class="timestamp" data-timestamp={ fmt.Sprintf("%s", p.Timestamp.Format(time.RFC3339)) }>
+                { p.Timestamp.Format("02 Jan 2006, 15:04") }
             </div>
                 <div class="prediction-content">
                     <img src={ p.ImageURL } alt="Prediction image" class="prediction-image" />

@@ -100,7 +100,7 @@ func (s *PredictionService) GeneratePredictions(category newsapi.Category) ([]dt
 		}
 
 		prediction.Sources = sources
-		prediction.Timestamp = time.Now()
+		prediction.Timestamp = time.Now().UTC()
 		predictions = append(predictions, *prediction)
 	}
 
