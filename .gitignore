@@ -31,3 +31,6 @@ go.work.sum
 *_templ.go
 
 .DS_Store
+
+# NPM
+*./node_modules
