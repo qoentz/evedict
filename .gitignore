@@ -30,7 +30,14 @@ go.work.sum
 # Templ generated
 *_templ.go
 
-.DS_Store
-
 # NPM
-node_modules
+node_modules/
+package-lock.json
+
+# Build
+tmp/
+
+# Tailwind CSS
+static/styles.css
+
+.DS_Store
