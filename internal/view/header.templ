@@ -1,53 +1,67 @@
 package view
 
 templ Header() {
-    <header class="fixed-header">
-        <div class="container">
-            <!-- Hamburger menu icon on the left side -->
-            <div class="menu-icon" onclick="toggleMenu()">&#9776;</div>
-
-            <div class="title-and-logo">
-                <!-- Logo container next to title -->
-                <div class="logo-container">
-                    <img src="/static/images/hand.png" alt="Hand" class="hand-image">
-                    <a href="#"
-                       hx-get="/api/predictions"
-                       hx-target="#prediction-feed"
-                       hx-trigger="click"
-                       hx-indicator="#loading-indicator"
-                       hx-swap="innerHTML"
-                       hx-on::before-request="this.closest('body').querySelector('#prediction-feed').innerHTML = ''">
-                        <img src="/static/images/crystal_ball.png" alt="Spinning Crystal Ball" class="spinning-ball">
-                    </a>
-                </div>
-                <h1>Evedict</h1>
-            </div>
-
-            <nav class="nav-menu">
-                <a href="/">Home</a>
-                <div class="category-dropdown">
-                    <form hx-get="/api/gen"
-                          hx-trigger="change"
-                          hx-target="#prediction-feed"
-                          hx-indicator="#loading-indicator"
-                          hx-on::before-request="this.closest('body').querySelector('#prediction-feed').innerHTML = ''">
-                        <select id="category-select" name="category">
-                            <option value="" selected hidden>Category</option>
-                            <option value="general">General</option>
-                            <option value="business">Business</option>
-                            <option value="entertainment">Entertainment</option>
-                            <option value="health">Health</option>
-                            <option value="science">Science</option>
-                            <option value="sports">Sports</option>
-                            <option value="technology">Technology</option>
-                        </select>
-                    </form>
-                </div>
-                <a href="/about">About</a>
-                <a href="/contact">Contact</a>
-            </nav>
+    <header class="fixed top-0 w-full bg-gray-800 text-white shadow-lg z-50">
+        <div class="max-w-7xl mx-auto px-4 flex justify-between items-center py-5">
+            @HamburgerMenuIcon()
+            @LogoAndTitle()
+            @NavigationMenu()
         </div>
     </header>
 }
+
+templ HamburgerMenuIcon() {
+    <div class="text-3xl cursor-pointer lg:hidden" onclick="toggleMenu()">&#9776;</div>
+}
+
+templ LogoAndTitle() {
+    <div class="flex items-center">
+        <div class="relative flex items-center">
+            <img src="/static/images/hand.png" alt="Hand" class="h-12 relative z-30 pointer-events-none" style="top: 16px;">
+            <a href="#"
+               hx-get="/api/predictions"
+               hx-target="#prediction-feed"
+               hx-trigger="click"
+               hx-indicator="#loading-indicator"
+               hx-swap="innerHTML"
+               hx-on::before-request="this.closest('body').querySelector('#prediction-feed').innerHTML = ''"
+               class="absolute cursor-pointer z-10"
+               style="top: -19px; left: 8px;">
+                <img src="/static/images/crystal_ball.png" alt="Spinning Crystal Ball" class="h-14 w-14 animate-spin-slow transform transition-transform duration-200 hover:scale-105 hover:brightness-75">
+            </a>
+        </div>
+        <h1 class="ml-4 text-4xl font-palatino">Evedict</h1>
+    </div>
+}
+
+templ NavigationMenu() {
+    <nav class="hidden lg:flex items-center space-x-6">
+        <a href="/" class="hover:text-gray-400">Home</a>
+        <div class="relative">
+            <form hx-get="/api/gen"
+                  hx-trigger="change"
+                  hx-target="#prediction-feed"
+                  hx-indicator="#loading-indicator"
+                  hx-on::before-request="this.closest('body').querySelector('#prediction-feed').innerHTML = ''">
+                <select id="category-select" name="category" class="bg-gray-800 border-none text-white focus:outline-none cursor-pointer">
+                    <option value="" selected hidden>Category</option>
+                    <option value="general">General</option>
+                    <option value="business">Business</option>
+                    <option value="entertainment">Entertainment</option>
+                    <option value="health">Health</option>
+                    <option value="science">Science</option>
+                    <option value="sports">Sports</option>
+                    <option value="technology">Technology</option>
+                </select>
+            </form>
+        </div>
+        <a href="/about" class="hover:text-gray-400">About</a>
+        <a href="/contact" class="hover:text-gray-400">Contact</a>
+    </nav>
+}
+
+
+
+
 
 

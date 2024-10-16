@@ -29,6 +29,7 @@ go.work.sum
 
 # Templ generated
 *_templ.go
+*_templ.txt
 
 # NPM
 node_modules/

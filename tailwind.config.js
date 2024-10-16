@@ -2,7 +2,20 @@
 module.exports = {
   content: ["./**/*.html", "./**/*.templ", "./**/*.go"],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        'palatino': ['Palatino', 'Palatino Linotype', 'Book Antiqua', 'serif'],
+      },
+      animation: {
+        'spin-slow': 'rotation 10s linear infinite',
+      },
+      keyframes: {
+        rotation: {
+          from: { transform: 'rotate(0deg)' },
+          to: { transform: 'rotate(359deg)' },
+        },
+      },
+    },
   },
   plugins: [],
 }
