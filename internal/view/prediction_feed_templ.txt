@@ -1,0 +1,18 @@
+<div class=\"prediction-container\">
+<div class=\"prediction-item\"><div class=\"timestamp\" data-timestamp=\"
+\">
+</div><div class=\"prediction-content\"><img src=\"
+\" alt=\"Prediction image\" class=\"prediction-image\"><div class=\"prediction-details\"><h2 class=\"prediction-headline\">
+</h2><p class=\"prediction-summary\">
+</p></div></div><!-- Outcomes container with page fold effect button --><div class=\"outcomes-container\"><div class=\"toggle-button\" onclick=\"toggleSources(this)\" title=\"Sources\"></div><h3 class=\"outcomes-title\">Outcomes</h3>
+<div class=\"
+\"><div class=\"percentage-display\">
+%</div><p class=\"outcome-content\">
+</p></div>
+</div><!-- Sources list with identical styling and back button --><div class=\"sources-list hidden\"><div class=\"toggle-button\" onclick=\"toggleSources(this)\" title=\"Outcomes\"></div><h3 class=\"sources-title\">Sources</h3><ul>
+<li><a href=\"
+\" target=\"_blank\" class=\"source-title\">
+</a> <span class=\"source-name\">- <em>
+</em></span></li>
+</ul></div></div>
+</div>

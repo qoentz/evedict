@@ -1,0 +1,4 @@
+<!doctype html><html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><link rel=\"icon\" href=\"/static/favicon.ico\" type=\"image/x-icon\"><link rel=\"stylesheet\" href=\"/static/styles/main.css\"><script src=\"https://unpkg.com/htmx.org@2.0.2\"></script><script src=\"/static/scripts.js\" defer></script><title>Evedict</title></head><body>
+<main class=\"content\">
+</main>
+</body></html>
