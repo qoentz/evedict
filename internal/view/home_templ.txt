@@ -1,1 +1,0 @@
-<div id=\"loading-indicator\" class=\"htmx-indicator\"><div class=\"spinner\"></div><!-- A spinner animation --></div><div id=\"prediction-feed\" hx-get=\"/api/predictions\" hx-trigger=\"load\" hx-target=\"#prediction-feed\" hx-indicator=\"#loading-indicator\" hx-swap=\"innerHTML\"></div>

@@ -7,46 +7,203 @@ import (
 )
 
 templ PredictionFeed(predictions []dto.Prediction) {
-    <div class="prediction-container">
+    <div class="
+        max-w-[800px]
+        mx-auto
+        p-5
+        border-x-2
+        border-[#e0e0e0]
+        flex
+        flex-col
+        gap-2.5
+        bg-[#fafafa]
+    ">
         for _, p := range predictions {
-            <div class="prediction-item">
-            <div class="timestamp" data-timestamp={ fmt.Sprintf("%s", p.Timestamp.Format(time.RFC3339)) }>
-                { p.Timestamp.Format("02 Jan 2006, 15:04") }
-            </div>
-                <div class="prediction-content">
-                    <img src={ p.ImageURL } alt="Prediction image" class="prediction-image" />
+            <div class="
+                relative
+                flex
+                justify-between
+                items-stretch
+                gap-8
+                border-b
+                border-[#e0e0e0]
+                pb-5
+                mt-4
+                flex-wrap
+            ">
+                <div class="
+                    absolute
+                    top-[10px]
+                    left-[10px]
+                    text-sm
+                    font-normal
+                    text-gray-400
+                    bg-black/70
+                    px-1
+                    py-0.5
+                    rounded-sm
+                "
+                data-timestamp={ fmt.Sprintf("%s", p.Timestamp.Format(time.RFC3339)) }>
+                    { p.Timestamp.Format("02 Jan 2006, 15:04") }
+                </div>
+
+                <div class="flex flex-col flex-[2]">
+                    <img
+                        src={ p.ImageURL }
+                        alt="Prediction image"
+                        class="
+                            w-full
+                            h-[250px]
+                            rounded-md
+                            mb-4
+                            object-cover
+                        "
+                    />
                     <div class="prediction-details">
-                        <h2 class="prediction-headline">{ p.Headline }</h2>
-                        <p class="prediction-summary">{ p.Summary }</p>
+                        <h2 class="
+                            text-4xl
+                            font-bold
+                            text-black
+                            my-4
+                        ">
+                            { p.Headline }
+                        </h2>
+                        <p class="text-lg leading-[1.6] text-gray-700">
+                            { p.Summary }
+                        </p>
                     </div>
                 </div>
 
-                <!-- Outcomes container with page fold effect button -->
-                <div class="outcomes-container">
-                    <div class="toggle-button" onclick="toggleSources(this)" title="Sources"></div>
-                    <h3 class="outcomes-title">Outcomes</h3>
+                <!-- Outcomes container -->
+                <div class="
+                    relative
+                    flex-1
+                    flex
+                    flex-col
+                    items-start
+                    justify-start
+                    gap-2.5
+                    p-4
+                    bg-[#f9f9f9]
+                    rounded-lg
+                    shadow-md
+                    border
+                    border-[#ccc]
+                ">
+                    <div class="
+                        absolute
+                        top-[-1px]
+                        right-[-1px]
+                        w-[30px]
+                        h-[30px]
+                        bg-[#ccc]
+                        rounded-tr-lg
+                        cursor-pointer
+                        transition-colors
+                        duration-300
+                        ease
+                        [clip-path:polygon(100%_0,0_0,100%_100%)]
+                        hover:bg-[#5a9bd5]
+                    "
+                    onclick="toggleSources(this)"
+                    title="Sources"></div>
+
+                    <h3 class="
+                        text-xl
+                        font-bold
+                        text-gray-800
+                        text-center
+                        uppercase
+                        tracking-wide
+                        border-b-2
+                        border-gray-300
+                        pb-1
+                        w-full
+                        mb-0
+                    ">
+                        Outcomes
+                    </h3>
+
                     for _, outcome := range p.Outcomes {
-                        <div class={ "outcome-item", confidenceClass(outcome.ConfidenceLevel) }>
-                            <div class="percentage-display">
+                        <div class={ "relative text-center p-4 rounded-lg font-bold text-lg bg-white shadow-sm flex-grow w-full transition-transform duration-200 ease border-l-[3px] hover:-translate-y-0.5 hover:shadow-md", confidenceClass(outcome.ConfidenceLevel) }>
+                            <div class="text-2xl font-bold mb-2 text-inherit">
                                 { fmt.Sprintf("%d", outcome.ConfidenceLevel) }%
                             </div>
-                            <p class="outcome-content">{ outcome.Content }</p>
+                            <p class="text-base leading-[1.5] text-gray-700 flex-grow">
+                                { outcome.Content }
+                            </p>
                         </div>
                     }
                 </div>
 
-                <!-- Sources list with identical styling and back button -->
-                <div class="sources-list hidden">
-                    <div class="toggle-button" onclick="toggleSources(this)" title="Outcomes"></div>
-                    <h3 class="sources-title">Sources</h3>
-                    <ul>
-                            for _, source := range p.Sources {
-                                <li>
-                                    <a href={ templ.URL(source.URL) } target="_blank" class="source-title">{ source.Title }</a>
-                                    <span class="source-name"> - <em>{ source.Name }</em></span>
-                                </li>
-                            }
-                        </ul>
+                <!-- Sources list -->
+                <div class="
+                    hidden
+                    relative
+                    flex-1
+                    flex
+                    flex-col
+                    items-start
+                    justify-start
+                    gap-2.5
+                    p-4
+                    bg-[#f9f9f9]
+                    rounded-lg
+                    shadow-md
+                    border
+                    border-[#ccc]
+                    sources-list
+                ">
+                    <div class="
+                        absolute
+                        top-[-1px]
+                        right-[-1px]
+                        w-[30px]
+                        h-[30px]
+                        bg-[#ccc]
+                        rounded-tr-lg
+                        cursor-pointer
+                        transition-colors
+                        duration-300
+                        ease
+                        [clip-path:polygon(100%_0,0_0,100%_100%)]
+                        hover:bg-[#5a9bd5]
+                    "
+                    onclick="toggleSources(this)"
+                    title="Outcomes"></div>
+
+                    <h3 class="
+                        text-xl
+                        font-bold
+                        text-gray-800
+                        text-center
+                        uppercase
+                        tracking-wide
+                        border-b-2
+                        border-gray-300
+                        pb-1
+                        w-full
+                        mb-0
+                    ">
+                        Sources
+                    </h3>
+
+                    <ul class="list-none p-0 m-0">
+                        for _, source := range p.Sources {
+                            <li class="mb-1.5 text-sm leading-[1.5] text-gray-700">
+                                <a
+                                    href={ templ.URL(source.URL) }
+                                    target="_blank"
+                                    class="text-[#007bff] hover:underline"
+                                >
+                                    { source.Title }
+                                </a>
+                                <span class="text-black italic inline">
+                                    {" - "}{ source.Name }
+                                </span>
+                            </li>
+                        }
+                    </ul>
                 </div>
             </div>
         }
@@ -56,15 +213,18 @@ templ PredictionFeed(predictions []dto.Prediction) {
 
 
 
+
 func confidenceClass(confidence int) string {
-    if confidence >= 70 {
-        return "high"
-    } else if confidence >= 40 {
-        return "medium"
-    } else {
-        return "low"
+    switch {
+    case confidence >= 70:
+        return "bg-[#e6f4ea] text-[#2e7d32] border-l-[#2e7d32]"
+    case confidence >= 40:
+        return "bg-[#fff3e0] text-[#ef6c00] border-l-[#ef6c00]"
+    default:
+        return "bg-[#ffebee] text-[#c62828] border-l-[#c62828]"
     }
 }
+
 
 
 
