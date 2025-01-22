@@ -1,23 +1,44 @@
 package view
 
 templ Header() {
-    <header class="fixed top-0 w-full bg-gray-800 text-white shadow-lg z-50">
-        <div class="max-w-7xl mx-auto px-4 flex justify-between items-center py-5">
-            @HamburgerMenuIcon()
-            @LogoAndTitle()
-            @NavigationMenu()
+    <header class="fixed top-0 w-full bg-gray-800 text-white shadow-lg z-50
+                 border-b border-gray-600 py-5 transition-all duration-300
+                 shrinkable-header">
+        <div class="max-w-7xl mx-auto px-4 flex items-center w-full">
+            <!-- 1) Hamburger Menu: visible on mobile, hidden on desktop -->
+            <div class="lg:hidden order-1">
+                @HamburgerMenuIcon()
+            </div>
+
+            <!-- 2) Logo: We give it 'mx-auto' so on mobile it centers itself.
+                   On desktop, we remove that with 'lg:mx-0' if needed. -->
+            <div class="order-2 mx-auto lg:mx-0">
+                @LogoAndTitle()
+            </div>
+
+            <!-- 3) Navigation Menu: hidden on mobile, visible on desktop.
+                 We push it to the right with 'ml-auto' -->
+            <div class="hidden lg:flex order-3 ml-auto">
+                @NavigationMenu()
+            </div>
         </div>
     </header>
 }
+
 
 templ HamburgerMenuIcon() {
     <div class="text-3xl cursor-pointer lg:hidden" onclick="toggleMenu()">&#9776;</div>
 }
 
 templ LogoAndTitle() {
-    <div class="flex items-center">
-        <div class="relative flex items-center">
-            <img src="/static/images/hand.png" alt="Hand" class="h-12 relative z-30 pointer-events-none" style="top: 16px;">
+    <div class="flex items-center animate-fade-slide-in" style="margin-top: 4px;">
+        <div class="relative flex items-center hand-ball-container">
+            <!-- The Hand -->
+            <img src="/static/images/hand.png" alt="Hand"
+                 class="h-12 relative z-30 pointer-events-none hand-image"
+                 style="top: 16px;">
+
+            <!-- The Ball -->
             <a href="#"
                hx-get="/api/predictions"
                hx-target="#prediction-feed"
@@ -27,10 +48,23 @@ templ LogoAndTitle() {
                hx-on::before-request="this.closest('body').querySelector('#prediction-feed').innerHTML = ''"
                class="absolute cursor-pointer z-10"
                style="top: -19px; left: 8px;">
-                <img src="/static/images/crystal_ball.png" alt="Spinning Crystal Ball" class="h-14 w-14 animate-spin-slow transform transition-transform duration-200 hover:scale-105 hover:brightness-75">
+                <img src="/static/images/crystal_ball.png" alt="Spinning Crystal Ball"
+                     class="h-14 w-14 animate-spin-slow animate-fade-slide-in
+                            transform transition-transform duration-200
+                            hover:brightness-75">
             </a>
         </div>
-        <h1 class="ml-4 text-4xl font-palatino">Evedict</h1>
+
+        <h1 class="ml-4 text-4xl font-palatino flex space-x-1">
+            <!-- Letters with staggered fade/slide, unchanged -->
+            <span class="inline-block animate-letter-slide-in" style="animation-delay: 0s;">E</span>
+            <span class="inline-block animate-letter-slide-in" style="animation-delay: 0.1s;">v</span>
+            <span class="inline-block animate-letter-slide-in" style="animation-delay: 0.2s;">e</span>
+            <span class="inline-block animate-letter-slide-in" style="animation-delay: 0.3s;">d</span>
+            <span class="inline-block animate-letter-slide-in" style="animation-delay: 0.4s;">i</span>
+            <span class="inline-block animate-letter-slide-in" style="animation-delay: 0.5s;">c</span>
+            <span class="inline-block animate-letter-slide-in" style="animation-delay: 0.6s;">t</span>
+        </h1>
     </div>
 }
 
