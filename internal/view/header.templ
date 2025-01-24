@@ -27,8 +27,9 @@ templ Header() {
 
 
 templ HamburgerMenuIcon() {
-    <div class="text-3xl cursor-pointer lg:hidden" onclick="toggleMenu()">&#9776;</div>
+    <div class="menu-icon text-3xl cursor-pointer lg:hidden" onclick="toggleMenu()">&#9776;</div>
 }
+
 
 templ LogoAndTitle() {
     <div class="flex items-center animate-fade-slide-in" style="margin-top: 4px;">
@@ -69,7 +70,7 @@ templ LogoAndTitle() {
 }
 
 templ NavigationMenu() {
-    <nav class="hidden lg:flex items-center space-x-6">
+    <nav id="nav-menu" class="hidden flex-col space-y-4 lg:flex lg:flex-row lg:space-y-0 lg:space-x-6">
         <a href="/" class="hover:text-gray-400">Home</a>
         <div class="relative">
             <form hx-get="/api/gen"
@@ -93,6 +94,7 @@ templ NavigationMenu() {
         <a href="/contact" class="hover:text-gray-400">Contact</a>
     </nav>
 }
+
 
 
 

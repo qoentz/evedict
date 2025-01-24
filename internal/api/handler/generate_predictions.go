@@ -35,7 +35,7 @@ func GeneratePredictions(s *service.PredictionService) http.HandlerFunc {
 			return
 		}
 
-		err = view.PredictionFeed(predictions).Render(r.Context(), w)
+		err = view.HighlightedSlider(predictions).Render(r.Context(), w)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Error rendering template: %v", err), http.StatusInternalServerError)
 			return

@@ -21,9 +21,18 @@ function toggleSources(button) {
 
 function toggleMenu() {
     const menuIcon = document.querySelector('.menu-icon');
-    const navMenu = document.querySelector('.nav-menu');
+    const navMenu = document.getElementById('nav-menu');
+
+    if (!menuIcon || !navMenu) {
+        console.error("Menu Icon or Nav Menu not found!");
+        return;
+    }
+
+    // Toggle visibility
+    navMenu.classList.toggle('hidden');
     menuIcon.classList.toggle('active');
-    navMenu.classList.toggle('active');
+
+    console.log("Menu visibility toggled");
 }
 
 function convertTimestampsToLocal() {

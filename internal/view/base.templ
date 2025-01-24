@@ -14,10 +14,11 @@ templ Base() {
         </head>
         <body>
             @Header()
-            <main class="content">
+            <main class="content mt-20">
                 { children... }
             </main>
             @Footer()
+            <script src="/static/after-scripts.js" defer></script>
         </body>
     </html>
 }

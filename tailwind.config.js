@@ -3,6 +3,10 @@ module.exports = {
   content: ["./**/*.html", "./**/*.templ", "./**/*.go"],
   theme: {
     extend: {
+      width: {
+        '7/10': '70%',
+        '3/10': '30%',
+      },
       fontFamily: {
         'palatino': ['Palatino', 'Palatino Linotype', 'Book Antiqua', 'serif'],
       },
