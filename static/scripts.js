@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
     const header = document.querySelector('.shrinkable-header');
-    const SCROLL_THRESHOLD = 200; // px threshold
+    const SCROLL_THRESHOLD = 100; // px threshold
 
     window.addEventListener('scroll', function() {
         if (window.scrollY > SCROLL_THRESHOLD) {

@@ -1,6 +1,10 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: ["./**/*.html", "./**/*.templ", "./**/*.go"],
+  safelist: [
+    'htmx-indicator',
+    'htmx-request',
+  ],
   theme: {
     extend: {
       width: {
@@ -13,7 +17,7 @@ module.exports = {
       animation: {
         'fade-slide-in': 'fadeSlideIn 1.5s ease-out forwards',
         'letter-slide-in': 'letterSlideIn 0.5s ease-out forwards',
-        'spin-slow': 'rotation 15s linear infinite', // Re-add the spinning animation
+        'spin-slow': 'rotation 15s linear infinite',
       },
       keyframes: {
         fadeSlideIn: {
@@ -28,12 +32,12 @@ module.exports = {
         },
         letterSlideIn: {
           '0%': {
-            transform: 'translateY(2px)', // Smaller vertical movement
-            opacity: 0, // Optional: Start faded if desired
+            transform: 'translateY(2px)',
+            opacity: 0,
           },
           '100%': {
-            transform: 'translateY(0)', // End at the original position
-            opacity: 1, // Ensure full opacity at the end
+            transform: 'translateY(0)',
+            opacity: 1,
           },
         },
         rotation: {
@@ -41,9 +45,14 @@ module.exports = {
           to: { transform: 'rotate(359deg)' },
         },
       },
+      backgroundImage: {
+        // Custom diagonal fade gradient
+        'fade-to-black': 'linear-gradient(to bottom right, rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0.7) 80%, rgba(0, 0, 0, 1) 100%)',
+      },
     },
   },
   plugins: [],
 };
+
 
 

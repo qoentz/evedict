@@ -70,15 +70,20 @@ templ LogoAndTitle() {
 }
 
 templ NavigationMenu() {
-    <nav id="nav-menu" class="hidden flex-col space-y-4 lg:flex lg:flex-row lg:space-y-0 lg:space-x-6">
-        <a href="/" class="hover:text-gray-400">Home</a>
-        <div class="relative">
+    <nav id="nav-menu" class="flex flex-col lg:flex-row items-center lg:space-x-6 mt-4 lg:mt-0">
+        <!-- Home Link -->
+        <a href="/" class="text-gray-300 hover:text-white text-base font-palatino transition-colors leading-none" style="position: relative; left: 35px;">Home</a>
+
+        <!-- Category Dropdown -->
+        <div class="relative flex items-center" style="position: relative; left: 17px; top: -1px;">
             <form hx-get="/api/gen"
                   hx-trigger="change"
                   hx-target="#prediction-feed"
                   hx-indicator="#loading-indicator"
                   hx-on::before-request="this.closest('body').querySelector('#prediction-feed').innerHTML = ''">
-                <select id="category-select" name="category" class="bg-gray-800 border-none text-white focus:outline-none cursor-pointer">
+                <select id="category-select" name="category"
+                        class="appearance-none bg-transparent text-gray-300 hover:text-white text-base font-palatino px-0 py-0 transition-none"
+                        style="width: auto; text-align: center; outline: none;">
                     <option value="" selected hidden>Category</option>
                     <option value="general">General</option>
                     <option value="business">Business</option>
@@ -90,10 +95,20 @@ templ NavigationMenu() {
                 </select>
             </form>
         </div>
-        <a href="/about" class="hover:text-gray-400">About</a>
-        <a href="/contact" class="hover:text-gray-400">Contact</a>
+
+        <!-- About and Contact Links -->
+        <a href="/about" class="text-gray-300 hover:text-white text-base font-palatino transition-colors leading-none">About</a>
+        <a href="/contact" class="text-gray-300 hover:text-white text-base font-palatino transition-colors leading-none">Contact</a>
     </nav>
 }
+
+
+
+
+
+
+
+
 
 
 

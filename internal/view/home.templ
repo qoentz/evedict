@@ -2,19 +2,23 @@ package view
 
 templ Home() {
     @Base() {
-        <div id="loading-indicator" class="htmx-indicator">
-            <div class="spinner"></div> <!-- A spinner animation -->
+        <!-- Spinner -->
+        <div id="loading-indicator" class="htmx-indicator absolute top-[50%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[999]">
+            <div class="w-16 h-16 border-4 border-gray-300 border-t-gray-600 rounded-full animate-spin"></div>
         </div>
 
+        <!-- Prediction Feed -->
         <div id="prediction-feed"
-                     hx-get="/api/predictions"
-                     hx-trigger="load"
-                     hx-target="#prediction-feed"
-                     hx-indicator="#loading-indicator"
-                     hx-swap="innerHTML">
+             hx-get="/api/predictions"
+             hx-trigger="load"
+             hx-target="#prediction-feed"
+             hx-indicator="#loading-indicator"
+             hx-swap="innerHTML">
         </div>
     }
 }
+
+
 
 
 
