@@ -36,7 +36,7 @@ templ HighlightedSlider(predictions []dto.Prediction) {
                         <div class="highlight-slide top-0 left-0 w-full h-full flex transition-all duration-700 ease-in-out">
                             @SlideContent(p)
                         </div>
-                    } else {
+                    } else if i <= 4 {
                         <div class="highlight-slide absolute top-0 left-0 w-full h-full flex translate-x-full opacity-0 transition-all duration-700 ease-in-out">
                             @SlideContent(p)
                         </div>
