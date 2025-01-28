@@ -126,12 +126,8 @@ document.addEventListener('click', (event) => {
 
 
 
-
-
-
 document.addEventListener('DOMContentLoaded', () => {
     setInterval(() => {
-        console.log("Automatic slide triggered");
         showNextSlide();
     }, 15000);
 });
