@@ -43,15 +43,43 @@ templ HamburgerMenuIcon() {
 
 templ MobileNavigationMenu() {
     <nav class="flex flex-col p-4 space-y-4">
+        <!-- Close Button -->
         <button class="self-end text-2xl mb-4" onclick="toggleMenu()" aria-label="Close Menu">&times;</button>
-        <a href="/" class="hover:bg-gray-600 px-3 py-2 rounded transition">Home</a>
-        <a href="/about" class="hover:bg-gray-600 px-3 py-2 rounded transition">About</a>
-        <a href="/services" class="hover:bg-gray-600 px-3 py-2 rounded transition">Services</a>
-        <a href="/contact" class="hover:bg-gray-600 px-3 py-2 rounded transition">Contact</a>
+
+        <!-- Home Link -->
+        <a href="/" class="text-gray-300 hover:text-white text-base font-palatino transition-colors leading-none hover:bg-gray-600 px-3 py-2 rounded transition">Home</a>
+
+        <!-- Category Dropdown -->
+        <div class="relative flex items-center">
+            <form hx-get="/api/gen"
+                  hx-trigger="change"
+                  hx-target="#prediction-feed"
+                  hx-indicator="#loading-indicator"
+                  hx-on::before-request="this.closest('body').querySelector('#prediction-feed').innerHTML = ''">
+                <select id="category-select" name="category"
+                        class="appearance-none bg-transparent text-gray-300 hover:text-white text-base font-palatino px-0 py-0 transition-none w-auto text-center outline-none -ml-1.5">
+                    <option value="" selected hidden>Category</option>
+                    <option value="general">General</option>
+                    <option value="business">Business</option>
+                    <option value="entertainment">Entertainment</option>
+                    <option value="health">Health</option>
+                    <option value="science">Science</option>
+                    <option value="sports">Sports</option>
+                    <option value="technology">Technology</option>
+                </select>
+            </form>
+        </div>
+
+        <!-- About Link -->
+        <a href="/about" class="text-gray-300 hover:text-white text-base font-palatino transition-colors leading-none hover:bg-gray-600 px-3 py-2 rounded transition">About</a>
+
+        <!-- Services Link -->
+        <a href="/services" class="text-gray-300 hover:text-white text-base font-palatino transition-colors leading-none hover:bg-gray-600 px-3 py-2 rounded transition">Services</a>
+
+        <!-- Contact Link -->
+        <a href="/contact" class="text-gray-300 hover:text-white text-base font-palatino transition-colors leading-none hover:bg-gray-600 px-3 py-2 rounded transition">Contact</a>
     </nav>
 }
-
-
 
 templ LogoAndTitle() {
     <div class="flex items-center animate-fade-slide-in" style="margin-top: 4px;">
@@ -94,18 +122,17 @@ templ LogoAndTitle() {
 templ NavigationMenu() {
     <nav id="nav-menu" class="flex flex-col lg:flex-row items-center lg:space-x-6 mt-4 lg:mt-0">
         <!-- Home Link -->
-        <a href="/" class="text-gray-300 hover:text-white text-base font-palatino transition-colors leading-none" style="position: relative; left: 35px;">Home</a>
+        <a href="/" class="text-gray-300 hover:text-white text-base font-palatino transition-colors leading-none ml-9">Home</a>
 
         <!-- Category Dropdown -->
-        <div class="relative flex items-center" style="position: relative; left: 17px; top: -1px;">
+        <div class="relative flex items-center ml-4 -mt-1">
             <form hx-get="/api/gen"
                   hx-trigger="change"
                   hx-target="#prediction-feed"
                   hx-indicator="#loading-indicator"
                   hx-on::before-request="this.closest('body').querySelector('#prediction-feed').innerHTML = ''">
                 <select id="category-select" name="category"
-                        class="appearance-none bg-transparent text-gray-300 hover:text-white text-base font-palatino px-0 py-0 transition-none"
-                        style="width: auto; text-align: center; outline: none;">
+                        class="appearance-none bg-transparent text-gray-300 hover:text-white text-base font-palatino px-0 py-0 transition-none w-auto text-center outline-none">
                     <option value="" selected hidden>Category</option>
                     <option value="general">General</option>
                     <option value="business">Business</option>
@@ -123,6 +150,7 @@ templ NavigationMenu() {
         <a href="/contact" class="text-gray-300 hover:text-white text-base font-palatino transition-colors leading-none">Contact</a>
     </nav>
 }
+
 
 
 
