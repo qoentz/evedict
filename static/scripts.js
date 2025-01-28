@@ -21,19 +21,37 @@ function toggleSources(button) {
 
 function toggleMenu() {
     const menuIcon = document.querySelector('.menu-icon');
-    const navMenu = document.getElementById('nav-menu');
+    const mobileNav = document.getElementById('mobile-nav');
+    const overlay = document.getElementById('overlay');
+    const body = document.body;
 
-    if (!menuIcon || !navMenu) {
-        console.error("Menu Icon or Nav Menu not found!");
+    if (!menuIcon || !mobileNav || !overlay) {
+        console.error("Menu Icon, Mobile Nav Menu, or Overlay not found!");
         return;
     }
 
-    // Toggle visibility
-    navMenu.classList.toggle('hidden');
+    // Toggle the mobile navigation menu
+    mobileNav.classList.toggle('-translate-x-full'); // Slide out
+    mobileNav.classList.toggle('translate-x-0'); // Slide in
+
+    // Toggle the overlay
+    overlay.classList.toggle('hidden');
+
+    // Toggle the 'active' state on the menu icon
     menuIcon.classList.toggle('active');
 
-    console.log("Menu visibility toggled");
+    // Toggle body overflow to prevent background scrolling
+    body.classList.toggle('overflow-hidden');
+
+    // Update aria-expanded for accessibility
+    const isExpanded = menuIcon.classList.contains('active');
+    menuIcon.setAttribute('aria-expanded', isExpanded);
+
+    console.log("Mobile menu visibility toggled");
 }
+
+
+document.getElementById('overlay').addEventListener('click', toggleMenu);
 
 function convertTimestampsToLocal() {
     document.querySelectorAll('.timestamp').forEach(element => {

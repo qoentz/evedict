@@ -5,30 +5,52 @@ templ Header() {
                  border-b border-gray-600 py-5 transition-all duration-300
                  shrinkable-header">
         <div class="max-w-7xl mx-auto px-4 flex items-center w-full">
-            <!-- 1) Hamburger Menu: visible on mobile, hidden on desktop -->
+            <!-- Hamburger Menu Icon -->
             <div class="lg:hidden order-1">
                 @HamburgerMenuIcon()
             </div>
 
-            <!-- 2) Logo: We give it 'mx-auto' so on mobile it centers itself.
-                   On desktop, we remove that with 'lg:mx-0' if needed. -->
+            <!-- Logo -->
             <div class="order-2 mx-auto lg:mx-0">
                 @LogoAndTitle()
             </div>
 
-            <!-- 3) Navigation Menu: hidden on mobile, visible on desktop.
-                 We push it to the right with 'ml-auto' -->
+            <!-- Desktop Navigation Menu -->
             <div class="hidden lg:flex order-3 ml-auto">
                 @NavigationMenu()
             </div>
         </div>
+
+        <!-- Mobile Navigation Menu -->
+        <div id="mobile-nav" class="fixed inset-y-0 left-0 w-64 bg-gray-700 transform -translate-x-full transition-transform duration-300 ease-in-out lg:hidden">
+            @MobileNavigationMenu()
+        </div>
+
+        <!-- Overlay -->
+        <div id="overlay" class="fixed inset-0 bg-black opacity-50 hidden lg:hidden"></div>
     </header>
 }
 
 
+
+
 templ HamburgerMenuIcon() {
-    <div class="menu-icon text-3xl cursor-pointer lg:hidden" onclick="toggleMenu()">&#9776;</div>
+    <div class="menu-icon text-3xl cursor-pointer transition-transform duration-300" onclick="toggleMenu()" aria-label="Toggle Menu" aria-expanded="false">
+        &#9776;
+    </div>
 }
+
+
+templ MobileNavigationMenu() {
+    <nav class="flex flex-col p-4 space-y-4">
+        <button class="self-end text-2xl mb-4" onclick="toggleMenu()" aria-label="Close Menu">&times;</button>
+        <a href="/" class="hover:bg-gray-600 px-3 py-2 rounded transition">Home</a>
+        <a href="/about" class="hover:bg-gray-600 px-3 py-2 rounded transition">About</a>
+        <a href="/services" class="hover:bg-gray-600 px-3 py-2 rounded transition">Services</a>
+        <a href="/contact" class="hover:bg-gray-600 px-3 py-2 rounded transition">Contact</a>
+    </nav>
+}
+
 
 
 templ LogoAndTitle() {
