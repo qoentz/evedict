@@ -51,8 +51,6 @@ function toggleMenu() {
 }
 
 
-document.getElementById('overlay').addEventListener('click', toggleMenu);
-
 function convertTimestampsToLocal() {
     document.querySelectorAll('.timestamp').forEach(element => {
         const timestampUTC = element.getAttribute('data-timestamp');
@@ -68,3 +66,23 @@ function convertTimestampsToLocal() {
 }
 
 document.addEventListener('htmx:afterSwap', convertTimestampsToLocal);
+
+document.addEventListener('DOMContentLoaded', function() {
+    const overlay = document.getElementById('overlay');
+    const mobileNavLinks = document.getElementById('mobile-nav-links');
+
+    if (overlay) {
+        overlay.addEventListener('click', toggleMenu);
+    }
+
+    if (mobileNavLinks) {
+        mobileNavLinks.addEventListener('click', function(event) {
+            const target = event.target;
+            if (target.tagName === 'A') {
+                // Optionally close the menu when a link is clicked
+                toggleMenu();
+            }
+        });
+    }
+});
+

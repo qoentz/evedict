@@ -21,15 +21,16 @@ templ Header() {
             </div>
         </div>
 
+        <!-- Overlay -->
+        <div id="overlay" class="fixed inset-0 bg-black opacity-50 hidden lg:hidden z-40"></div>
+
         <!-- Mobile Navigation Menu -->
-        <div id="mobile-nav" class="fixed inset-y-0 left-0 w-64 bg-gray-700 transform -translate-x-full transition-transform duration-300 ease-in-out lg:hidden">
+        <div id="mobile-nav" class="fixed inset-y-0 left-0 w-64 bg-gray-700 transform -translate-x-full transition-transform duration-300 ease-in-out lg:hidden z-50">
             @MobileNavigationMenu()
         </div>
-
-        <!-- Overlay -->
-        <div id="overlay" class="fixed inset-0 bg-black opacity-50 hidden lg:hidden"></div>
     </header>
 }
+
 
 
 
@@ -42,7 +43,7 @@ templ HamburgerMenuIcon() {
 
 
 templ MobileNavigationMenu() {
-    <nav class="flex flex-col p-4 space-y-4">
+    <nav id="mobile-nav-links" class="flex flex-col p-4 space-y-4">
         <!-- Close Button -->
         <button class="self-end text-2xl mb-4" onclick="toggleMenu()" aria-label="Close Menu">&times;</button>
 
@@ -73,13 +74,12 @@ templ MobileNavigationMenu() {
         <!-- About Link -->
         <a href="/about" class="text-gray-300 hover:text-white text-base font-palatino transition-colors leading-none hover:bg-gray-600 px-3 py-2 rounded transition">About</a>
 
-        <!-- Services Link -->
-        <a href="/services" class="text-gray-300 hover:text-white text-base font-palatino transition-colors leading-none hover:bg-gray-600 px-3 py-2 rounded transition">Services</a>
-
         <!-- Contact Link -->
         <a href="/contact" class="text-gray-300 hover:text-white text-base font-palatino transition-colors leading-none hover:bg-gray-600 px-3 py-2 rounded transition">Contact</a>
     </nav>
 }
+
+
 
 templ LogoAndTitle() {
     <div class="flex items-center animate-fade-slide-in" style="margin-top: 4px;">
