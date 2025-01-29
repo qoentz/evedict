@@ -36,7 +36,7 @@ templ Header() {
 
 
 templ HamburgerMenuIcon() {
-    <div class="menu-icon text-3xl cursor-pointer transition-transform duration-300" onclick="toggleMenu()" aria-label="Toggle Menu" aria-expanded="false">
+    <div class="menu-icon text-3xl cursor-pointer transition-transform duration-300" aria-label="Toggle Menu" aria-expanded="false">
         &#9776;
     </div>
 }
@@ -45,7 +45,7 @@ templ HamburgerMenuIcon() {
 templ MobileNavigationMenu() {
     <nav id="mobile-nav-links" class="flex flex-col p-4 space-y-4">
         <!-- Close Button -->
-        <button class="self-end text-2xl mb-4" onclick="toggleMenu()" aria-label="Close Menu">&times;</button>
+        <button class="close-menu-button self-end text-2xl mb-4" aria-label="Close Menu">&times;</button>
 
         <!-- Home Link -->
         <a href="/" class="text-gray-300 hover:text-white text-base font-palatino transition-colors leading-none hover:bg-gray-600 px-3 py-2 rounded transition">Home</a>

@@ -1,8 +1,35 @@
+// /static/js/modules/slider.js
+
 let slideIndex = 0;
+let slideInterval = null;
+
+export function initSlider() {
+    const prevButton = document.getElementById('prevSlide');
+    const nextButton = document.getElementById('nextSlide');
+    const tinyCardsContainer = document.getElementById('tinyCardsContainer');
+    const slides = document.querySelectorAll('.highlight-slide');
+
+    if (!prevButton || !nextButton || !tinyCardsContainer || slides.length === 0) {
+        console.error("Slider elements not found or no slides available!");
+        return;
+    }
+
+    // Prevent multiple intervals
+    if (slideInterval !== null) {
+        clearInterval(slideInterval);
+    }
+
+    // Attach event listeners to navigation buttons
+    prevButton.addEventListener('click', showPrevSlide);
+    nextButton.addEventListener('click', showNextSlide);
+
+    // Start the automatic slide
+    slideInterval = setInterval(showNextSlide, 15000);
+}
 
 function showNextSlide() {
     const slides = document.querySelectorAll('.highlight-slide');
-    const tinyCardsContainer = document.querySelector('#tinyCardsContainer');
+    const tinyCardsContainer = document.getElementById('tinyCardsContainer');
 
     if (slides.length <= 1 || !tinyCardsContainer) return;
 
@@ -21,7 +48,7 @@ function showNextSlide() {
 
 function showPrevSlide() {
     const slides = document.querySelectorAll('.highlight-slide');
-    const tinyCardsContainer = document.querySelector('#tinyCardsContainer');
+    const tinyCardsContainer = document.getElementById('tinyCardsContainer');
 
     if (slides.length <= 1 || !tinyCardsContainer) return;
 
@@ -56,7 +83,7 @@ function updateTinyCards(slides, tinyCardsContainer, totalSlides, visibleTinyCar
         // Clear the current cards
         tinyCardsContainer.innerHTML = '';
 
-        // Correctly calculate the `startIndex` for the new tiny card list
+        // Calculate the `startIndex` for the new tiny card list
         let startIndex;
         if (direction === 'next') {
             // For "next", the list moves forward
@@ -69,7 +96,6 @@ function updateTinyCards(slides, tinyCardsContainer, totalSlides, visibleTinyCar
         // Add the new set of cards
         for (let i = 0; i < visibleTinyCardsCount; i++) {
             const tinyIndex = (startIndex + i) % totalSlides;
-
             const newCard = createTinyCard(slides[tinyIndex]);
 
             // Animate the new card's entry
@@ -96,9 +122,6 @@ function updateTinyCards(slides, tinyCardsContainer, totalSlides, visibleTinyCar
     }, 500); // Match the duration of the animation
 }
 
-
-
-
 function createTinyCard(slide) {
     const imgSrc = slide.querySelector('img').src;
     const headline = slide.querySelector('h2').textContent;
@@ -113,23 +136,4 @@ function createTinyCard(slide) {
     `;
     return card;
 }
-
-// Attach event listeners to navigation buttons
-document.addEventListener('click', (event) => {
-    const prevButton = event.target.closest('#prevSlide');
-    const nextButton = event.target.closest('#nextSlide');
-
-    if (prevButton) showPrevSlide();
-    if (nextButton) showNextSlide();
-});
-
-
-
-
-document.addEventListener('DOMContentLoaded', () => {
-    setInterval(() => {
-        showNextSlide();
-    }, 15000);
-});
-
 
