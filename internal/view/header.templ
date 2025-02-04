@@ -97,6 +97,13 @@ templ LogoAndTitle() {
                hx-indicator="#loading-indicator"
                hx-swap="innerHTML"
                hx-on::before-request="this.closest('body').querySelector('#prediction-feed').innerHTML = ''"
+               hx-on:click="
+                   document.querySelectorAll('h1 span').forEach(el => {
+                       el.classList.remove('animate-letter-slide-in');
+                       void el.offsetWidth;
+                       el.classList.add('animate-letter-slide-in');
+                   });
+               "
                class="absolute cursor-pointer z-10"
                style="top: -19px; left: 8px;">
                 <img src="/static/images/crystal_ball.png" alt="Spinning Crystal Ball"
@@ -104,6 +111,7 @@ templ LogoAndTitle() {
                             transform transition-transform duration-200
                             hover:brightness-75">
             </a>
+
         </div>
 
         <h1 class="ml-4 text-4xl font-palatino flex space-x-1">

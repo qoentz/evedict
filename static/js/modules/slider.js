@@ -1,3 +1,5 @@
+// /static/js/slider.js
+
 let slideIndex = 0;
 let slideInterval = null;
 
@@ -12,19 +14,32 @@ export function initSlider() {
         return;
     }
 
-    // Prevent multiple intervals
+    // Clear any previous interval so it doesn't continue running
     if (slideInterval !== null) {
         clearInterval(slideInterval);
     }
 
-    // Attach event listeners to navigation buttons
-    prevButton.addEventListener('click', showPrevSlide);
-    nextButton.addEventListener('click', showNextSlide);
+    // Reset the slide index
+    slideIndex = 0;
 
-    // Initialize dots (in case any adjustments are needed)
+    // Reset all slides to the initial state:
+    // Show only the first slide, hide the rest.
+    slides.forEach((slide, index) => {
+        if (index === 0) {
+            slide.classList.remove('translate-x-full', 'opacity-0');
+        } else {
+            slide.classList.add('translate-x-full', 'opacity-0');
+        }
+    });
+
+    // Use the onclick property to ensure only one event listener is bound
+    prevButton.onclick = showPrevSlide;
+    nextButton.onclick = showNextSlide;
+
+    // Initialize the dots indicator based on the new state
     updateDots();
 
-    // Start the automatic slide
+    // Start the automatic slide interval
     slideInterval = setInterval(showNextSlide, 15000);
 }
 
@@ -35,18 +50,15 @@ function showNextSlide() {
     if (slides.length <= 1 || !tinyCardsContainer) return;
 
     const totalSlides = slides.length;
-    const visibleTinyCardsCount = 4; // Always display 4 tiny cards
-    const nextSlideIndex = (slideIndex + 1) % totalSlides; // Determine the next slide index
+    const visibleTinyCardsCount = 4;
+    const nextSlideIndex = (slideIndex + 1) % totalSlides;
 
-    // Animate slide transition
+    // Transition current slide out and next slide in
     slides[slideIndex].classList.add('translate-x-full', 'opacity-0');
     slides[nextSlideIndex].classList.remove('translate-x-full', 'opacity-0');
     slideIndex = nextSlideIndex;
 
-    // Update the active dot indicator
     updateDots();
-
-    // Animate the tiny card list
     updateTinyCards(slides, tinyCardsContainer, totalSlides, visibleTinyCardsCount, 'next');
 }
 
@@ -57,18 +69,14 @@ function showPrevSlide() {
     if (slides.length <= 1 || !tinyCardsContainer) return;
 
     const totalSlides = slides.length;
-    const visibleTinyCardsCount = 4; // Always display 4 tiny cards
-    const prevSlideIndex = (slideIndex - 1 + totalSlides) % totalSlides; // Determine the previous slide index
+    const visibleTinyCardsCount = 4;
+    const prevSlideIndex = (slideIndex - 1 + totalSlides) % totalSlides;
 
-    // Animate slide transition
     slides[slideIndex].classList.add('translate-x-full', 'opacity-0');
     slides[prevSlideIndex].classList.remove('translate-x-full', 'opacity-0');
     slideIndex = prevSlideIndex;
 
-    // Update the active dot indicator
     updateDots();
-
-    // Animate the tiny card list
     updateTinyCards(slides, tinyCardsContainer, totalSlides, visibleTinyCardsCount, 'prev');
 }
 
@@ -88,37 +96,25 @@ function updateDots() {
 }
 
 function updateTinyCards(slides, tinyCardsContainer, totalSlides, visibleTinyCardsCount, direction) {
-    const tinyCards = Array.from(tinyCardsContainer.children); // Current tiny cards
-
-    // Animate the existing tiny cards
+    const tinyCards = Array.from(tinyCardsContainer.children);
     tinyCards.forEach((card) => {
         if (direction === 'next') {
-            card.style.transform = `translateY(-100%)`; // Move card up
+            card.style.transform = 'translateY(-100%)';
         } else if (direction === 'prev') {
-            card.style.transform = `translateY(100%)`; // Move card down
+            card.style.transform = 'translateY(100%)';
         }
         card.style.transition = 'transform 0.5s ease-in-out';
     });
 
-    // After the animation completes, update the tiny cards
     setTimeout(() => {
-        // Clear the current cards
         tinyCardsContainer.innerHTML = '';
 
-        // Calculate the startIndex for the new tiny card list
-        let startIndex;
-        if (direction === 'next') {
-            startIndex = (slideIndex + 1) % totalSlides;
-        } else if (direction === 'prev') {
-            startIndex = (slideIndex + 1) % totalSlides;
-        }
+        let startIndex = (slideIndex + 1) % totalSlides;
 
-        // Add the new set of cards
         for (let i = 0; i < visibleTinyCardsCount; i++) {
             const tinyIndex = (startIndex + i) % totalSlides;
             const newCard = createTinyCard(slides[tinyIndex]);
 
-            // Animate the new card's entry
             if (direction === 'prev' && i === 0) {
                 newCard.style.transform = 'translateY(-100%)';
                 newCard.style.opacity = '0';
@@ -139,7 +135,7 @@ function updateTinyCards(slides, tinyCardsContainer, totalSlides, visibleTinyCar
 
             tinyCardsContainer.appendChild(newCard);
         }
-    }, 500); // Match the duration of the animation
+    }, 500); // Match the animation duration
 }
 
 function createTinyCard(slide) {
