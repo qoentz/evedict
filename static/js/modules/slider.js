@@ -1,5 +1,3 @@
-// /static/js/modules/slider.js
-
 let slideIndex = 0;
 let slideInterval = null;
 
@@ -23,6 +21,9 @@ export function initSlider() {
     prevButton.addEventListener('click', showPrevSlide);
     nextButton.addEventListener('click', showNextSlide);
 
+    // Initialize dots (in case any adjustments are needed)
+    updateDots();
+
     // Start the automatic slide
     slideInterval = setInterval(showNextSlide, 15000);
 }
@@ -35,12 +36,15 @@ function showNextSlide() {
 
     const totalSlides = slides.length;
     const visibleTinyCardsCount = 4; // Always display 4 tiny cards
-    const nextSlideIndex = (slideIndex + 1) % totalSlides; // Determine the next highlighted slide index
+    const nextSlideIndex = (slideIndex + 1) % totalSlides; // Determine the next slide index
 
-    // Update the highlighted slide
+    // Animate slide transition
     slides[slideIndex].classList.add('translate-x-full', 'opacity-0');
     slides[nextSlideIndex].classList.remove('translate-x-full', 'opacity-0');
     slideIndex = nextSlideIndex;
+
+    // Update the active dot indicator
+    updateDots();
 
     // Animate the tiny card list
     updateTinyCards(slides, tinyCardsContainer, totalSlides, visibleTinyCardsCount, 'next');
@@ -54,26 +58,44 @@ function showPrevSlide() {
 
     const totalSlides = slides.length;
     const visibleTinyCardsCount = 4; // Always display 4 tiny cards
-    const prevSlideIndex = (slideIndex - 1 + totalSlides) % totalSlides; // Determine the previous highlighted slide index
+    const prevSlideIndex = (slideIndex - 1 + totalSlides) % totalSlides; // Determine the previous slide index
 
-    // Update the highlighted slide
+    // Animate slide transition
     slides[slideIndex].classList.add('translate-x-full', 'opacity-0');
     slides[prevSlideIndex].classList.remove('translate-x-full', 'opacity-0');
     slideIndex = prevSlideIndex;
+
+    // Update the active dot indicator
+    updateDots();
 
     // Animate the tiny card list
     updateTinyCards(slides, tinyCardsContainer, totalSlides, visibleTinyCardsCount, 'prev');
 }
 
+function updateDots() {
+    const dotContainer = document.getElementById('slideDots');
+    if (!dotContainer) return;
+    const dots = dotContainer.children;
+    for (let i = 0; i < dots.length; i++) {
+        if (i === slideIndex) {
+            dots[i].classList.remove('bg-gray-400');
+            dots[i].classList.add('bg-white');
+        } else {
+            dots[i].classList.remove('bg-white');
+            dots[i].classList.add('bg-gray-400');
+        }
+    }
+}
+
 function updateTinyCards(slides, tinyCardsContainer, totalSlides, visibleTinyCardsCount, direction) {
     const tinyCards = Array.from(tinyCardsContainer.children); // Current tiny cards
 
-    // Add animation to the existing tiny cards
+    // Animate the existing tiny cards
     tinyCards.forEach((card) => {
         if (direction === 'next') {
-            card.style.transform = `translateY(-100%)`; // Move each card up
+            card.style.transform = `translateY(-100%)`; // Move card up
         } else if (direction === 'prev') {
-            card.style.transform = `translateY(100%)`; // Move each card down
+            card.style.transform = `translateY(100%)`; // Move card down
         }
         card.style.transition = 'transform 0.5s ease-in-out';
     });
@@ -83,13 +105,11 @@ function updateTinyCards(slides, tinyCardsContainer, totalSlides, visibleTinyCar
         // Clear the current cards
         tinyCardsContainer.innerHTML = '';
 
-        // Calculate the `startIndex` for the new tiny card list
+        // Calculate the startIndex for the new tiny card list
         let startIndex;
         if (direction === 'next') {
-            // For "next", the list moves forward
             startIndex = (slideIndex + 1) % totalSlides;
         } else if (direction === 'prev') {
-            // For "prev", shift backward but keep the tiny list aligned with "next" logic
             startIndex = (slideIndex + 1) % totalSlides;
         }
 
@@ -100,7 +120,7 @@ function updateTinyCards(slides, tinyCardsContainer, totalSlides, visibleTinyCar
 
             // Animate the new card's entry
             if (direction === 'prev' && i === 0) {
-                newCard.style.transform = 'translateY(-100%)'; // Start new card from above
+                newCard.style.transform = 'translateY(-100%)';
                 newCard.style.opacity = '0';
                 newCard.style.transition = 'transform 0.4s ease-in-out, opacity 0.5s ease-in-out';
                 setTimeout(() => {
@@ -108,7 +128,7 @@ function updateTinyCards(slides, tinyCardsContainer, totalSlides, visibleTinyCar
                     newCard.style.opacity = '1';
                 }, 50);
             } else if (direction === 'next' && i === visibleTinyCardsCount - 1) {
-                newCard.style.transform = 'translateY(100%)'; // Start new card from below
+                newCard.style.transform = 'translateY(100%)';
                 newCard.style.opacity = '0';
                 newCard.style.transition = 'transform 0.4s ease-in-out, opacity 0.5s ease-in-out';
                 setTimeout(() => {
@@ -136,4 +156,5 @@ function createTinyCard(slide) {
     `;
     return card;
 }
+
 

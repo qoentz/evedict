@@ -14,9 +14,6 @@ templ PredictionFeed(predictions []dto.Prediction) {
     </div>
 }
 
-
-
-
 templ HighlightedSlider(predictions []dto.Prediction) {
     if len(predictions) == 0 {
         <div class="flex items-center justify-center h-64 bg-gray-800 text-gray-500">
@@ -54,6 +51,19 @@ templ HighlightedSlider(predictions []dto.Prediction) {
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                     </svg>
                 </button>
+
+                <!-- Slide Indicator Dots -->
+                <div id="slideDots" class="absolute -bottom-8 md:-bottom-12 left-0 w-full flex justify-center space-x-2 md:space-y-4 z-30 pb-4">
+                    for i, _ := range predictions {
+                        if i <= 4 {
+                            if i == 0 {
+                                <span class="dot block w-2 md:w-3 h-2 md:h-3 rounded-full bg-white transition-all duration-300"></span>
+                            } else {
+                                <span class="dot block w-2 md:w-3 h-2 md:h-3 rounded-full bg-gray-400 transition-all duration-300"></span>
+                            }
+                        }
+                    }
+                </div>
             </div>
         </div>
 
@@ -64,7 +74,6 @@ templ HighlightedSlider(predictions []dto.Prediction) {
                     <div class="relative w-full h-28 bg-gray-800 rounded-lg overflow-hidden shadow-md group snap-start">
                         <!-- Image -->
                         <img src={p.ImageURL} alt="Tiny Card Image" class="w-full h-full object-cover opacity-70 group-hover:opacity-50 transition-opacity duration-300" />
-
                         <!-- Headline Overlay -->
                         <div class="absolute inset-0 flex items-center justify-center p-2">
                             <p class="text-white text-sm font-bold text-center leading-tight">
@@ -77,10 +86,6 @@ templ HighlightedSlider(predictions []dto.Prediction) {
         </div>
     </div>
 }
-
-
-
-
 
 
 templ SlideContent(p dto.Prediction) {
@@ -110,13 +115,6 @@ templ SlideContent(p dto.Prediction) {
         </div>
     </div>
 }
-
-
-
-
-
-
-
 
 templ TinyCard(p dto.Prediction) {
     <div class="flex items-center space-x-4 p-2 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 cursor-pointer">
