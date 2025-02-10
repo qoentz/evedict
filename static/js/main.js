@@ -15,6 +15,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
 document.addEventListener('htmx:afterSwap', (event) => {
     initSlider();
-    initMenu()
 });
 
