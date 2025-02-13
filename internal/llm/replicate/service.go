@@ -28,16 +28,16 @@ func NewReplicateService(client *http.Client, modelURL string, apiKey string) *S
 	}
 }
 
-func (s *Service) GetDivination(prompt string) (*dto.Divination, error) {
+func (s *Service) GetForecast(prompt string) (*dto.Forecast, error) {
 	output, err := s.processRequest(prompt, 1024)
 	if err != nil {
 		return nil, err
 	}
 
-	var result dto.Divination
+	var result dto.Forecast
 	err = json.Unmarshal([]byte(output), &result)
 	if err != nil {
-		return nil, fmt.Errorf("error parsing divination output: %v\nOutput Data:\n%s", err, output)
+		return nil, fmt.Errorf("error parsing forecast output: %v\nOutput Data:\n%s", err, output)
 	}
 
 	return &result, nil
@@ -123,19 +123,19 @@ func (s *Service) processRequest(prompt string, maxTokens int) (string, error) {
 		return "", fmt.Errorf("unexpected status code: %d\nResponse Body:\n%s", resp.StatusCode, string(body))
 	}
 
-	// Decode the initial response to get the divination status and URLs
-	var divination ResponsePayload
-	err = json.NewDecoder(resp.Body).Decode(&divination)
+	// Decode the initial response to get the forecast status and URLs
+	var forecast ResponsePayload
+	err = json.NewDecoder(resp.Body).Decode(&forecast)
 	if err != nil {
 		return "", fmt.Errorf("error parsing response JSON: %v", err)
 	}
 
 	// Poll for completion if needed
-	for divination.Status != "succeeded" && divination.Status != "failed" {
+	for forecast.Status != "succeeded" && forecast.Status != "failed" {
 		time.Sleep(2 * time.Second)
 
 		// Poll the status using the "get" URL
-		req, err = http.NewRequest("GET", divination.URLs.Get, nil)
+		req, err = http.NewRequest("GET", forecast.URLs.Get, nil)
 		if err != nil {
 			return "", fmt.Errorf("error creating GET request: %v", err)
 		}
@@ -152,16 +152,16 @@ func (s *Service) processRequest(prompt string, maxTokens int) (string, error) {
 			return "", fmt.Errorf("unexpected status code: %d\nResponse Body:\n%s", resp.StatusCode, string(body))
 		}
 
-		// Update the divination with the new status
-		err = json.NewDecoder(resp.Body).Decode(&divination)
+		// Update the forecast with the new status
+		err = json.NewDecoder(resp.Body).Decode(&forecast)
 		if err != nil {
-			return "", fmt.Errorf("error parsing divination JSON: %v", err)
+			return "", fmt.Errorf("error parsing forecast JSON: %v", err)
 		}
 	}
 
 	// Handle the output
 	var outputStr string
-	switch v := divination.Output.(type) {
+	switch v := forecast.Output.(type) {
 	case string:
 		outputStr = v
 	case []interface{}:
@@ -171,12 +171,12 @@ func (s *Service) processRequest(prompt string, maxTokens int) (string, error) {
 			if str, ok := item.(string); ok {
 				builder.WriteString(str)
 			} else {
-				return "", fmt.Errorf("divination output array contains non-string elements")
+				return "", fmt.Errorf("forecast output array contains non-string elements")
 			}
 		}
 		outputStr = builder.String()
 	default:
-		return "", fmt.Errorf("unexpected type for divination output: %T", divination.Output)
+		return "", fmt.Errorf("unexpected type for forecast output: %T", forecast.Output)
 	}
 
 	return strings.TrimSpace(outputStr), nil

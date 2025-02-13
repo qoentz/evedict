@@ -1,5 +1,5 @@
 /* Center the news feed, give it a max width, and add side borders */
-.divination-container {
+.forecast-container {
     max-width: 800px;
     margin: 0 auto;
     padding: 20px;
@@ -11,7 +11,7 @@
     background-color: #fafafa;       /* Optional background for better contrast */
 }
 
-.divination-item {
+.forecast-item {
     display: flex;
     justify-content: space-between;
     align-items: stretch;
@@ -36,14 +36,14 @@
 }
 
 /* Full article content (image, headline, summary) on the left */
-.divination-content {
+.forecast-content {
     display: flex;
     flex-direction: column;
     flex: 2;
 }
 
 /* Full-width image inside content */
-.divination-image {
+.forecast-image {
     width: 100%;
     height: 250px;
     border-radius: 8px;
@@ -52,7 +52,7 @@
 }
 
 /* Bold, large headline */
-.divination-headline {
+.forecast-headline {
     font-size: 35px;
     font-weight: 700;
     color: #000;
@@ -60,7 +60,7 @@
 }
 
 /* Smaller, readable content text */
-.divination-summary {
+.forecast-summary {
     font-size: 18px;
     line-height: 1.6;
     color: #333;

@@ -81,12 +81,12 @@ templ LogoAndTitle() {
 
           <!-- The Ball -->
           <a href="#"
-             hx-get="/api/divinations"
-             hx-target="#divination-feed"
+             hx-get="/api/forecasts"
+             hx-target="#forecast-feed"
              hx-trigger="click"
              hx-indicator="#loading-indicator"
              hx-swap="innerHTML"
-             hx-on::before-request="this.closest('body').querySelector('#divination-feed').innerHTML = ''"
+             hx-on::before-request="this.closest('body').querySelector('#forecast-feed').innerHTML = ''"
              hx-on:click="
                  document.querySelectorAll('h1 span').forEach(el => {
                      el.classList.remove('animate-letter-slide-in');

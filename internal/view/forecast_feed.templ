@@ -5,21 +5,21 @@ import (
     "github.com/qoentz/evedict/internal/api/dto"
 )
 
-templ DivinationFeed(divinations []dto.Divination) {
-    <div id="divination-feed" class="relative min-h-[600px]">
+templ ForecastFeed(forecasts []dto.Forecast) {
+    <div id="forecast-feed" class="relative min-h-[600px]">
         <!-- Highlighted Slider -->
         <div class="highlighted-slider">
-            @HighlightedSlider(divinations)
+            @HighlightedSlider(forecasts)
         </div>
-        <!-- More Divinations Section -->
-        @MoreDivinations(divinations)
+        <!-- More Forecasts Section -->
+        @MoreForecasts(forecasts)
     </div>
 }
 
-templ HighlightedSlider(divinations []dto.Divination) {
-    if len(divinations) == 0 {
+templ HighlightedSlider(forecasts []dto.Forecast) {
+    if len(forecasts) == 0 {
         <div class="flex items-center justify-center h-64 bg-gray-800 text-gray-500">
-            No divinations available
+            No forecasts available
         </div>
         return
     }
@@ -30,7 +30,7 @@ templ HighlightedSlider(divinations []dto.Divination) {
             <!-- Slides and Navigation -->
             <div class="relative w-full h-full">
                 <!-- Highlight Slides -->
-                for i, p := range divinations {
+                for i, p := range forecasts {
                     if i == 0 {
                         <div class="highlight-slide top-0 left-0 w-full h-full flex transition-all duration-700 ease-in-out">
                             @SlideContent(p)
@@ -56,7 +56,7 @@ templ HighlightedSlider(divinations []dto.Divination) {
 
                 <!-- Slide Indicator Dots -->
                 <div id="slideDots" class="absolute -bottom-8 md:-bottom-12 left-0 w-full flex justify-center space-x-2 md:space-x-4 z-30 pb-4">
-                    for i, _ := range divinations {
+                    for i, _ := range forecasts {
                         if i <= 4 {
                             if i == 0 {
                                 <span class="dot block w-2 md:w-3 h-2 md:h-3 rounded-full bg-white transition-all duration-300"></span>
@@ -71,7 +71,7 @@ templ HighlightedSlider(divinations []dto.Divination) {
 
         <!-- Tiny Stacked Cards (approx. 30% width, visible only on desktop) -->
         <div id="tinyCardsContainer" class="hidden lg:flex w-full lg:w-3/10 bg-gray-900 p-4 pt-14 flex-col space-y-4 items-center overflow-hidden snap-start">
-            for i, p := range divinations {
+            for i, p := range forecasts {
                 if i != 0 && i <= 4 {
                     <div class="relative w-full h-28 bg-gray-700 rounded-lg overflow-hidden shadow-md group snap-start">
                         <!-- Image -->
@@ -89,12 +89,12 @@ templ HighlightedSlider(divinations []dto.Divination) {
     </div>
 }
 
-templ SlideContent(p dto.Divination) {
+templ SlideContent(p dto.Forecast) {
     <div class="relative w-full h-full flex bg-gray-800 rounded-lg overflow-hidden">
         <!-- Image Background with Bottom Gradient -->
         <div class="absolute inset-0 w-full h-full rounded-lg overflow-hidden">
             <!-- Image -->
-            <img src={p.ImageURL} alt="Divination Image" loading="lazy" class="w-full h-full object-cover object-center rounded-lg" />
+            <img src={p.ImageURL} alt="Forecast Image" loading="lazy" class="w-full h-full object-cover object-center rounded-lg" />
             <!-- Gradient Overlay -->
             <div class="absolute inset-0 bg-gradient-to-t from-black to-transparent"></div>
         </div>
@@ -115,15 +115,15 @@ templ SlideContent(p dto.Divination) {
     </div>
 }
 
-templ MoreDivinations(divinations []dto.Divination) {
-    if len(divinations) <= 8 {
+templ MoreForecasts(forecasts []dto.Forecast) {
+    if len(forecasts) <= 8 {
         return
     }
 
     <div class="max-w-screen-xl mx-auto p-6 md:px-4 md:py-8 bg-gray-800">
       <!-- Grid: vertical (1 col) on mobile, 3 cols on md, 4 cols on lg -->
       <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-        for i, p := range divinations {
+        for i, p := range forecasts {
           if i >= 5 && i <= 8 {
             if i == 8 {
               <div class="bg-gray-600 rounded-lg shadow-md overflow-hidden transform hover:scale-105 transition duration-300 md:hidden lg:block">

@@ -7,11 +7,11 @@ templ Home() {
             <div class="w-16 h-16 border-4 border-gray-300 border-t-gray-600 rounded-full animate-spin"></div>
         </div>
 
-        <!-- Divination Feed -->
-        <div id="divination-feed"
-             hx-get="/api/divinations"
+        <!-- Forecast Feed -->
+        <div id="forecast-feed"
+             hx-get="/api/forecasts"
              hx-trigger="load"
-             hx-target="#divination-feed"
+             hx-target="#forecast-feed"
              hx-indicator="#loading-indicator"
              hx-swap="innerHTML">
         </div>

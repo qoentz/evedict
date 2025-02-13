@@ -7,17 +7,17 @@ import (
 	"net/http"
 )
 
-func GetDivinations(s *service.DivinationService) http.HandlerFunc {
+func GetForecasts(s *service.ForecastService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 
-		divinations, err := s.GetDivinations()
+		forecasts, err := s.GetForecasts()
 		if err != nil {
-			http.Error(w, fmt.Sprintf("Couldn't get divinations: %v", err), http.StatusInternalServerError)
+			http.Error(w, fmt.Sprintf("Couldn't get forecasts: %v", err), http.StatusInternalServerError)
 			return
 		}
 
-		err = view.DivinationFeed(divinations).Render(r.Context(), w)
+		err = view.ForecastFeed(forecasts).Render(r.Context(), w)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Error rendering template: %v", err), http.StatusInternalServerError)
 			return

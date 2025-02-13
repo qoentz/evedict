@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-type Divination struct {
+type Forecast struct {
 	ID        uuid.UUID `json:"id"`
 	Headline  string    `json:"headline"`
 	Summary   string    `json:"summary"`

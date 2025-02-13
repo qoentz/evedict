@@ -15,12 +15,12 @@ type PromptTemplate struct {
 	ExtractKeywords string `yaml:"extract_keywords"`
 }
 
-func (p *PromptTemplate) CreateDivinationPrompt(mainArticle newsapi.Article, relatedArticles []newsapi.Article) (string, error) {
+func (p *PromptTemplate) CreateForecastPrompt(mainArticle newsapi.Article, relatedArticles []newsapi.Article) (string, error) {
 	if mainArticle.Title == "" || mainArticle.Description == "" {
 		return "", fmt.Errorf("main article is missing title or description")
 	}
 
-	t, err := template.New("divinationPrompt").Parse(p.PredictEvents)
+	t, err := template.New("forecastPrompt").Parse(p.PredictEvents)
 	if err != nil {
 		return "", fmt.Errorf("error parsing template: %v", err)
 	}

@@ -8,7 +8,7 @@ import (
 	"net/http"
 )
 
-func GenerateDivinations(s *service.DivinationService) http.HandlerFunc {
+func GenerateForecasts(s *service.ForecastService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 
@@ -23,26 +23,26 @@ func GenerateDivinations(s *service.DivinationService) http.HandlerFunc {
 			return
 		}
 
-		divinations, err := s.GenerateDivinations(newsCategory)
+		forecasts, err := s.GenerateForecasts(newsCategory)
 		if err != nil {
-			http.Error(w, fmt.Sprintf("Couldn't generate divinations: %v", err), http.StatusInternalServerError)
+			http.Error(w, fmt.Sprintf("Couldn't generate forecasts: %v", err), http.StatusInternalServerError)
 			return
 		}
 
-		err = s.SaveDivinations(divinations)
+		err = s.SaveForecasts(forecasts)
 		if err != nil {
-			http.Error(w, fmt.Sprintf("Couldn't save divinations: %v", err), http.StatusInternalServerError)
+			http.Error(w, fmt.Sprintf("Couldn't save forecasts: %v", err), http.StatusInternalServerError)
 			return
 		}
 
-		err = view.DivinationFeed(divinations).Render(r.Context(), w)
+		err = view.ForecastFeed(forecasts).Render(r.Context(), w)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Error rendering template: %v", err), http.StatusInternalServerError)
 			return
 		}
 
 		//w.Header().Set("Content-Type", "application/json")
-		//err = json.NewEncoder(w).Encode(divinations)
+		//err = json.NewEncoder(w).Encode(forecasts)
 		//if err != nil {
 		//	return
 		//}

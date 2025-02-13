@@ -1,1 +1,1 @@
-DROP TABLE IF EXISTS divination;
+DROP TABLE IF EXISTS forecast;
