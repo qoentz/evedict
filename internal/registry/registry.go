@@ -10,21 +10,21 @@ import (
 )
 
 type Registry struct {
-	PredictionService *service.PredictionService
+	DivinationService *service.DivinationService
 	ReplicateService  *replicate.Service
 	NewsAPIService    *newsapi.Service
 }
 
 func NewRegistry(c *config.SystemConfig, db *sqlx.DB) *Registry {
-	predictionRepository := repository.NewPredictionRepository(db)
+	divinationRepository := repository.NewDivinationRepository(db)
 
 	replicateService := replicate.NewReplicateService(c.HTTPClient, c.EnvConfig.ExternalServiceConfig.ReplicateModel, c.EnvConfig.ExternalServiceConfig.ReplicateAPIKey)
 	newsAPIService := newsapi.NewNewsAPIService(c.HTTPClient, c.EnvConfig.ExternalServiceConfig.NewsAPIKey, c.EnvConfig.ExternalServiceConfig.NewsAPIURL)
 
-	predictionService := service.NewPredictionService(predictionRepository, replicateService, newsAPIService, c.PromptTemplate)
+	divinationService := service.NewDivinationService(divinationRepository, replicateService, newsAPIService, c.PromptTemplate)
 
 	return &Registry{
-		PredictionService: predictionService,
+		DivinationService: divinationService,
 		ReplicateService:  replicateService,
 		NewsAPIService:    newsAPIService,
 	}

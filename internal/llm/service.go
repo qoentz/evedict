@@ -5,7 +5,7 @@ import (
 )
 
 type Service interface {
-	GetPrediction(prompt string) (*dto.Prediction, error)
+	GetDivination(prompt string) (*dto.Divination, error)
 	SelectArticles(prompt string) ([]int, error)
 	ExtractKeywords(prompt string) ([]string, error)
 }

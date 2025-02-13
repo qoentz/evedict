@@ -1,4 +1,4 @@
-CREATE TABLE prediction (
+CREATE TABLE divination (
                             id UUID PRIMARY KEY,
                             headline VARCHAR(255) NOT NULL,
                             summary TEXT,
@@ -6,4 +6,4 @@ CREATE TABLE prediction (
                             timestamp TIMESTAMPTZ NOT NULL
 );
 
-CREATE INDEX idx_prediction_timestamp ON prediction(timestamp);
+CREATE INDEX idx_divination_timestamp ON divination(timestamp);

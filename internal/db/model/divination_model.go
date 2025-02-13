@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-type Prediction struct {
+type Divination struct {
 	ID        uuid.UUID `db:"id"`
 	Headline  string    `db:"headline"`
 	Summary   string    `db:"summary"`
