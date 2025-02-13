@@ -25,8 +25,8 @@ templ HighlightedSlider(predictions []dto.Prediction) {
     }
 
     <div class="relative w-full max-w-screen-xl mx-auto h-auto md:h-[600px] bg-gray-800 rounded-lg shadow-md flex flex-col md:flex-row">
-        <!-- Main Highlighted Slide (approx. 70% width) -->
-        <div class="w-full md:w-7/10 bg-gray-700 relative shadow-md flex p-6 md:p-14 overflow-hidden">
+        <!-- Main Highlighted Slide (full width on mobile & iPad, 70% on desktop) -->
+        <div class="w-full lg:w-7/10 bg-gray-700 relative shadow-md flex p-6 md:p-14 overflow-hidden">
             <!-- Slides and Navigation -->
             <div class="relative w-full h-full">
                 <!-- Highlight Slides -->
@@ -69,8 +69,8 @@ templ HighlightedSlider(predictions []dto.Prediction) {
             </div>
         </div>
 
-        <!-- Tiny Stacked Cards (approx. 30% width, hidden on Mobile) -->
-        <div id="tinyCardsContainer" class="hidden md:flex w-full md:w-3/10 bg-gray-900 p-4 pt-14 flex-col space-y-4 items-center overflow-hidden snap-start">
+        <!-- Tiny Stacked Cards (approx. 30% width, visible only on desktop) -->
+        <div id="tinyCardsContainer" class="hidden lg:flex w-full lg:w-3/10 bg-gray-900 p-4 pt-14 flex-col space-y-4 items-center overflow-hidden snap-start">
             for i, p := range predictions {
                 if i != 0 && i <= 4 {
                     <div class="relative w-full h-28 bg-gray-700 rounded-lg overflow-hidden shadow-md group snap-start">
@@ -115,15 +115,6 @@ templ SlideContent(p dto.Prediction) {
     </div>
 }
 
-templ TinyCard(p dto.Prediction) {
-    <div class="flex items-center space-x-4 p-2 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 cursor-pointer">
-        <!-- Image -->
-        <img src={p.ImageURL} alt={p.Headline} class="w-12 h-12 md:w-16 md:h-16 object-cover rounded-lg"/>
-        <!-- Headline -->
-        <h3 class="text-sm font-bold text-gray-800 truncate">{p.Headline}</h3>
-    </div>
-}
-
 templ MorePredictions(predictions []dto.Prediction) {
     if len(predictions) <= 8 {
         return
@@ -160,8 +151,6 @@ templ MorePredictions(predictions []dto.Prediction) {
       </div>
     </div>
 }
-
-
 
 func confidenceColor(conf int) string {
     switch {
