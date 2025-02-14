@@ -107,19 +107,28 @@ func (s *ForecastService) GenerateForecasts(category newsapi.Category) ([]dto.Fo
 	return forecasts, nil
 }
 
-func (s *ForecastService) GetForecasts() ([]dto.Forecast, error) {
-	forecasts, err := s.ForecastRepository.GetForecasts()
+func (s *ForecastService) GetForecasts(limit int, offset int) ([]dto.Forecast, error) {
+	forecasts, err := s.ForecastRepository.GetForecasts(limit, offset)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get forecasts: %v", err)
 	}
 
 	var result []dto.Forecast
 	for _, forecast := range forecasts {
-		dtoForecast := s.convertToDTO(forecast)
-		result = append(result, dtoForecast)
+		dtoForecast := s.convertToDTO(&forecast)
+		result = append(result, *dtoForecast)
 	}
 
 	return result, nil
+}
+
+func (s *ForecastService) GetForecast(forecastId uuid.UUID) (*dto.Forecast, error) {
+	forecast, err := s.ForecastRepository.GetForecast(forecastId)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get forecast: %v", err)
+	}
+
+	return s.convertToDTO(forecast), nil
 }
 
 func (s *ForecastService) SaveForecasts(forecasts []dto.Forecast) error {
@@ -140,7 +149,7 @@ func (s *ForecastService) SaveForecast(forecast *dto.Forecast) error {
 	return nil
 }
 
-func (s *ForecastService) convertToDTO(forecast model.Forecast) dto.Forecast {
+func (s *ForecastService) convertToDTO(forecast *model.Forecast) *dto.Forecast {
 	dtoOutcomes := make([]dto.Outcome, len(forecast.Outcomes))
 	for i, o := range forecast.Outcomes {
 		dtoOutcomes[i] = dto.Outcome{
@@ -158,7 +167,8 @@ func (s *ForecastService) convertToDTO(forecast model.Forecast) dto.Forecast {
 		}
 	}
 
-	return dto.Forecast{
+	return &dto.Forecast{
+		ID:        forecast.ID,
 		Headline:  forecast.Headline,
 		Summary:   forecast.Summary,
 		Outcomes:  dtoOutcomes,

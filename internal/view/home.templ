@@ -9,7 +9,7 @@ templ Home() {
 
         <!-- Forecast Feed -->
         <div id="forecast-feed"
-             hx-get="/api/forecasts"
+             hx-get="/api/forecasts?limit=9&offset=0"
              hx-trigger="load"
              hx-target="#forecast-feed"
              hx-indicator="#loading-indicator"

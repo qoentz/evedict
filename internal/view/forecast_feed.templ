@@ -73,7 +73,7 @@ templ HighlightedSlider(forecasts []dto.Forecast) {
         <div id="tinyCardsContainer" class="hidden lg:flex w-full lg:w-3/10 bg-gray-900 p-4 pt-14 flex-col space-y-4 items-center overflow-hidden snap-start">
             for i, p := range forecasts {
                 if i != 0 && i <= 4 {
-                    <div class="relative w-full h-28 bg-gray-700 rounded-lg overflow-hidden shadow-md group snap-start">
+                    <div hx-get={"/api/forecasts/" + fmt.Sprintf("%v", p.ID)} hx-trigger="click" hx-target="#forecast-feed" hx-swap="innerHTML" class="cursor-pointer relative w-full h-28 bg-gray-700 rounded-lg overflow-hidden shadow-md group snap-start">
                         <!-- Image -->
                         <img src={p.ImageURL} alt="Tiny Card Image" class="w-full h-full object-cover opacity-70 group-hover:opacity-50 transition-opacity duration-300" />
                         <!-- Headline Overlay -->
@@ -90,14 +90,14 @@ templ HighlightedSlider(forecasts []dto.Forecast) {
 }
 
 templ SlideContent(p dto.Forecast) {
-    <div class="relative w-full h-full flex bg-gray-800 rounded-lg overflow-hidden">
+    <div hx-get={"/api/forecasts/" + fmt.Sprintf("%v", p.ID)} hx-trigger="click" hx-target="#forecast-feed" hx-swap="innerHTML" class="cursor-pointer relative w-full h-full flex bg-gray-800 rounded-lg overflow-hidden">
         <!-- Image Background with Bottom Gradient -->
-        <div class="absolute inset-0 w-full h-full rounded-lg overflow-hidden">
-            <!-- Image -->
-            <img src={p.ImageURL} alt="Forecast Image" loading="lazy" class="w-full h-full object-cover object-center rounded-lg" />
-            <!-- Gradient Overlay -->
-            <div class="absolute inset-0 bg-gradient-to-t from-black to-transparent"></div>
-        </div>
+            <div class="absolute inset-0 w-full h-full rounded-lg overflow-hidden">
+                <!-- Image -->
+                <img src={p.ImageURL} alt="Forecast Image" loading="lazy" class="w-full h-full object-cover object-center rounded-lg" />
+                <!-- Gradient Overlay -->
+                <div class="absolute inset-0 bg-gradient-to-t from-black to-transparent"></div>
+            </div>
 
         <!-- Content Overlay -->
         <div class="relative z-10 flex flex-col justify-end w-full h-full p-4 md:p-6 space-y-2 md:space-y-4">
@@ -126,7 +126,7 @@ templ MoreForecasts(forecasts []dto.Forecast) {
         for i, p := range forecasts {
           if i >= 5 && i <= 8 {
             if i == 8 {
-              <div class="bg-gray-600 rounded-lg shadow-md overflow-hidden transform hover:scale-105 transition duration-300 md:hidden lg:block">
+              <div hx-get={"/api/forecasts/" + fmt.Sprintf("%v", p.ID)} hx-trigger="click" hx-target="#forecast-feed" hx-swap="innerHTML" class="cursor-pointer bg-gray-600 rounded-lg shadow-md overflow-hidden transform hover:scale-105 transition duration-300 md:hidden lg:block">
                 <!-- Image -->
                 <img src={p.ImageURL} alt={p.Headline} class="w-full h-28 md:h-40 object-cover" />
                 <!-- Card Content -->
@@ -136,7 +136,7 @@ templ MoreForecasts(forecasts []dto.Forecast) {
                 </div>
               </div>
             } else {
-              <div class="bg-gray-600 rounded-lg shadow-md overflow-hidden transform hover:scale-105 transition duration-300">
+              <div hx-get={"/api/forecasts/" + fmt.Sprintf("%v", p.ID)} hx-trigger="click" hx-target="#forecast-feed" hx-swap="innerHTML" class="cursor-pointer bg-gray-600 rounded-lg shadow-md overflow-hidden transform hover:scale-105 transition duration-300">
                 <!-- Image -->
                 <img src={p.ImageURL} alt={p.Headline} class="w-full h-28 md:h-40 object-cover" />
                 <!-- Card Content -->
@@ -150,34 +150,6 @@ templ MoreForecasts(forecasts []dto.Forecast) {
         }
       </div>
     </div>
-}
-
-func confidenceColor(conf int) string {
-    switch {
-    case conf >= 70:
-        return "bg-green-500"
-    case conf >= 40:
-        return "bg-yellow-500"
-    default:
-        return "bg-red-500"
-    }
-}
-
-// Helper to generate style width as a data attribute
-func dataWidth(percent int) string {
-    return fmt.Sprintf("%d%%", percent)
-}
-
-
-func confidenceClass(confidence int) string {
-    switch {
-    case confidence >= 70:
-        return "bg-[#e6f4ea] text-[#2e7d32] border-l-[#2e7d32]"
-    case confidence >= 40:
-        return "bg-[#fff3e0] text-[#ef6c00] border-l-[#ef6c00]"
-    default:
-        return "bg-[#ffebee] text-[#c62828] border-l-[#c62828]"
-    }
 }
 
 

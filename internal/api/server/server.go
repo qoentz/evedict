@@ -25,7 +25,8 @@ func InitRouter(reg *registry.Registry) *mux.Router {
 	}).Methods("GET")
 
 	api := router.PathPrefix("/api").Subrouter()
-	api.Handle("/forecasts/", handler.GetForecasts(reg.ForecastService)).Methods("GET")
+	api.Handle("/forecasts", handler.GetForecasts(reg.ForecastService)).Methods("GET")
+	api.Handle("/forecasts/{forecastId}", handler.GetForecast(reg.ForecastService)).Methods("GET")
 
 	api.Handle("/gen", handler.GenerateForecasts(reg.ForecastService)).Methods("GET")
 

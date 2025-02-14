@@ -17,33 +17,48 @@ func NewForecastRepository(db *sqlx.DB) *ForecastRepository {
 	}
 }
 
-func (r *ForecastRepository) GetForecasts() ([]model.Forecast, error) {
+func (r *ForecastRepository) GetForecasts(limit int, offset int) ([]model.Forecast, error) {
 	var forecasts []model.Forecast
-	err := r.DB.Select(&forecasts, `
+	query := `
 		SELECT id, headline, summary, image_url, timestamp 
 		FROM forecast
 		ORDER BY timestamp DESC
-		LIMIT 10
-	`)
+		LIMIT $1 OFFSET $2
+	`
+
+	err := r.DB.Select(&forecasts, query, limit, offset)
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch forecasts: %v", err)
 	}
 
-	for i := range forecasts {
-		outcomes, err := r.getOutcomesByForecastID(forecasts[i].ID)
-		if err != nil {
-			return nil, fmt.Errorf("failed to fetch outcomes for forecast %d: %v", forecasts[i].ID, err)
-		}
-		forecasts[i].Outcomes = outcomes
+	return forecasts, nil
+}
 
-		sources, err := r.getSourcesByForecastID(forecasts[i].ID)
-		if err != nil {
-			return nil, fmt.Errorf("failed to fetch sources for forecast %d: %v", forecasts[i].ID, err)
-		}
-		forecasts[i].Sources = sources
+func (r *ForecastRepository) GetForecast(forecastId uuid.UUID) (*model.Forecast, error) {
+	var forecast model.Forecast
+	query := `
+		SELECT id, headline, summary, image_url, timestamp 
+		FROM forecast
+		WHERE id = $1
+	`
+	err := r.DB.Get(&forecast, query, forecastId)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch forecast: %v", err)
 	}
 
-	return forecasts, nil
+	outcomes, err := r.getOutcomesByForecastID(forecastId)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch outcomes for forecast %s: %v", forecastId, err)
+	}
+	forecast.Outcomes = outcomes
+
+	sources, err := r.getSourcesByForecastID(forecastId)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch sources for forecast %s: %v", forecastId, err)
+	}
+	forecast.Sources = sources
+
+	return &forecast, nil
 }
 
 func (r *ForecastRepository) SaveForecast(forecast *model.Forecast) error {

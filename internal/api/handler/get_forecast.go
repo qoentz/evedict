@@ -2,29 +2,34 @@ package handler
 
 import (
 	"fmt"
+	"github.com/google/uuid"
+	"github.com/gorilla/mux"
 	"github.com/qoentz/evedict/internal/service"
-	"github.com/qoentz/evedict/internal/util"
 	"github.com/qoentz/evedict/internal/view"
 	"net/http"
 )
 
-func GetForecasts(s *service.ForecastService) http.HandlerFunc {
+func GetForecast(s *service.ForecastService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 
-		limit, offset, err := util.ParsePagination(r, 9, 0)
+		forecastId, err := uuid.Parse(mux.Vars(r)["forecastId"])
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			http.Error(w, fmt.Sprintf("Invalid forecast ID: %v", err), http.StatusBadRequest)
 			return
 		}
 
-		forecasts, err := s.GetForecasts(limit, offset)
+		forecast, err := s.GetForecast(forecastId)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Couldn't get forecasts: %v", err), http.StatusInternalServerError)
 			return
 		}
 
-		err = view.ForecastFeed(forecasts).Render(r.Context(), w)
+		for _, forr := range forecast.Outcomes {
+			fmt.Println(forr.ConfidenceLevel)
+		}
+
+		err = view.ForecastDetail(forecast).Render(r.Context(), w)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Error rendering template: %v", err), http.StatusInternalServerError)
 			return
