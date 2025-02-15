@@ -70,7 +70,7 @@ templ HighlightedSlider(forecasts []dto.Forecast) {
         </div>
 
         <!-- Tiny Stacked Cards (approx. 30% width, visible only on desktop) -->
-        <div id="tinyCardsContainer" class="hidden md:flex w-full md:w-3/10 bg-gray-900 p-4 pt-14 flex-col space-y-4 items-center overflow-hidden snap-start">
+        <div id="tinyCardsContainer" class="hidden lg:flex w-full md:w-3/10 bg-gray-900 p-4 pt-14 flex-col space-y-4 items-center overflow-hidden snap-start">
             for i, p := range forecasts {
                 if i != 0 && i <= 4 {
                     <div hx-get={"/api/forecasts/" + fmt.Sprintf("%v", p.ID)}
