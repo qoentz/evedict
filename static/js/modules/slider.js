@@ -58,6 +58,8 @@ function showNextSlide() {
     slides[nextSlideIndex].classList.remove('translate-x-full', 'opacity-0');
     slideIndex = nextSlideIndex;
 
+    updateSlidePointerEvents(slides, slideIndex);
+
     updateDots();
     updateTinyCards(slides, tinyCardsContainer, totalSlides, visibleTinyCardsCount, 'next');
 }
@@ -75,6 +77,8 @@ function showPrevSlide() {
     slides[slideIndex].classList.add('translate-x-full', 'opacity-0');
     slides[prevSlideIndex].classList.remove('translate-x-full', 'opacity-0');
     slideIndex = prevSlideIndex;
+
+    updateSlidePointerEvents(slides, slideIndex);
 
     updateDots();
     updateTinyCards(slides, tinyCardsContainer, totalSlides, visibleTinyCardsCount, 'prev');
@@ -139,18 +143,49 @@ function updateTinyCards(slides, tinyCardsContainer, totalSlides, visibleTinyCar
 }
 
 function createTinyCard(slide) {
+    // Get the same URL from the original clickable element in the slide.
+    const clickableEl = slide.querySelector('[hx-get]');
+    const hxGet = clickableEl ? clickableEl.getAttribute('hx-get') : '';
     const imgSrc = slide.querySelector('img').src;
     const headline = slide.querySelector('h2').textContent;
 
     const card = document.createElement('div');
-    card.className = 'relative w-full h-28 bg-black rounded-lg overflow-hidden shadow-md group';
+    card.className =
+        'cursor-pointer relative w-full h-28 bg-gray-700 rounded-lg overflow-hidden shadow-md group snap-start';
+
+    // Set HTMX attributes so the card behaves like the original.
+    card.setAttribute('hx-get', hxGet);
+    card.setAttribute('hx-trigger', 'click');
+    card.setAttribute('hx-target', '#forecast-feed');
+    card.setAttribute('hx-swap', 'innerHTML');
+
     card.innerHTML = `
         <img src="${imgSrc}" alt="Tiny Card Image" class="w-full h-full object-cover opacity-70 group-hover:opacity-50 transition-opacity duration-300"/>
         <div class="absolute inset-0 flex items-center justify-center p-2">
             <p class="text-white text-sm font-bold text-center leading-tight">${headline}</p>
         </div>
     `;
+
+    // Explicitly reset any inline transforms.
+    card.style.transform = 'translateY(0)';
+
+    // Re-process the card with HTMX so that its hx-* attributes are bound.
+    if (window.htmx) {
+        htmx.process(card);
+    }
+
     return card;
 }
+
+function updateSlidePointerEvents(slides, activeIndex) {
+    slides.forEach((slide, index) => {
+        if (index === activeIndex) {
+            slide.classList.remove('pointer-events-none');
+        } else {
+            slide.classList.add('pointer-events-none');
+        }
+    });
+}
+
 
 
