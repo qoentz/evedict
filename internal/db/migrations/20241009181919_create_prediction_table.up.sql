@@ -2,7 +2,7 @@ CREATE TABLE forecast (
                             id UUID PRIMARY KEY,
                             headline VARCHAR(255) NOT NULL,
                             summary TEXT,
-                            image_url VARCHAR(255),
+                            image_url VARCHAR,
                             timestamp TIMESTAMPTZ NOT NULL
 );
 

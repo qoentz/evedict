@@ -1,10 +1,10 @@
 package handler
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/qoentz/evedict/internal/eventfeed/newsapi"
 	"github.com/qoentz/evedict/internal/service"
-	"github.com/qoentz/evedict/internal/view"
 	"net/http"
 )
 
@@ -35,16 +35,10 @@ func GenerateForecasts(s *service.ForecastService) http.HandlerFunc {
 			return
 		}
 
-		err = view.ForecastFeed(forecasts).Render(r.Context(), w)
+		w.Header().Set("Content-Type", "application/json")
+		err = json.NewEncoder(w).Encode(forecasts)
 		if err != nil {
-			http.Error(w, fmt.Sprintf("Error rendering template: %v", err), http.StatusInternalServerError)
 			return
 		}
-
-		//w.Header().Set("Content-Type", "application/json")
-		//err = json.NewEncoder(w).Encode(forecasts)
-		//if err != nil {
-		//	return
-		//}
 	}
 }

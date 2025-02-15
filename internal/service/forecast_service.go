@@ -79,9 +79,10 @@ func (s *ForecastService) GenerateForecasts(category newsapi.Category) ([]dto.Fo
 		var sources []dto.Source
 
 		mainSource := dto.Source{
-			Name:  mainArticle.Source.Name,
-			Title: mainArticle.Title,
-			URL:   mainArticle.URL,
+			Name:     mainArticle.Source.Name,
+			Title:    mainArticle.Title,
+			URL:      mainArticle.URL,
+			ImageURL: mainArticle.URLToImage,
 		}
 		sources = append(sources, mainSource)
 
@@ -91,9 +92,10 @@ func (s *ForecastService) GenerateForecasts(category newsapi.Category) ([]dto.Fo
 			}
 
 			source := dto.Source{
-				Name:  article.Source.Name,
-				Title: article.Title,
-				URL:   article.URL,
+				Name:     article.Source.Name,
+				Title:    article.Title,
+				URL:      article.URL,
+				ImageURL: article.URLToImage,
 			}
 
 			sources = append(sources, source)
@@ -205,6 +207,7 @@ func (s *ForecastService) convertToModel(forecasts []dto.Forecast) []model.Forec
 				Name:       src.Name,
 				Title:      src.Title,
 				URL:        src.URL,
+				ImageURL:   src.ImageURL,
 			}
 		}
 

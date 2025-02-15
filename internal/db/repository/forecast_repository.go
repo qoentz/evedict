@@ -115,7 +115,7 @@ func (r *ForecastRepository) SaveForecasts(forecasts []model.Forecast) error {
 	// Prepare queries, including the `id` field
 	forecastQuery := `INSERT INTO forecast (id, headline, summary, image_url, timestamp) VALUES ($1, $2, $3, $4, $5)`
 	outcomeQuery := `INSERT INTO outcome (id, forecast_id, content, confidence_level) VALUES ($1, $2, $3, $4)`
-	sourceQuery := `INSERT INTO source (id, forecast_id, name, title, url) VALUES ($1, $2, $3, $4, $5)`
+	sourceQuery := `INSERT INTO source (id, forecast_id, name, title, url, image_url) VALUES ($1, $2, $3, $4, $5, $6)`
 
 	// Insert each forecast and associated records within the transaction
 	for i := range forecasts {
@@ -139,7 +139,7 @@ func (r *ForecastRepository) SaveForecasts(forecasts []model.Forecast) error {
 
 		// Insert associated Sources with specified UUIDs
 		for _, source := range forecast.Sources {
-			_, err = tx.Exec(sourceQuery, source.ID, forecast.ID, source.Name, source.Title, source.URL)
+			_, err = tx.Exec(sourceQuery, source.ID, forecast.ID, source.Name, source.Title, source.URL, source.ImageURL)
 			if err != nil {
 				tx.Rollback()
 				return fmt.Errorf("failed to insert source: %v", err)

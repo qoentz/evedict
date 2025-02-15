@@ -25,10 +25,6 @@ func GetForecast(s *service.ForecastService) http.HandlerFunc {
 			return
 		}
 
-		for _, forr := range forecast.Outcomes {
-			fmt.Println(forr.ConfidenceLevel)
-		}
-
 		err = view.ForecastDetail(forecast).Render(r.Context(), w)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Error rendering template: %v", err), http.StatusInternalServerError)
