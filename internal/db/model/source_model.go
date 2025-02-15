@@ -8,5 +8,5 @@ type Source struct {
 	Name       string    `db:"name"`
 	Title      string    `db:"title"`
 	URL        string    `db:"url"`
-	ImageURL   string    `db:"image_url"`
+	ImageURL   *string   `db:"image_url"`
 }

@@ -84,6 +84,7 @@ func (s *ForecastService) GenerateForecasts(category newsapi.Category) ([]dto.Fo
 			URL:      mainArticle.URL,
 			ImageURL: mainArticle.URLToImage,
 		}
+
 		sources = append(sources, mainSource)
 
 		for _, article := range articles {
@@ -167,6 +168,10 @@ func (s *ForecastService) convertToDTO(forecast *model.Forecast) *dto.Forecast {
 			Title: src.Title,
 			URL:   src.URL,
 		}
+
+		if src.ImageURL != nil {
+			dtoSources[i].ImageURL = *src.ImageURL
+		}
 	}
 
 	return &dto.Forecast{
@@ -207,7 +212,7 @@ func (s *ForecastService) convertToModel(forecasts []dto.Forecast) []model.Forec
 				Name:       src.Name,
 				Title:      src.Title,
 				URL:        src.URL,
-				ImageURL:   src.ImageURL,
+				ImageURL:   &src.ImageURL,
 			}
 		}
 

@@ -163,6 +163,6 @@ func (r *ForecastRepository) getOutcomesByForecastID(forecastID uuid.UUID) ([]mo
 
 func (r *ForecastRepository) getSourcesByForecastID(forecastID uuid.UUID) ([]model.Source, error) {
 	var sources []model.Source
-	err := r.DB.Select(&sources, `SELECT id, forecast_id, name, title, url FROM source WHERE forecast_id = $1`, forecastID)
+	err := r.DB.Select(&sources, `SELECT id, forecast_id, name, title, url, image_url FROM source WHERE forecast_id = $1`, forecastID)
 	return sources, err
 }
