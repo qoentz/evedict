@@ -11,8 +11,8 @@ templ ForecastFeed(forecasts []dto.Forecast) {
         <div class="highlighted-slider">
             @HighlightedSlider(forecasts)
         </div>
-        <!-- More Forecasts Section -->
-        @MoreForecasts(forecasts)
+        <!-- Bottom Forecasts Section -->
+        @BottomForecasts(forecasts)
     </div>
 }
 
@@ -79,7 +79,7 @@ templ HighlightedSlider(forecasts []dto.Forecast) {
                          hx-swap="innerHTML"
                          class="cursor-pointer relative w-full h-28 bg-gray-800 rounded-lg overflow-hidden shadow-md group snap-start">
                         <!-- Image -->
-                        <img src={p.ImageURL} alt="Tiny Card Image" class="w-full h-full object-cover opacity-70 group-hover:opacity-50 transition-opacity duration-300" />
+                        <img src={p.ImageURL} alt="Tiny Card Image" class="w-full h-full object-cover opacity-70 group-hover:opacity-50 transition-opacity" />
                         <!-- Headline Overlay -->
                         <div class="absolute inset-0 flex items-center justify-center p-2">
                             <p class="text-white text-sm font-bold text-center leading-tight">
@@ -110,20 +110,20 @@ templ SlideContent(p dto.Forecast) {
         <!-- Content Overlay -->
         <div class="relative z-10 flex flex-col justify-end w-full h-full p-4 md:p-6 space-y-2 md:space-y-4">
             <!-- Headline -->
-            <h2 class="text-xl md:text-3xl font-bold text-white leading-tight transition-colors duration-300 ease-in-out group-hover:text-gray-400">
+            <h2 class="text-xl md:text-3xl font-bold text-white leading-tight group-hover:text-gray-300">
                 {p.Headline}
             </h2>
             <!-- Separator -->
             <div class="h-[1px] w-12 md:w-16 bg-gray-600"></div>
             <!-- Summary -->
-            <p class="text-xs md:text-sm text-gray-300 leading-relaxed line-clamp-3 transition-colors duration-300 ease-in-out group-hover:text-gray-400">
+            <p class="text-xs md:text-sm text-gray-300 leading-relaxed line-clamp-3 group-hover:text-gray-400">
                 {p.Summary}
             </p>
         </div>
     </div>
 }
 
-templ MoreForecasts(forecasts []dto.Forecast) {
+templ BottomForecasts(forecasts []dto.Forecast) {
     if len(forecasts) <= 8 {
         return
     }
@@ -134,23 +134,43 @@ templ MoreForecasts(forecasts []dto.Forecast) {
         for i, p := range forecasts {
           if i >= 5 && i <= 8 {
             if i == 8 {
-              <div hx-get={"/api/forecasts/" + fmt.Sprintf("%v", p.ID)} hx-trigger="click" hx-target="#forecast-feed" hx-swap="innerHTML" class="cursor-pointer bg-gray-600 rounded-lg shadow-md overflow-hidden transform hover:scale-105 transition duration-300 md:hidden lg:block">
+              <div hx-get={"/api/forecasts/" + fmt.Sprintf("%v", p.ID)}
+                   hx-trigger="click"
+                   hx-target="#forecast-feed"
+                   hx-swap="innerHTML"
+                   class="cursor-pointer bg-gray-600 rounded-lg shadow-md overflow-hidden group md:hidden lg:block">
                 <!-- Image -->
-                <img src={p.ImageURL} alt={p.Headline} class="w-full h-28 md:h-40 object-cover" />
+                <img src={p.ImageURL}
+                     alt={p.Headline}
+                     class="w-full h-28 md:h-40 object-cover" />
                 <!-- Card Content -->
                 <div class="p-2 md:p-4">
-                  <h3 class="text-sm md:text-lg font-semibold text-white mb-1 md:mb-2">{p.Headline}</h3>
-                  <p class="text-gray-300 text-xs md:text-sm line-clamp-3">{p.Summary}</p>
+                  <h3 class="text-sm md:text-lg font-semibold text-white mb-1 md:mb-2 group-hover:text-gray-300">
+                    {p.Headline}
+                  </h3>
+                  <p class="text-gray-300 text-xs md:text-sm line-clamp-3 group-hover:text-gray-400">
+                    {p.Summary}
+                  </p>
                 </div>
               </div>
             } else {
-              <div hx-get={"/api/forecasts/" + fmt.Sprintf("%v", p.ID)} hx-trigger="click" hx-target="#forecast-feed" hx-swap="innerHTML" class="cursor-pointer bg-gray-600 rounded-lg shadow-md overflow-hidden transform hover:scale-105 transition duration-300">
+              <div hx-get={"/api/forecasts/" + fmt.Sprintf("%v", p.ID)}
+                   hx-trigger="click"
+                   hx-target="#forecast-feed"
+                   hx-swap="innerHTML"
+                   class="cursor-pointer bg-gray-600 rounded-lg shadow-md overflow-hidden group">
                 <!-- Image -->
-                <img src={p.ImageURL} alt={p.Headline} class="w-full h-28 md:h-40 object-cover" />
+                <img src={p.ImageURL}
+                     alt={p.Headline}
+                     class="w-full h-28 md:h-40 object-cover" />
                 <!-- Card Content -->
                 <div class="p-2 md:p-4">
-                  <h3 class="text-sm md:text-lg font-semibold text-white mb-1 md:mb-2">{p.Headline}</h3>
-                  <p class="text-gray-300 text-xs md:text-sm line-clamp-3">{p.Summary}</p>
+                  <h3 class="text-sm md:text-lg font-semibold text-white mb-1 md:mb-2 transition-colors ease-in-out group-hover:text-gray-300">
+                    {p.Headline}
+                  </h3>
+                  <p class="text-gray-300 text-xs md:text-sm line-clamp-3 transition-colors ease-in-out group-hover:text-gray-400">
+                    {p.Summary}
+                  </p>
                 </div>
               </div>
             }
@@ -159,9 +179,3 @@ templ MoreForecasts(forecasts []dto.Forecast) {
       </div>
     </div>
 }
-
-
-
-
-
-

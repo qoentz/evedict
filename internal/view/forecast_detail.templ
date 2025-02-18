@@ -5,12 +5,12 @@ import (
     "github.com/qoentz/evedict/internal/api/dto"
 )
 
-templ ForecastDetail(f *dto.Forecast) {
+templ ForecastDetail(f *dto.Forecast, related []dto.Forecast) {
   <div id="forecast-feed" class="relative min-h-[600px] bg-gray-50">
     <div class="relative w-full max-w-screen-xl mx-auto h-auto bg-gray-800 shadow-md overflow-hidden">
       @ForecastBackButton()
       @ForecastHeader(f)
-      @ForecastContent(f)
+      @ForecastContent(f, related)
     </div>
   </div>
 }
@@ -42,53 +42,94 @@ templ ForecastHeader(f *dto.Forecast) {
   </div>
 }
 
-templ ForecastContent(f *dto.Forecast) {
+templ ForecastContent(f *dto.Forecast, related []dto.Forecast) {
   <div class="max-w-screen-xl mx-auto">
     <div class="bg-gray-800 rounded-lg shadow-md p-8">
-      <!-- Grid: Left Column (Summary & Further read) & Right Column (Outcomes) -->
+      <!-- Grid: Left Column (Summary + Related) & Right Column (Outcomes + Further read) -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-        <!-- Left Column: Summary and Further read stacked -->
+        <!-- Left Column: Summary and Related -->
         <div class="space-y-8">
           <!-- Summary -->
           <div>
             <p class="text-base text-white">{f.Summary}</p>
           </div>
-          <!-- Further read -->
+          <!-- Related -->
           <div>
-            <h2 class="text-xl font-semibold mb-4 text-white">Further read</h2>
-            <ul class="space-y-4">
-              for _, s := range f.Sources {
-                <li class="bg-gray-700 rounded-lg p-4 shadow flex flex-col md:flex-row items-start md:items-center justify-between">
-                  <div>
-                    <p class="font-bold text-white text-base">{s.Name}</p>
-                    <p class="text-sm text-gray-300">{s.Title}</p>
+            <h2 class="text-xl font-semibold text-white border-b border-gray-600 pb-2">Related</h2>
+            <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+              for _, r := range related {
+                <div hx-get={"/api/forecasts/" + fmt.Sprintf("%v", r.ID)}
+                     hx-trigger="click"
+                     hx-target="#forecast-feed"
+                     hx-swap="innerHTML"
+                     class="cursor-pointer bg-gray-600 rounded-lg shadow-md overflow-hidden group">
+                  <!-- Image -->
+                  <img src={r.ImageURL}
+                       alt={r.Headline}
+                       class="w-full h-28 md:h-40 object-cover" />
+                  <!-- Card Content -->
+                  <div class="p-2 md:p-4">
+                    <h3 class="text-sm md:text-lg font-semibold text-white mb-1 md:mb-2 group-hover:text-gray-300">
+                      {r.Headline}
+                    </h3>
+                    <p class="text-gray-300 text-xs md:text-sm line-clamp-3 group-hover:text-gray-400">
+                      {r.Summary}
+                    </p>
                   </div>
-                  <a href={ templ.URL(s.URL) } target="_blank" rel="noopener"
-                     class="mt-2 md:mt-0 text-blue-400 hover:underline text-sm">
-                    Visit Source
-                  </a>
-                </li>
+                </div>
               }
-            </ul>
+            </div>
           </div>
         </div>
-        <!-- Right Column: Outcomes -->
+        <!-- Right Column: Outcomes and Further read -->
         <div>
-          <h2 class="text-xl font-semibold mb-4 text-white">Outcomes</h2>
-          <div class="grid grid-cols-1 gap-10">
+          <!-- Outcomes -->
+          <div class="mb-4">
+            <h2 class="text-xl font-semibold text-white border-b border-gray-600 pb-2">Outcomes</h2>
+          </div>
+          <div class="mt-4 grid grid-cols-1 gap-8">
             for _, o := range f.Outcomes {
               <div class="bg-gray-700 rounded-lg p-4 shadow">
                 <p class="text-base font-bold text-white">{o.Content}</p>
-                <!-- Animated Progress Indicator: Horizontal Bar + Circular Pie Chart -->
                 @ProgressBar(&o)
               </div>
             }
+          </div>
+          <!-- Further read -->
+          <div class="mt-8">
+            <div class="mb-4">
+              <h2 class="text-xl font-semibold text-white border-b border-gray-600 pb-2">Further read</h2>
+            </div>
+            <!-- Fixed container: force height and enable vertical scrolling -->
+            <div style="height:570px; overflow-y:auto;">
+              <ul class="space-y-4">
+                for _, s := range f.Sources {
+                  <li class="relative rounded-lg shadow overflow-hidden border border-gray-600" style="height:6.5rem;">
+                    <!-- Background Image -->
+                    <img src={ s.ImageURL } alt={ s.Name } class="absolute inset-0 w-full h-full object-cover filter brightness-75" />
+                    <!-- Gradient Overlay: fades from transparent on the left to black on the right -->
+                    <div class="absolute inset-0 bg-gradient-to-r from-transparent to-black"></div>
+                    <!-- Card Content -->
+                    <div class="relative z-10 p-4 flex flex-col md:flex-row items-center justify-between h-full">
+                      <div class="flex-1 min-h-[3rem]">
+                        <p class="font-bold text-white text-base">{s.Name}</p>
+                        <p class="text-sm text-gray-300">{s.Title}</p>
+                      </div>
+                      <a href={ templ.URL(s.URL) } target="_blank" rel="noopener" class="mt-2 md:mt-0 text-blue-300 hover:underline text-2xl">
+                        <i class="fa fa-external-link"></i>
+                      </a>
+                    </div>
+                  </li>
+                }
+              </ul>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
 }
+
 
 templ ProgressBar(o *dto.Outcome) {
 <!-- Animated Progress Indicator: Horizontal Bar with Floating Circular Indicator -->

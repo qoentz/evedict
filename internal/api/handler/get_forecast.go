@@ -21,11 +21,17 @@ func GetForecast(s *service.ForecastService) http.HandlerFunc {
 
 		forecast, err := s.GetForecast(forecastId)
 		if err != nil {
+			http.Error(w, fmt.Sprintf("Couldn't get forecast: %v", err), http.StatusInternalServerError)
+			return
+		}
+
+		forecasts, err := s.GetForecasts(4, 9)
+		if err != nil {
 			http.Error(w, fmt.Sprintf("Couldn't get forecasts: %v", err), http.StatusInternalServerError)
 			return
 		}
 
-		err = view.ForecastDetail(forecast).Render(r.Context(), w)
+		err = view.ForecastDetail(forecast, forecasts).Render(r.Context(), w)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Error rendering template: %v", err), http.StatusInternalServerError)
 			return
