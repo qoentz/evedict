@@ -14,20 +14,20 @@ import (
 func InitRouter(reg *registry.Registry) *mux.Router {
 	router := mux.NewRouter().StrictSlash(true)
 
+	// Full page endpoints
 	router.HandleFunc("/", handler.Home()).Methods("GET")
-	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
-		http.FileServer(http.Dir("./static/")).ServeHTTP(w, r)
-	})))
+	router.HandleFunc("/forecasts/{forecastId}", handler.GetForecast(reg.ForecastService)).Methods("GET")
 
+	// Static assets and favicon
+	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static/"))))
 	router.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "./static/favicon.ico")
 	}).Methods("GET")
 
+	// API endpoints for htmx partial updates
 	api := router.PathPrefix("/api").Subrouter()
 	api.Handle("/forecasts", handler.GetForecasts(reg.ForecastService)).Methods("GET")
-	api.Handle("/forecasts/{forecastId}", handler.GetForecast(reg.ForecastService)).Methods("GET")
-
+	api.Handle("/forecasts/{forecastId}", handler.GetForecastFragment(reg.ForecastService)).Methods("GET")
 	api.Handle("/gen", handler.GenerateForecasts(reg.ForecastService)).Methods("GET")
 
 	router.NotFoundHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

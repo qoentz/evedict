@@ -5,7 +5,14 @@ import (
     "github.com/qoentz/evedict/internal/api/dto"
 )
 
-templ ForecastDetail(f *dto.Forecast, related []dto.Forecast) {
+templ ForecastDetailPage(f *dto.Forecast, related []dto.Forecast) {
+    @Base() {
+        @ForecastDetailFragment(f, related)
+    }
+}
+
+
+templ ForecastDetailFragment(f *dto.Forecast, related []dto.Forecast) {
   <div id="forecast-feed" class="relative min-h-[600px] bg-gray-50">
     <div class="relative w-full max-w-screen-xl mx-auto h-auto bg-gray-800 shadow-md overflow-hidden">
       @ForecastBackButton()
@@ -62,6 +69,7 @@ templ ForecastContent(f *dto.Forecast, related []dto.Forecast) {
                      hx-trigger="click"
                      hx-target="#forecast-feed"
                      hx-swap="innerHTML"
+                     hx-push-url={"/forecasts/" + fmt.Sprintf("%v", r.ID)}
                      class="cursor-pointer bg-gray-600 rounded-lg shadow-md overflow-hidden group">
                   <!-- Image -->
                   <img src={r.ImageURL}
@@ -179,8 +187,6 @@ templ ProgressBar(o *dto.Outcome) {
 </div>
 }
 
-
-
 func getProgressBarStroke(confidenceLevel int) string {
     if confidenceLevel >= 75 {
         return "#10B981" // Tailwind's green-500
@@ -197,6 +203,7 @@ templ ForecastBackButton() {
       hx-get="/api/forecasts?limit=9&offset=0"
       hx-target="#forecast-feed"
       hx-swap="innerHTML"
+      hx-push-url={"/"}
       class="p-2 transition duration-150 transform hover:scale-110 hover:bg-gray-300 hover:text-gray-800 rounded-full focus:outline-none"
       aria-label="Go back">
       <svg xmlns="http://www.w3.org/2000/svg"

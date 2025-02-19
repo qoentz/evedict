@@ -9,7 +9,7 @@ import (
 	"net/http"
 )
 
-func GetForecast(s *service.ForecastService) http.HandlerFunc {
+func GetForecastFragment(s *service.ForecastService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 
@@ -31,11 +31,10 @@ func GetForecast(s *service.ForecastService) http.HandlerFunc {
 			return
 		}
 
-		err = view.ForecastDetailPage(forecast, forecasts).Render(r.Context(), w)
+		err = view.ForecastDetailFragment(forecast, forecasts).Render(r.Context(), w)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Error rendering template: %v", err), http.StatusInternalServerError)
 			return
 		}
-
 	}
 }
