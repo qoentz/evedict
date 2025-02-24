@@ -62,23 +62,31 @@ templ ForecastContent(f *dto.Forecast, related []dto.Forecast) {
       </div>
 
       <!-- Desktop/iPad Layout -->
-      <div class="hidden md:grid grid-cols-2 gap-8 mb-8">
+      <div class="hidden md:grid grid-cols-2 gap-8 mb-8 items-stretch">
         <!-- Left Column -->
         <div class="space-y-8">
           @ForecastSummary(f)
           @ForecastRelatedDesktop(related)
         </div>
         <!-- Right Column -->
-        <div class="space-y-8">
-          @ForecastOutcomes(f)
-          @ForecastFurtherRead(f)
+        <div class="relative h-full overflow-hidden">
+          <!-- This absolute container fills the right column -->
+          <div class="absolute inset-0 flex flex-col">
+            <!-- Outcomes takes natural height -->
+            <div>
+              @ForecastOutcomes(f)
+            </div>
+            <!-- Further read fills remaining space and scrolls if needed -->
+            <div class="mt-8 flex-1 overflow-y-auto">
+              @ForecastFurtherRead(f)
+            </div>
+          </div>
         </div>
       </div>
 
     </div>
   </div>
 }
-
 
 templ ForecastSummary(f *dto.Forecast) {
   <div>
@@ -190,27 +198,26 @@ templ ForecastFurtherRead(f *dto.Forecast) {
     <div class="mb-4">
       <h2 class="text-xl font-semibold text-white border-b border-gray-600 pb-2">Further read</h2>
     </div>
-    <div style="height:570px; overflow-y:auto;">
-      <ul class="space-y-4">
-        for _, s := range f.Sources {
-          <li class="relative rounded-lg shadow overflow-hidden border border-gray-600" style="height:6.5rem;">
-            <img src={ s.ImageURL } alt={ s.Name } class="absolute inset-0 w-full h-full object-cover filter brightness-75" />
-            <div class="absolute inset-0 bg-gradient-to-r from-transparent to-black"></div>
-            <div class="relative z-10 p-4 flex flex-col md:flex-row items-center justify-between h-full">
-              <div class="flex-1 min-h-[3rem]">
-                <p class="font-bold text-white text-base">{s.Name}</p>
-                <p class="text-sm text-gray-300">{s.Title}</p>
-              </div>
-              <a href={ templ.URL(s.URL) } target="_blank" rel="noopener" class="mt-2 md:mt-0 text-blue-300 hover:underline text-2xl">
-                <i class="fa fa-external-link"></i>
-              </a>
+    <ul class="space-y-4">
+      for _, s := range f.Sources {
+        <li class="relative rounded-lg shadow overflow-hidden border border-gray-600" style="height:6.5rem;">
+          <img src={ s.ImageURL } alt={ s.Name } class="absolute inset-0 w-full h-full object-cover filter brightness-75" />
+          <div class="absolute inset-0 bg-gradient-to-r from-transparent to-black"></div>
+          <div class="relative z-10 p-4 flex flex-col md:flex-row items-center justify-between h-full">
+            <div class="flex-1 min-h-[3rem]">
+              <p class="font-bold text-white text-base">{s.Name}</p>
+              <p class="text-sm text-gray-300">{s.Title}</p>
             </div>
-          </li>
-        }
-      </ul>
-    </div>
+            <a href={ templ.URL(s.URL) } target="_blank" rel="noopener" class="mt-2 md:mt-0 text-blue-300 hover:underline text-2xl">
+              <i class="fa fa-external-link"></i>
+            </a>
+          </div>
+        </li>
+      }
+    </ul>
   </div>
 }
+
 
 templ ProgressBar(o *dto.Outcome) {
 <!-- Animated Progress Indicator: Horizontal Bar with Floating Circular Indicator -->
