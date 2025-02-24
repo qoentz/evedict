@@ -58,7 +58,10 @@ templ ForecastContent(f *dto.Forecast, related []dto.Forecast) {
         @ForecastSummary(f)
         @ForecastOutcomes(f)
         @ForecastRelatedMobile(related)
-        @ForecastFurtherRead(f)
+        <div class="space-y-0">
+            @FurtherReadTitle()
+            @ForecastFurtherRead(f)
+        </div>
       </div>
 
       <!-- Desktop/iPad Layout -->
@@ -76,8 +79,9 @@ templ ForecastContent(f *dto.Forecast, related []dto.Forecast) {
             <div>
               @ForecastOutcomes(f)
             </div>
+            @FurtherReadTitle()
             <!-- Further read fills remaining space and scrolls if needed -->
-            <div class="mt-8 flex-1 overflow-y-auto">
+            <div class="flex-1 overflow-y-auto">
               @ForecastFurtherRead(f)
             </div>
           </div>
@@ -193,11 +197,14 @@ templ ForecastRelatedDesktop(related []dto.Forecast) {
   </div>
 }
 
+templ FurtherReadTitle() {
+   <div class="mt-8 mb-4">
+     <h2 class="text-xl font-semibold text-white border-b border-gray-600 pb-2">Further read</h2>
+   </div>
+}
+
 templ ForecastFurtherRead(f *dto.Forecast) {
   <div>
-    <div class="mb-4">
-      <h2 class="text-xl font-semibold text-white border-b border-gray-600 pb-2">Further read</h2>
-    </div>
     <ul class="space-y-4">
       for _, s := range f.Sources {
         <li class="relative rounded-lg shadow overflow-hidden border border-gray-600" style="height:6.5rem;">
@@ -217,7 +224,6 @@ templ ForecastFurtherRead(f *dto.Forecast) {
     </ul>
   </div>
 }
-
 
 templ ProgressBar(o *dto.Outcome) {
 <!-- Animated Progress Indicator: Horizontal Bar with Floating Circular Indicator -->
