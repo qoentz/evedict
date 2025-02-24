@@ -125,7 +125,7 @@ templ ForecastRelatedMobile(related []dto.Forecast) {
           <div hx-get={"/api/forecasts/" + fmt.Sprintf("%v", r.ID)}
                hx-trigger="click"
                hx-target="#forecast-feed"
-               hx-swap="innerHTML"
+               hx-swap="innerHTML show:window:top"
                hx-push-url={"/forecasts/" + fmt.Sprintf("%v", r.ID)}
                class="cursor-pointer bg-gray-600 rounded-lg shadow-md overflow-hidden group">
             <img src={r.ImageURL}
@@ -157,7 +157,7 @@ templ ForecastRelatedDesktop(related []dto.Forecast) {
           <div hx-get={"/api/forecasts/" + fmt.Sprintf("%v", r.ID)}
                hx-trigger="click"
                hx-target="#forecast-feed"
-               hx-swap="innerHTML"
+               hx-swap="innerHTML show:window:top"
                hx-push-url={"/forecasts/" + fmt.Sprintf("%v", r.ID)}
                class="cursor-pointer bg-gray-600 rounded-lg shadow-md overflow-hidden group hidden lg:block">
             <img src={r.ImageURL}
@@ -176,7 +176,7 @@ templ ForecastRelatedDesktop(related []dto.Forecast) {
           <div hx-get={"/api/forecasts/" + fmt.Sprintf("%v", r.ID)}
                hx-trigger="click"
                hx-target="#forecast-feed"
-               hx-swap="innerHTML"
+               hx-swap="innerHTML show:window:top"
                hx-push-url={"/forecasts/" + fmt.Sprintf("%v", r.ID)}
                class="cursor-pointer bg-gray-600 rounded-lg shadow-md overflow-hidden group">
             <img src={r.ImageURL}
@@ -288,7 +288,7 @@ templ ForecastBackButton() {
     <button
       hx-get="/api/forecasts?limit=9&offset=0"
       hx-target="#forecast-feed"
-      hx-swap="innerHTML"
+      hx-swap="innerHTML show:window:top"
       hx-push-url={"/"}
       class="p-2 transition duration-150 transform hover:scale-110 hover:bg-gray-300 hover:text-gray-800 rounded-full focus:outline-none"
       aria-label="Go back">
