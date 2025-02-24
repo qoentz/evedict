@@ -6,9 +6,9 @@ import { initSlider } from './modules/slider.js';
 import { initBall} from "./modules/logo.js";
 
 document.addEventListener('DOMContentLoaded', () => {
-    initHeader();
-    convertTimestampsToLocal();
+    initHeader()
     initBall()
+    convertTimestampsToLocal();
 });
 
 document.addEventListener('htmx:afterSwap', (event) => {
@@ -17,4 +17,10 @@ document.addEventListener('htmx:afterSwap', (event) => {
         initSlider();
     }
 });
+
+
+
+
+
+
 

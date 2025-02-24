@@ -1,12 +1,15 @@
 export function initHeader() {
-    const header = document.querySelector('.shrinkable-header');
-    const SCROLL_THRESHOLD = 100; // px threshold
+    updateHeader();
+    window.addEventListener('scroll', updateHeader);
+}
 
-    window.addEventListener('scroll', () => {
-        if (window.scrollY > SCROLL_THRESHOLD) {
-            header.classList.add('scrolled');
-        } else {
-            header.classList.remove('scrolled');
-        }
-    });
+export function updateHeader() {
+    const header = document.querySelector('.shrinkable-header');
+    const SCROLL_THRESHOLD = 100;
+    if (!header) return;
+    if (window.scrollY > SCROLL_THRESHOLD) {
+        header.classList.add('scrolled');
+    } else {
+        header.classList.remove('scrolled');
+    }
 }
