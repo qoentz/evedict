@@ -2,13 +2,8 @@ package view
 
 templ Home() {
     @Base() {
-        <!-- Spinner -->
-        <div id="loading-indicator" class="htmx-indicator absolute top-[50%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[999]">
-            <div class="w-16 h-16 border-4 border-gray-300 border-t-gray-600 rounded-full animate-spin"></div>
-        </div>
-
         <!-- Forecast Feed -->
-        <div id="forecast-feed"
+        <div
              hx-get="/api/forecasts?limit=9&offset=0"
              hx-trigger="load"
              hx-target="#forecast-feed"

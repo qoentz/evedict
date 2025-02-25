@@ -11,9 +11,8 @@ templ ForecastDetailPage(f *dto.Forecast, related []dto.Forecast) {
     }
 }
 
-
 templ ForecastDetailFragment(f *dto.Forecast, related []dto.Forecast) {
-  <div id="forecast-feed" class="relative min-h-[600px] bg-gray-50">
+  <div class="relative min-h-[600px] bg-gray-50">
     <div class="relative w-full max-w-screen-xl mx-auto h-auto bg-gray-800 shadow-md overflow-hidden">
       @ForecastBackButton()
       @ForecastHeader(f)

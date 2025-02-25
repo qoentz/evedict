@@ -72,53 +72,46 @@ templ HamburgerMenuIcon() {
 }
 
 templ LogoAndTitle() {
-  <div class="flex items-center animate-fade-slide-in" style="margin-top: 4px;">
-      <div class="relative flex items-center hand-ball-container">
-          <!-- The Hand -->
-          <img src="/static/images/hand.png" alt="Hand"
-               class="h-12 relative z-30 pointer-events-none hand-image"
-               style="top: 16px;">
-
-          <!-- The Ball -->
-          <a href="#"
-             hx-get="/api/forecasts"
-             hx-target="#forecast-feed"
-             hx-trigger="click"
-             hx-indicator="#loading-indicator"
-             hx-swap="innerHTML"
-             hx-push-url={"/"}
-             hx-on::before-request="this.closest('body').querySelector('#forecast-feed').innerHTML = ''"
-             hx-on:click="
-                 document.querySelectorAll('h1 span').forEach(el => {
-                     el.classList.remove('animate-letter-slide-in');
-                     void el.offsetWidth;
-                     el.classList.add('animate-letter-slide-in');
-                 });
-             "
-             class="absolute cursor-pointer z-10"
-
-             style="top: -19px; left: 8px;">
-              <img src="/static/images/crystal_ball.png" alt="Spinning Crystal Ball"
-                   class="h-14 w-14 animate-spin-slow animate-fade-slide-in
-                          transform transition-transform duration-200
-                          hover:brightness-75">
-          </a>
-
-      </div>
-
-      <h1 class="ml-4 text-4xl font-palatino flex space-x-1">
-          <!-- Letters with staggered fade/slide, unchanged -->
-          <span class="inline-block animate-letter-slide-in" style="animation-delay: 0s;">E</span>
-          <span class="inline-block animate-letter-slide-in" style="animation-delay: 0.1s;">v</span>
-          <span class="inline-block animate-letter-slide-in" style="animation-delay: 0.2s;">e</span>
-          <span class="inline-block animate-letter-slide-in" style="animation-delay: 0.3s;">d</span>
-          <span class="inline-block animate-letter-slide-in" style="animation-delay: 0.4s;">i</span>
-          <span class="inline-block animate-letter-slide-in" style="animation-delay: 0.5s;">c</span>
-          <span class="inline-block animate-letter-slide-in" style="animation-delay: 0.6s;">t</span>
-      </h1>
+  <div class="flex items-center animate-fade-slide-in logo-wrapper" style="margin-top: 4px;">
+    <div class="relative flex items-center hand-ball-container">
+      <!-- The Hand -->
+      <img src="/static/images/hand.png" alt="Hand"
+           class="h-12 relative z-30 pointer-events-none hand-image"
+           style="top: 16px;">
+      <!-- The Ball -->
+      <a href="#"
+         hx-get="/api/forecasts"
+         hx-target="#forecast-feed"
+         hx-trigger="click"
+         hx-indicator="#loading-indicator"
+         hx-swap="innerHTML"
+         hx-push-url="/"
+         hx-on::before-request="this.closest('body').querySelector('#forecast-feed').innerHTML = ''"
+         hx-on:click="
+             document.querySelectorAll('.logo-text-wrapper span').forEach(el => {
+                 el.classList.remove('animate-letter-slide-in');
+                 void el.offsetWidth;
+                 el.classList.add('animate-letter-slide-in');
+             });
+         "
+         class="absolute cursor-pointer z-10"
+         style="top: -19px; left: 8px;">
+           <img src="/static/images/crystal_ball.png" alt="Spinning Crystal Ball"
+                class="h-14 w-14 animate-spin-slow transform transition-transform duration-200 hover:brightness-75">
+      </a>
+    </div>
+    <!-- Logo text with letter animations -->
+    <h1 class="ml-4 text-4xl font-palatino flex space-x-1 logo-text-wrapper">
+      <span class="inline-block animate-letter-slide-in" style="animation-delay: 0s;">E</span>
+      <span class="inline-block animate-letter-slide-in" style="animation-delay: 0.1s;">v</span>
+      <span class="inline-block animate-letter-slide-in" style="animation-delay: 0.2s;">e</span>
+      <span class="inline-block animate-letter-slide-in" style="animation-delay: 0.3s;">d</span>
+      <span class="inline-block animate-letter-slide-in" style="animation-delay: 0.4s;">i</span>
+      <span class="inline-block animate-letter-slide-in" style="animation-delay: 0.5s;">c</span>
+      <span class="inline-block animate-letter-slide-in" style="animation-delay: 0.6s;">t</span>
+    </h1>
   </div>
 }
-
 
 templ NavigationMenu() {
   <nav id="nav-menu" class="flex items-center mt-4 lg:mt-0">

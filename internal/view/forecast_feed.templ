@@ -6,7 +6,7 @@ import (
 )
 
 templ ForecastFeed(forecasts []dto.Forecast) {
-    <div id="forecast-feed" class="relative min-h-[600px]">
+    <div class="relative min-h-[600px]">
         <!-- Highlighted Slider -->
         <div class="highlighted-slider">
             @HighlightedSlider(forecasts)
