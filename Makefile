@@ -11,7 +11,7 @@ air:
 	air -c air.toml
 
 tailwind:
-	npx tailwindcss -i internal/view/css/input.css -o static/styles.css --watch
+	npx tailwindcss -i internal/view/css/input.css -o static/css/styles.css --watch
 
 templ:
 	templ generate -watch -proxy=http://localhost:8080
