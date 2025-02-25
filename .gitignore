@@ -39,6 +39,6 @@ package-lock.json
 tmp/
 
 # Tailwind CSS
-static/styles.css
+static/css/styles.css
 
 .DS_Store
