@@ -73,12 +73,12 @@ templ HamburgerMenuIcon() {
 
 templ LogoAndTitle() {
   <div class="flex items-center animate-fade-slide-in logo-wrapper" style="margin-top: 4px;">
-    <div class="relative flex items-center hand-ball-container">
+    <div class="relative flex items-center hand-ball-container" hx-preserve>
       <!-- The Hand -->
       <img src="/static/images/hand.png" alt="Hand"
            class="h-12 relative z-30 pointer-events-none hand-image"
            style="top: 16px;">
-      <!-- The Ball -->
+      <!-- The Ball – note: no CSS spin class here -->
       <a href="#"
          hx-get="/api/forecasts"
          hx-target="#forecast-feed"
@@ -96,8 +96,10 @@ templ LogoAndTitle() {
          "
          class="absolute cursor-pointer z-10"
          style="top: -19px; left: 8px;">
-           <img src="/static/images/crystal_ball.png" alt="Spinning Crystal Ball"
-                class="h-14 w-14 animate-spin-slow transform transition-transform duration-200 hover:brightness-75">
+           <!-- Give the ball an id and do not add any CSS animation class -->
+           <img id="ball" src="/static/images/crystal_ball.png" alt="Spinning Crystal Ball"
+                class="h-14 w-14 transform hover:brightness-75"
+                style="transition: none;">
       </a>
     </div>
     <!-- Logo text with letter animations -->
