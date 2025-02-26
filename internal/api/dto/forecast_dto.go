@@ -16,4 +16,5 @@ type Forecast struct {
 	Tags      []string      `json:"tags"`
 	Sources   []Source      `json:"sources"`
 	Timestamp time.Time     `json:"timestamp"`
+	Related   []Forecast    `json:"related"`
 }

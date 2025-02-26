@@ -25,13 +25,7 @@ func GetForecastFragment(s *service.ForecastService) http.HandlerFunc {
 			return
 		}
 
-		forecasts, err := s.GetForecasts(4, 9)
-		if err != nil {
-			http.Error(w, fmt.Sprintf("Couldn't get forecasts: %v", err), http.StatusInternalServerError)
-			return
-		}
-
-		err = view.ForecastDetailFragment(forecast, forecasts).Render(r.Context(), w)
+		err = view.ForecastDetailFragment(forecast).Render(r.Context(), w)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Error rendering template: %v", err), http.StatusInternalServerError)
 			return

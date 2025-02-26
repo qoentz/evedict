@@ -126,17 +126,45 @@ func (s *ForecastService) GetForecasts(limit int, offset int) ([]dto.Forecast, e
 	return result, nil
 }
 
-func (s *ForecastService) GetForecast(forecastId uuid.UUID) (*dto.Forecast, error) {
-	forecast, err := s.ForecastRepository.GetForecast(forecastId)
+func (s *ForecastService) GetForecast(forecastID uuid.UUID) (*dto.Forecast, error) {
+	forecast, err := s.ForecastRepository.GetForecast(forecastID)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get forecast: %v", err)
+		return nil, err
+	}
+	if forecast == nil {
+		return nil, fmt.Errorf("forecast not found")
 	}
 
-	return s.convertToDTO(forecast), nil
+	tagNames := make([]string, len(forecast.Tags))
+	for i, t := range forecast.Tags {
+		tagNames[i] = t.Name
+	}
+
+	relatedForecasts, err := s.ForecastRepository.GetRelatedForecastsByTagAndCategory(forecast.ID, tagNames, forecast.Category, 4)
+	if err != nil {
+		return nil, err
+	}
+
+	dtoForecast := s.convertToDTO(forecast)
+
+	dtoRelated := make([]dto.Forecast, len(relatedForecasts))
+	for i, rf := range relatedForecasts {
+		dtoRelated[i] = dto.Forecast{
+			ID:       rf.ID,
+			Headline: rf.Headline,
+			Summary:  rf.Summary,
+			ImageURL: rf.ImageURL,
+		}
+	}
+
+	dtoForecast.Related = dtoRelated
+
+	return dtoForecast, nil
 }
 
 func (s *ForecastService) SaveForecasts(forecasts []dto.Forecast) error {
 	modelForecasts := s.convertToModel(forecasts)
+	fmt.Println("CATEGORY: ", modelForecasts[0].Category, " ", modelForecasts[1].Category)
 	err := s.ForecastRepository.SaveForecasts(modelForecasts)
 	if err != nil {
 		return fmt.Errorf("failed to save forecasts: %v", err)
@@ -159,6 +187,13 @@ func (s *ForecastService) convertToDTO(forecast *model.Forecast) *dto.Forecast {
 		dtoOutcomes[i] = dto.Outcome{
 			Content:         o.Content,
 			ConfidenceLevel: o.ConfidenceLevel,
+		}
+	}
+
+	dtoTags := make([]dto.Tag, len(forecast.Tags))
+	for i, t := range forecast.Tags {
+		dtoTags[i] = dto.Tag{
+			Name: t.Name,
 		}
 	}
 

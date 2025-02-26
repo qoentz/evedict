@@ -1,4 +1,7 @@
 predict_events: |
+  IMPORTANT: Output exactly one forecast prediction as a single JSON object.
+  IMPORTANT: The "category" field must be exactly one of the following four words—no more, no less: "Politics", "Economy", "Technology", "Culture". Under no circumstances should any other category (such as "Health", "Sports", "Entertainment", etc.) appear in the output.
+  
   Based on the following main news article, generate a reflective summary prediction that substantiates two possible outcomes, each with a confidence level between 0 and 100. 
   The confidence levels should be realistic and reflect the actual likelihood of each outcome, rather than using fixed placeholder values.
   
@@ -6,7 +9,8 @@ predict_events: |
   Craft a headline that highlights the most intriguing aspect of the prediction, focusing on the most captivating outcome rather than the one with the highest confidence level.
 
   Additionally, choose exactly one category from the following set: "Politics", "Economy", "Technology", "Culture" and include it in the output.
-
+  If the subject matter seems to naturally belong to another category (for example, if it relates to health or sports), you must map it to one of the allowed categories.
+  
   Main Article Title: {{.MainArticle.Title}}
   Main Article Content: {{.MainArticle.Content}}
 

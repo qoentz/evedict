@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
+	"github.com/lib/pq"
 	"github.com/qoentz/evedict/internal/db/model"
+	"github.com/qoentz/evedict/internal/util"
 )
 
 type ForecastRepository struct {
@@ -34,31 +36,85 @@ func (r *ForecastRepository) GetForecasts(limit int, offset int) ([]model.Foreca
 	return forecasts, nil
 }
 
-func (r *ForecastRepository) GetForecast(forecastId uuid.UUID) (*model.Forecast, error) {
-	var forecast model.Forecast
-	query := `
-		SELECT id, headline, summary, image_url, timestamp 
-		FROM forecast
-		WHERE id = $1
-	`
-	err := r.DB.Get(&forecast, query, forecastId)
+func (r *ForecastRepository) GetForecast(forecastID uuid.UUID) (*model.Forecast, error) {
+	var f model.Forecast
+	forecastQuery := `
+        SELECT id, headline, summary, image_url, category, timestamp
+        FROM forecast
+        WHERE id = $1
+    `
+	err := r.DB.Get(&f, forecastQuery, forecastID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch forecast: %v", err)
 	}
 
-	outcomes, err := r.getOutcomesByForecastID(forecastId)
+	outcomes, err := r.getOutcomesByForecastID(forecastID)
 	if err != nil {
-		return nil, fmt.Errorf("failed to fetch outcomes for forecast %s: %v", forecastId, err)
+		return nil, fmt.Errorf("failed to fetch outcomes: %v", err)
 	}
-	forecast.Outcomes = outcomes
+	f.Outcomes = outcomes
 
-	sources, err := r.getSourcesByForecastID(forecastId)
+	sources, err := r.getSourcesByForecastID(forecastID)
 	if err != nil {
-		return nil, fmt.Errorf("failed to fetch sources for forecast %s: %v", forecastId, err)
+		return nil, fmt.Errorf("failed to fetch sources: %v", err)
 	}
-	forecast.Sources = sources
+	f.Sources = sources
 
-	return &forecast, nil
+	tags, err := r.getTagsByForecastID(forecastID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch tags for forecast %s: %v", forecastID, err)
+	}
+	f.Tags = tags
+
+	return &f, nil
+}
+
+func (r *ForecastRepository) GetRelatedForecastsByTagAndCategory(
+	mainID uuid.UUID,
+	tagNames []string,
+	category util.Category,
+	limit int,
+) ([]model.RelatedForecast, error) {
+
+	// If you’re using lib/pq, you can pass tagNames as pq.StringArray to "t2.name = ANY($2)"
+	// We'll define matched_by_tag with a boolean literal in each SELECT.
+	// The final ORDER BY puts matched_by_tag = TRUE first, then newest to oldest.
+
+	unionQuery := `
+    SELECT *
+    FROM (
+        SELECT DISTINCT ON (id) id, headline, summary, image_url, timestamp, matched_by_tag
+        FROM (
+            SELECT f.id, f.headline, f.summary, f.image_url, f.timestamp, TRUE AS matched_by_tag
+            FROM forecast f
+            JOIN forecast_tag ft ON ft.forecast_id = f.id
+            JOIN tag t2 ON t2.id = ft.tag_id
+            WHERE f.id <> $1
+              AND t2.name = ANY($2)
+            UNION ALL
+            SELECT f.id, f.headline, f.summary, f.image_url, f.timestamp, FALSE AS matched_by_tag
+            FROM forecast f
+            WHERE f.id <> $1
+              AND f.category = $3
+        ) AS unioned
+        ORDER BY id, matched_by_tag DESC, timestamp DESC
+    ) AS deduped
+    ORDER BY matched_by_tag DESC, timestamp DESC
+    LIMIT $4
+`
+
+	var related []model.RelatedForecast
+	err := r.DB.Select(&related, unionQuery,
+		mainID,                   // $1
+		pq.StringArray(tagNames), // $2 (the list of tags)
+		category,                 // $3
+		limit,                    // $4
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch related forecasts: %v", err)
+	}
+
+	return related, nil
 }
 
 func (r *ForecastRepository) SaveForecast(forecast *model.Forecast) error {
@@ -220,6 +276,21 @@ func (r *ForecastRepository) getOutcomesByForecastID(forecastID uuid.UUID) ([]mo
 	var outcomes []model.Outcome
 	err := r.DB.Select(&outcomes, `SELECT id, forecast_id, content, confidence_level FROM outcome WHERE forecast_id = $1`, forecastID)
 	return outcomes, err
+}
+
+func (r *ForecastRepository) getTagsByForecastID(forecastID uuid.UUID) ([]model.Tag, error) {
+	var tags []model.Tag
+	query := `
+        SELECT t.id, t.name
+        FROM tag t
+        JOIN forecast_tag ft ON ft.tag_id = t.id
+        WHERE ft.forecast_id = $1
+    `
+	err := r.DB.Select(&tags, query, forecastID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch tags: %v", err)
+	}
+	return tags, nil
 }
 
 func (r *ForecastRepository) getSourcesByForecastID(forecastID uuid.UUID) ([]model.Source, error) {
