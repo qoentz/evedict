@@ -14,6 +14,7 @@ module.exports = {
       fontFamily: {
         palatino: ['Palatino', 'Palatino Linotype', 'Book Antiqua', 'serif'],
         libre: ['"Libre Baskerville"', 'serif'],
+        gillsans: ["Gill Sans", "Gill Sans MT", "Calibri", "Trebuchet MS", "sans-serif"],
       },
       animation: {
         'fade-slide-in': 'fadeSlideIn 1.5s ease-out forwards',

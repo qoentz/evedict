@@ -83,7 +83,7 @@ templ HighlightedSlider(forecasts []dto.Forecast) {
                         <img src={p.ImageURL} alt="Tiny Card Image" class="w-full h-full object-cover opacity-70 group-hover:opacity-50 transition-opacity" />
                         <!-- Headline Overlay -->
                         <div class="absolute inset-0 flex items-center justify-center p-2">
-                            <p class="text-white text-sm font-bold text-center leading-tight">
+                            <p class="text-white text-sm font-bold font-libre text-center leading-tight">
                                 {p.Headline}
                             </p>
                         </div>
@@ -141,7 +141,7 @@ templ BottomForecasts(forecasts []dto.Forecast) {
                    hx-target="#forecast-feed"
                    hx-swap="innerHTML show:window:top"
                    hx-push-url={"/forecasts/" + fmt.Sprintf("%v", p.ID)}
-                   class="cursor-pointer bg-gray-600 rounded-lg shadow-md overflow-hidden group md:hidden lg:block">
+                   class="cursor-pointer bg-gray-600 rounded-lg shadow-md overflow-hidden group font-gillsans md:hidden lg:block">
                 <!-- Image -->
                 <img src={p.ImageURL}
                      alt={p.Headline}
@@ -162,7 +162,7 @@ templ BottomForecasts(forecasts []dto.Forecast) {
                    hx-target="#forecast-feed"
                    hx-swap="innerHTML show:window:top"
                    hx-push-url={"/forecasts/" + fmt.Sprintf("%v", p.ID)}
-                   class="cursor-pointer bg-gray-600 rounded-lg shadow-md overflow-hidden group">
+                   class="cursor-pointer bg-gray-600 rounded-lg shadow-md overflow-hidden group font-gillsans">
                 <!-- Image -->
                 <img src={p.ImageURL}
                      alt={p.Headline}

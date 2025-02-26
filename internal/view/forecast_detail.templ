@@ -110,7 +110,7 @@ templ ForecastOutcomes(f *dto.Forecast) {
     <div class="mt-4 grid grid-cols-1 gap-8">
       for _, o := range f.Outcomes {
         <div class="bg-gray-700 rounded-lg p-6 shadow">
-          <p class="text-lg font-semibold leading-relaxed text-white">
+          <p class="text-base font-libre font-semibold leading-relaxed text-white">
             {o.Content}
           </p>
           @ProgressBar(&o)
@@ -133,7 +133,7 @@ templ ForecastRelatedMobile(related []dto.Forecast) {
                hx-target="#forecast-feed"
                hx-swap="innerHTML show:window:top"
                hx-push-url={"/forecasts/" + fmt.Sprintf("%v", r.ID)}
-               class="cursor-pointer bg-gray-600 rounded-lg shadow-md overflow-hidden group">
+               class="cursor-pointer bg-gray-600 rounded-lg shadow-md overflow-hidden group font-gillsans">
             <img src={r.ImageURL}
                  alt={r.Headline}
                  class="w-full h-28 md:h-40 object-cover" />
@@ -165,7 +165,7 @@ templ ForecastRelatedDesktop(related []dto.Forecast) {
                hx-target="#forecast-feed"
                hx-swap="innerHTML show:window:top"
                hx-push-url={"/forecasts/" + fmt.Sprintf("%v", r.ID)}
-               class="cursor-pointer bg-gray-600 rounded-lg shadow-md overflow-hidden group hidden lg:block">
+               class="cursor-pointer bg-gray-600 rounded-lg shadow-md overflow-hidden group font-gillsans hidden lg:block">
             <img src={r.ImageURL}
                  alt={r.Headline}
                  class="w-full h-28 md:h-40 object-cover" />
@@ -184,7 +184,7 @@ templ ForecastRelatedDesktop(related []dto.Forecast) {
                hx-target="#forecast-feed"
                hx-swap="innerHTML show:window:top"
                hx-push-url={"/forecasts/" + fmt.Sprintf("%v", r.ID)}
-               class="cursor-pointer bg-gray-600 rounded-lg shadow-md overflow-hidden group">
+               class="cursor-pointer bg-gray-600 rounded-lg shadow-md overflow-hidden group font-gillsans">
             <img src={r.ImageURL}
                  alt={r.Headline}
                  class="w-full h-28 md:h-40 object-cover" />
@@ -218,7 +218,7 @@ templ ForecastFurtherRead(f *dto.Forecast) {
           <div class="absolute inset-0 bg-gradient-to-r from-transparent to-black"></div>
           <div class="relative z-10 p-4 flex flex-col md:flex-row items-center justify-between h-full">
             <div class="flex-1 min-h-[3rem]">
-              <p class="font-bold text-white text-base">{s.Name}</p>
+              <p class="font-bold font-libre text-white text-sm">{s.Name}</p>
               <p class="text-sm text-gray-300">{s.Title}</p>
             </div>
             <a href={ templ.URL(s.URL) } target="_blank" rel="noopener" class="mt-2 md:mt-0 text-blue-300 hover:underline text-2xl">
