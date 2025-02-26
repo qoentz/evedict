@@ -1,8 +1,11 @@
 predict_events: |
-  Based on the following main news article, generate a reflective summary prediction that substantiates two possible outcomes, each with a confidence level between 0 and 100.
+  Based on the following main news article, generate a reflective summary prediction that substantiates two possible outcomes, each with a confidence level between 0 and 100. 
+  The confidence levels should be realistic and reflect the actual likelihood of each outcome, rather than using fixed placeholder values.
   
   The summary should provide insightful support for the outcomes by incorporating key points from the main article and adding context from related articles. 
   Craft a headline that highlights the most intriguing aspect of the prediction, focusing on the most captivating outcome rather than the one with the highest confidence level.
+
+  Additionally, choose exactly one category from the following set: "Politics", "Economy", "Technology", "Culture" and include it in the output.
 
   Main Article Title: {{.MainArticle.Title}}
   Main Article Content: {{.MainArticle.Content}}
@@ -13,17 +16,18 @@ predict_events: |
     Description: {{.Description}}
   {{end}}
   
-  Ensure the headline, summary, and each outcome are written in complete sentences with proper punctuation. 
+  Ensure the headline, summary, category, and each outcome are written in complete sentences with proper punctuation. 
   The summary should be at least two to three sentences long, providing a detailed and reflective account that supports the outcomes.
-  
+
   Output the predictions as a single JSON object exactly matching the following format. 
   Do not include any additional text or explanations. Ensure that the JSON is compact, with 
   field names and values properly formatted without extra spaces or line breaks. Do not include 
   any extra spaces before or after colons or field names.
-  
+
   {
     "headline": "Prediction Headline",
     "summary": "Detailed summary of the prediction",
+    "category": "Politics",
     "outcomes": [
       {
         "content": "First possible outcome",
@@ -35,6 +39,7 @@ predict_events: |
       }
     ]
   }
+
 
 
 select_articles: |

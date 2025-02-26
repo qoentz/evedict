@@ -75,6 +75,7 @@ func (s *ForecastService) GenerateForecasts(category newsapi.Category) ([]dto.Fo
 		}
 
 		forecast.ImageURL = mainArticle.URLToImage
+		forecast.Tags = keywords
 
 		var sources []dto.Source
 
@@ -203,6 +204,13 @@ func (s *ForecastService) convertToModel(forecasts []dto.Forecast) []model.Forec
 			}
 		}
 
+		tags := make([]model.Tag, len(forecast.Tags))
+		for i, tag := range forecast.Tags {
+			tags[i] = model.Tag{
+				Name: tag,
+			}
+		}
+
 		// Generate UUIDs and set ForecastID for associated Sources
 		sources := make([]model.Source, len(forecast.Sources))
 		for k, src := range forecast.Sources {
@@ -222,8 +230,10 @@ func (s *ForecastService) convertToModel(forecasts []dto.Forecast) []model.Forec
 			Headline:  forecast.Headline,
 			Summary:   forecast.Summary,
 			ImageURL:  forecast.ImageURL,
+			Category:  forecast.Category,
 			Timestamp: forecast.Timestamp,
 			Outcomes:  outcomes,
+			Tags:      tags,
 			Sources:   sources,
 		}
 	}

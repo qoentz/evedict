@@ -1,6 +1,6 @@
 CREATE TABLE forecast_tag (
                               forecast_id UUID NOT NULL REFERENCES forecast(id) ON DELETE CASCADE,
-                              tag_id INT NOT NULL REFERENCES tag(id) ON DELETE CASCADE,
+                              tag_id UUID NOT NULL REFERENCES tag(id) ON DELETE CASCADE,
                               PRIMARY KEY (forecast_id, tag_id)
 );
 

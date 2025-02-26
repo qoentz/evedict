@@ -112,34 +112,95 @@ func (r *ForecastRepository) SaveForecasts(forecasts []model.Forecast) error {
 		return fmt.Errorf("failed to begin transaction: %v", err)
 	}
 
-	// Prepare queries, including the `id` field
-	forecastQuery := `INSERT INTO forecast (id, headline, summary, image_url, timestamp) VALUES ($1, $2, $3, $4, $5)`
-	outcomeQuery := `INSERT INTO outcome (id, forecast_id, content, confidence_level) VALUES ($1, $2, $3, $4)`
-	sourceQuery := `INSERT INTO source (id, forecast_id, name, title, url, image_url) VALUES ($1, $2, $3, $4, $5, $6)`
+	// 1) Prepare the forecast INSERT query (note the "category" field is included now)
+	forecastQuery := `
+        INSERT INTO forecast (id, headline, summary, image_url, category, timestamp)
+        VALUES ($1, $2, $3, $4, $5, $6)
+    `
 
-	// Insert each forecast and associated records within the transaction
+	// 2) Prepare the others (same as before)
+	outcomeQuery := `
+        INSERT INTO outcome (id, forecast_id, content, confidence_level)
+        VALUES ($1, $2, $3, $4)
+    `
+	sourceQuery := `
+        INSERT INTO source (id, forecast_id, name, title, url, image_url)
+        VALUES ($1, $2, $3, $4, $5, $6)
+    `
+
+	// 3) We'll use this to "upsert" tags by name
+	tagUpsertQuery := `
+        INSERT INTO tag (name)
+        VALUES ($1)
+        ON CONFLICT (name)
+        DO UPDATE SET name = EXCLUDED.name
+        RETURNING id
+    `
+	forecastTagQuery := `
+        INSERT INTO forecast_tag (forecast_id, tag_id)
+        VALUES ($1, $2)
+    `
+
+	// Insert each forecast + associated records
 	for i := range forecasts {
 		forecast := &forecasts[i]
 
-		// Insert the main Forecast record with a specified UUID
-		_, err = tx.Exec(forecastQuery, forecast.ID, forecast.Headline, forecast.Summary, forecast.ImageURL, forecast.Timestamp)
+		// === INSERT MAIN FORECAST (with category) ===
+		_, err = tx.Exec(forecastQuery,
+			forecast.ID,
+			forecast.Headline,
+			forecast.Summary,
+			forecast.ImageURL,
+			forecast.Category, // <--- category now included here
+			forecast.Timestamp,
+		)
 		if err != nil {
 			tx.Rollback()
 			return fmt.Errorf("failed to insert forecast: %v", err)
 		}
 
-		// Insert associated Outcomes with specified UUIDs
+		// === OUTCOMES ===
 		for _, outcome := range forecast.Outcomes {
-			_, err = tx.Exec(outcomeQuery, outcome.ID, forecast.ID, outcome.Content, outcome.ConfidenceLevel)
+			_, err = tx.Exec(outcomeQuery,
+				outcome.ID,
+				forecast.ID,
+				outcome.Content,
+				outcome.ConfidenceLevel,
+			)
 			if err != nil {
 				tx.Rollback()
 				return fmt.Errorf("failed to insert outcome: %v", err)
 			}
 		}
 
-		// Insert associated Sources with specified UUIDs
+		// === TAGS ===
+		for _, tag := range forecast.Tags {
+			// 1. Upsert the tag by name, let Postgres assign/keep its UUID
+			var tagID uuid.UUID
+			err = tx.QueryRow(tagUpsertQuery, tag.Name).Scan(&tagID)
+			if err != nil {
+				tx.Rollback()
+				return fmt.Errorf("failed to upsert tag (name=%q): %v", tag.Name, err)
+			}
+
+			// 2. Insert into forecast_tag
+			_, err = tx.Exec(forecastTagQuery, forecast.ID, tagID)
+			if err != nil {
+				tx.Rollback()
+				return fmt.Errorf("failed to insert forecast_tag link: %v", err)
+			}
+		}
+
+		// === SOURCES ===
 		for _, source := range forecast.Sources {
-			_, err = tx.Exec(sourceQuery, source.ID, forecast.ID, source.Name, source.Title, source.URL, source.ImageURL)
+			_, err = tx.Exec(sourceQuery,
+				source.ID,
+				forecast.ID,
+				source.Name,
+				source.Title,
+				source.URL,
+				source.ImageURL,
+			)
 			if err != nil {
 				tx.Rollback()
 				return fmt.Errorf("failed to insert source: %v", err)
