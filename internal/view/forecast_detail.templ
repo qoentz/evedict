@@ -133,7 +133,7 @@ templ ForecastRelatedMobile(related []dto.Forecast) {
                hx-target="#forecast-feed"
                hx-swap="innerHTML show:window:top"
                hx-push-url={"/forecasts/" + fmt.Sprintf("%v", r.ID)}
-               class="cursor-pointer bg-gray-600 rounded-lg shadow-md overflow-hidden group font-gillsans">
+               class="cursor-pointer bg-gray-600 rounded-lg shadow-md overflow-hidden group">
             <img src={r.ImageURL}
                  alt={r.Headline}
                  class="w-full h-28 md:h-40 object-cover" />
@@ -165,7 +165,7 @@ templ ForecastRelatedDesktop(related []dto.Forecast) {
                hx-target="#forecast-feed"
                hx-swap="innerHTML show:window:top"
                hx-push-url={"/forecasts/" + fmt.Sprintf("%v", r.ID)}
-               class="cursor-pointer bg-gray-600 rounded-lg shadow-md overflow-hidden group font-gillsans hidden lg:block">
+               class="cursor-pointer bg-gray-600 rounded-lg shadow-md overflow-hidden group hidden lg:block">
             <img src={r.ImageURL}
                  alt={r.Headline}
                  class="w-full h-28 md:h-40 object-cover" />
@@ -184,7 +184,7 @@ templ ForecastRelatedDesktop(related []dto.Forecast) {
                hx-target="#forecast-feed"
                hx-swap="innerHTML show:window:top"
                hx-push-url={"/forecasts/" + fmt.Sprintf("%v", r.ID)}
-               class="cursor-pointer bg-gray-600 rounded-lg shadow-md overflow-hidden group font-gillsans">
+               class="cursor-pointer bg-gray-600 rounded-lg shadow-md overflow-hidden group">
             <img src={r.ImageURL}
                  alt={r.Headline}
                  class="w-full h-28 md:h-40 object-cover" />
