@@ -12,7 +12,8 @@ module.exports = {
         '3/10': '30%',
       },
       fontFamily: {
-        'palatino': ['Palatino', 'Palatino Linotype', 'Book Antiqua', 'serif'],
+        palatino: ['Palatino', 'Palatino Linotype', 'Book Antiqua', 'serif'],
+        libre: ['"Libre Baskerville"', 'serif'],
       },
       animation: {
         'fade-slide-in': 'fadeSlideIn 1.5s ease-out forwards',
