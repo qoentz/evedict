@@ -28,7 +28,8 @@ func InitRouter(reg *registry.Registry) *mux.Router {
 	api := router.PathPrefix("/api").Subrouter()
 	api.Handle("/forecasts", handler.GetForecasts(reg.ForecastService)).Methods("GET")
 	api.Handle("/forecasts/{forecastId}", handler.GetForecastFragment(reg.ForecastService)).Methods("GET")
-	api.Handle("/gen", handler.GenerateForecasts(reg.ForecastService)).Methods("GET")
+
+	api.Handle("/gen", handler.GenerateForecasts(reg.ForecastService)).Methods("POST")
 
 	router.NotFoundHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "", http.StatusNotFound)

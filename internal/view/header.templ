@@ -125,22 +125,22 @@ templ NavigationMenu() {
          Politics
          <span class="absolute left-0 right-0 bottom-0 h-0.5 bg-white scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-center"></span>
       </a>
-      <!-- Technology -->
-      <a href="#"
-         class="relative group text-gray-300 hover:text-white text-base font-palatino transition-colors px-3 py-2">
-         Technology
-         <span class="absolute left-0 right-0 bottom-0 h-0.5 bg-white scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-center"></span>
-      </a>
       <!-- Economy -->
       <a href="#"
          class="relative group text-gray-300 hover:text-white text-base font-palatino transition-colors px-3 py-2">
          Economy
          <span class="absolute left-0 right-0 bottom-0 h-0.5 bg-white scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-center"></span>
       </a>
-      <!-- Entertainment -->
+      <!-- Technology -->
+            <a href="#"
+               class="relative group text-gray-300 hover:text-white text-base font-palatino transition-colors px-3 py-2">
+               Technology
+               <span class="absolute left-0 right-0 bottom-0 h-0.5 bg-white scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-center"></span>
+            </a>
+      <!-- Culture -->
       <a href="#"
          class="relative group text-gray-300 hover:text-white text-base font-palatino transition-colors px-3 py-2">
-         Entertainment
+         Culture
          <span class="absolute left-0 right-0 bottom-0 h-0.5 bg-white scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-center"></span>
       </a>
     </div>
@@ -172,13 +172,6 @@ templ MobileNavigationMenu() {
          Politics
          <span class="absolute left-0 right-0 bottom-0 h-0.5 bg-white scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-center"></span>
       </a>
-      <!-- Technology -->
-      <a href="#"
-         class="relative group text-gray-300 hover:text-white text-base font-palatino transition-colors px-3 py-2"
-         @click="setTimeout(() => open = false, 350)">
-         Technology
-         <span class="absolute left-0 right-0 bottom-0 h-0.5 bg-white scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-center"></span>
-      </a>
       <!-- Economy -->
       <a href="#"
          class="relative group text-gray-300 hover:text-white text-base font-palatino transition-colors px-3 py-2"
@@ -186,11 +179,18 @@ templ MobileNavigationMenu() {
          Economy
          <span class="absolute left-0 right-0 bottom-0 h-0.5 bg-white scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-center"></span>
       </a>
-      <!-- Entertainment -->
+      <!-- Technology -->
+            <a href="#"
+               class="relative group text-gray-300 hover:text-white text-base font-palatino transition-colors px-3 py-2"
+               @click="setTimeout(() => open = false, 350)">
+               Technology
+               <span class="absolute left-0 right-0 bottom-0 h-0.5 bg-white scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-center"></span>
+            </a>
+      <!-- Culture -->
       <a href="#"
          class="relative group text-gray-300 hover:text-white text-base font-palatino transition-colors px-3 py-2"
          @click="setTimeout(() => open = false, 350)">
-         Entertainment
+         Culture
          <span class="absolute left-0 right-0 bottom-0 h-0.5 bg-white scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-center"></span>
       </a>
     </div>
