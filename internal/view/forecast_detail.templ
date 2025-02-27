@@ -159,7 +159,7 @@ templ ForecastRelatedDesktop(f *dto.Forecast) {
           if len(f.Tags) > 0 {
              for i, r := range f.Tags {
                 if i > 0 {
-                  ,
+                  <em>,</em>
                 }
                 <em>{r.Name}</em>
              }
@@ -317,12 +317,16 @@ func getProgressBarStroke(confidenceLevel int) string {
 }
 
 templ ForecastBackButton() {
-  <div class="absolute top-6 left-4 z-30">
+  <div class="absolute top-6 left-4 z-30" x-data="{
+    category: new URLSearchParams(window.location.search).get('category') || '',
+    get backUrl() { return this.category ? '/?category=' + this.category : '/' },
+    get forecastsUrl() { return '/api/forecasts?limit=9&offset=0' + (this.category ? '&category=' + this.category : '') }
+  }">
     <button
-      hx-get="/api/forecasts?limit=9&offset=0"
+      x-bind:hx-get="forecastsUrl"
       hx-target="#forecast-feed"
       hx-swap="innerHTML show:window:top"
-      hx-push-url={"/"}
+      x-bind:hx-push-url="backUrl"
       class="p-2 transition duration-150 transform hover:scale-110 hover:bg-gray-300 hover:text-gray-800 rounded-full focus:outline-none"
       aria-label="Go back">
       <svg xmlns="http://www.w3.org/2000/svg"
@@ -338,6 +342,8 @@ templ ForecastBackButton() {
     </button>
   </div>
 }
+
+
 
 
 

@@ -2,13 +2,11 @@ package util
 
 import (
 	"fmt"
-	"net/http"
+	"net/url"
 	"strconv"
 )
 
-func ParsePagination(r *http.Request, defaultLimit, defaultOffset int) (limit, offset int, err error) {
-	query := r.URL.Query()
-
+func ParsePagination(query url.Values, defaultLimit, defaultOffset int) (limit, offset int, err error) {
 	limit = defaultLimit
 	offset = defaultOffset
 

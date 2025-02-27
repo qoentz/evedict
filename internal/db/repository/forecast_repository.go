@@ -19,16 +19,29 @@ func NewForecastRepository(db *sqlx.DB) *ForecastRepository {
 	}
 }
 
-func (r *ForecastRepository) GetForecasts(limit int, offset int) ([]model.Forecast, error) {
+func (r *ForecastRepository) GetForecasts(limit int, offset int, category *util.Category) ([]model.Forecast, error) {
 	var forecasts []model.Forecast
-	query := `
-		SELECT id, headline, summary, image_url, timestamp 
-		FROM forecast
-		ORDER BY timestamp DESC
-		LIMIT $1 OFFSET $2
-	`
+	var err error
 
-	err := r.DB.Select(&forecasts, query, limit, offset)
+	if category != nil {
+		query := `
+			SELECT id, headline, summary, image_url, timestamp 
+			FROM forecast
+			WHERE category = $1
+			ORDER BY timestamp DESC
+			LIMIT $2 OFFSET $3
+		`
+		err = r.DB.Select(&forecasts, query, *category, limit, offset)
+	} else {
+		query := `
+			SELECT id, headline, summary, image_url, timestamp 
+			FROM forecast
+			ORDER BY timestamp DESC
+			LIMIT $1 OFFSET $2
+		`
+		err = r.DB.Select(&forecasts, query, limit, offset)
+	}
+
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch forecasts: %v", err)
 	}

@@ -1,4 +1,4 @@
-package handler
+package fragment
 
 import (
 	"fmt"
@@ -8,17 +8,28 @@ import (
 	"net/http"
 )
 
-func GetForecasts(s *service.ForecastService) http.HandlerFunc {
+func GetForecastsFragment(s *service.ForecastService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 
-		limit, offset, err := util.ParsePagination(r, 9, 0)
+		query := r.URL.Query()
+		limit, offset, err := util.ParsePagination(query, 9, 0)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 
-		forecasts, err := s.GetForecasts(limit, offset)
+		var category *util.Category
+		if catStr := query.Get("category"); catStr != "" {
+			cat, err := util.ParseCategory(catStr)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
+			category = &cat
+		}
+
+		forecasts, err := s.GetForecasts(limit, offset, category)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Couldn't get forecasts: %v", err), http.StatusInternalServerError)
 			return

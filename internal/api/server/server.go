@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/qoentz/evedict/internal/api/handler"
+	"github.com/qoentz/evedict/internal/api/handler/fragment"
+	"github.com/qoentz/evedict/internal/api/handler/page"
 	"github.com/qoentz/evedict/internal/registry"
 	"log"
 	"net"
@@ -15,8 +17,8 @@ func InitRouter(reg *registry.Registry) *mux.Router {
 	router := mux.NewRouter().StrictSlash(true)
 
 	// Full page endpoints
-	router.HandleFunc("/", handler.Home()).Methods("GET")
-	router.HandleFunc("/forecasts/{forecastId}", handler.GetForecast(reg.ForecastService)).Methods("GET")
+	router.HandleFunc("/", page.Home()).Methods("GET")
+	router.HandleFunc("/forecasts/{forecastId}", page.GetForecast(reg.ForecastService)).Methods("GET")
 
 	// Static assets and favicon
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static/"))))
@@ -26,8 +28,8 @@ func InitRouter(reg *registry.Registry) *mux.Router {
 
 	// API endpoints for htmx partial updates
 	api := router.PathPrefix("/api").Subrouter()
-	api.Handle("/forecasts", handler.GetForecasts(reg.ForecastService)).Methods("GET")
-	api.Handle("/forecasts/{forecastId}", handler.GetForecastFragment(reg.ForecastService)).Methods("GET")
+	api.Handle("/forecasts", fragment.GetForecastsFragment(reg.ForecastService)).Methods("GET")
+	api.Handle("/forecasts/{forecastId}", fragment.GetForecastFragment(reg.ForecastService)).Methods("GET")
 
 	api.Handle("/gen", handler.GenerateForecasts(reg.ForecastService)).Methods("POST")
 

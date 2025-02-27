@@ -78,7 +78,7 @@ templ LogoAndTitle() {
       <img src="/static/images/hand.png" alt="Hand"
            class="h-12 relative z-30 pointer-events-none hand-image"
            style="top: 16px;">
-      <!-- The Ball – note: no CSS spin class here -->
+      <!-- The Ball -->
       <a href="#"
          hx-get="/api/forecasts"
          hx-target="#forecast-feed"
@@ -86,20 +86,19 @@ templ LogoAndTitle() {
          hx-indicator="#loading-indicator"
          hx-swap="innerHTML"
          hx-push-url="/"
-         hx-on::before-request="this.closest('body').querySelector('#forecast-feed').innerHTML = ''"
          hx-on:click="
-             document.querySelectorAll('.logo-text-wrapper span').forEach(el => {
-                 el.classList.remove('animate-letter-slide-in');
-                 void el.offsetWidth;
-                 el.classList.add('animate-letter-slide-in');
-             });
+           document.querySelectorAll('.logo-text-wrapper span').forEach(el => {
+               el.classList.remove('animate-letter-slide-in');
+               void el.offsetWidth;
+               el.classList.add('animate-letter-slide-in');
+           });
+           window.dispatchEvent(new CustomEvent('clear-active-category', { bubbles: true, detail: { activeCategory: '' } }));
          "
          class="absolute cursor-pointer z-10"
          style="top: -19px; left: 8px;">
-           <!-- Give the ball an id and do not add any CSS animation class -->
-           <img id="ball" src="/static/images/crystal_ball.png" alt="Spinning Crystal Ball"
-                class="h-14 w-14 transform hover:brightness-75"
-                style="transition: none;">
+         <img id="ball" src="/static/images/crystal_ball.png" alt="Spinning Crystal Ball"
+              class="h-14 w-14 transform hover:brightness-75"
+              style="transition: none;">
       </a>
     </div>
     <!-- Logo text with letter animations -->
@@ -116,32 +115,78 @@ templ LogoAndTitle() {
 }
 
 templ NavigationMenu() {
-  <nav id="nav-menu" class="flex items-center mt-4 lg:mt-0">
+  <nav id="nav-menu" class="flex items-center mt-4 lg:mt-0"
+       x-data="{ activeCategory: (new URLSearchParams(window.location.search).get('category') || '').toLowerCase() }"
+       x-on:clear-active-category.window="activeCategory = $event.detail.activeCategory">
     <!-- Categories Group -->
     <div class="flex items-center space-x-6 border-r border-gray-600 pr-6">
       <!-- Politics -->
       <a href="#"
-         class="relative group text-gray-300 hover:text-white text-base font-palatino transition-colors px-3 py-2">
+         data-category="politics"
+         hx-get="/api/forecasts?limit=9&offset=0&category=Politics"
+         hx-target="#forecast-feed"
+         hx-swap="innerHTML"
+         hx-push-url="/?category=Politics"
+         hx-indicator="#loading-indicator"
+         @click="activeCategory = 'politics'"
+         class="relative group text-base font-palatino transition-colors px-3 py-2"
+         x-bind:class="activeCategory === 'politics' ? 'text-white' : 'text-gray-300 hover:text-white'">
          Politics
-         <span class="absolute left-0 right-0 bottom-0 h-0.5 bg-white scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-center"></span>
+         <span x-bind:class="activeCategory === 'politics'
+                  ? 'absolute left-0 right-0 bottom-0 h-0.5 bg-white transition-transform duration-300 origin-center scale-x-100'
+                  : 'absolute left-0 right-0 bottom-0 h-0.5 bg-white scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-center'">
+         </span>
       </a>
       <!-- Economy -->
       <a href="#"
-         class="relative group text-gray-300 hover:text-white text-base font-palatino transition-colors px-3 py-2">
+         data-category="economy"
+         hx-get="/api/forecasts?limit=9&offset=0&category=Economy"
+         hx-target="#forecast-feed"
+         hx-swap="innerHTML"
+         hx-push-url="/?category=Economy"
+         hx-indicator="#loading-indicator"
+         @click="activeCategory = 'economy'"
+         class="relative group text-base font-palatino transition-colors px-3 py-2"
+         x-bind:class="activeCategory === 'economy' ? 'text-white' : 'text-gray-300 hover:text-white'">
          Economy
-         <span class="absolute left-0 right-0 bottom-0 h-0.5 bg-white scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-center"></span>
+         <span x-bind:class="activeCategory === 'economy'
+                  ? 'absolute left-0 right-0 bottom-0 h-0.5 bg-white transition-transform duration-300 origin-center scale-x-100'
+                  : 'absolute left-0 right-0 bottom-0 h-0.5 bg-white scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-center'">
+         </span>
       </a>
       <!-- Technology -->
-            <a href="#"
-               class="relative group text-gray-300 hover:text-white text-base font-palatino transition-colors px-3 py-2">
-               Technology
-               <span class="absolute left-0 right-0 bottom-0 h-0.5 bg-white scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-center"></span>
-            </a>
+      <a href="#"
+         data-category="technology"
+         hx-get="/api/forecasts?limit=9&offset=0&category=Technology"
+         hx-target="#forecast-feed"
+         hx-swap="innerHTML"
+         hx-push-url="/?category=Technology"
+         hx-indicator="#loading-indicator"
+         @click="activeCategory = 'technology'"
+         class="relative group text-base font-palatino transition-colors px-3 py-2"
+         x-bind:class="activeCategory === 'technology' ? 'text-white' : 'text-gray-300 hover:text-white'">
+         Technology
+         <span x-bind:class="activeCategory === 'technology'
+                  ? 'absolute left-0 right-0 bottom-0 h-0.5 bg-white transition-transform duration-300 origin-center scale-x-100'
+                  : 'absolute left-0 right-0 bottom-0 h-0.5 bg-white scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-center'">
+         </span>
+      </a>
       <!-- Culture -->
       <a href="#"
-         class="relative group text-gray-300 hover:text-white text-base font-palatino transition-colors px-3 py-2">
+         data-category="culture"
+         hx-get="/api/forecasts?limit=9&offset=0&category=Culture"
+         hx-target="#forecast-feed"
+         hx-swap="innerHTML"
+         hx-push-url="/?category=Culture"
+         hx-indicator="#loading-indicator"
+         @click="activeCategory = 'culture'"
+         class="relative group text-base font-palatino transition-colors px-3 py-2"
+         x-bind:class="activeCategory === 'culture' ? 'text-white' : 'text-gray-300 hover:text-white'">
          Culture
-         <span class="absolute left-0 right-0 bottom-0 h-0.5 bg-white scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-center"></span>
+         <span x-bind:class="activeCategory === 'culture'
+                  ? 'absolute left-0 right-0 bottom-0 h-0.5 bg-white transition-transform duration-300 origin-center scale-x-100'
+                  : 'absolute left-0 right-0 bottom-0 h-0.5 bg-white scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-center'">
+         </span>
       </a>
     </div>
     <!-- About and Contact Group -->

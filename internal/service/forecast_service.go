@@ -10,6 +10,7 @@ import (
 	"github.com/qoentz/evedict/internal/llm"
 	"github.com/qoentz/evedict/internal/llm/replicate"
 	"github.com/qoentz/evedict/internal/promptgen"
+	"github.com/qoentz/evedict/internal/util"
 	"time"
 )
 
@@ -117,8 +118,8 @@ func (s *ForecastService) GenerateForecasts(category newsapi.Category) ([]dto.Fo
 	return forecasts, nil
 }
 
-func (s *ForecastService) GetForecasts(limit int, offset int) ([]dto.Forecast, error) {
-	forecasts, err := s.ForecastRepository.GetForecasts(limit, offset)
+func (s *ForecastService) GetForecasts(limit int, offset int, category *util.Category) ([]dto.Forecast, error) {
+	forecasts, err := s.ForecastRepository.GetForecasts(limit, offset, category)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get forecasts: %v", err)
 	}
