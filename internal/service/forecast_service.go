@@ -75,7 +75,13 @@ func (s *ForecastService) GenerateForecasts(category newsapi.Category) ([]dto.Fo
 		}
 
 		forecast.ImageURL = mainArticle.URLToImage
-		forecast.Tags = keywords
+
+		tags := make([]dto.Tag, len(keywords))
+		for i, t := range keywords {
+			tags[i].Name = t
+		}
+
+		forecast.Tags = tags
 
 		var sources []dto.Source
 
@@ -131,6 +137,7 @@ func (s *ForecastService) GetForecast(forecastID uuid.UUID) (*dto.Forecast, erro
 	if err != nil {
 		return nil, err
 	}
+
 	if forecast == nil {
 		return nil, fmt.Errorf("forecast not found")
 	}
@@ -216,6 +223,7 @@ func (s *ForecastService) convertToDTO(forecast *model.Forecast) *dto.Forecast {
 		Summary:   forecast.Summary,
 		Outcomes:  dtoOutcomes,
 		ImageURL:  forecast.ImageURL,
+		Tags:      dtoTags,
 		Sources:   dtoSources,
 		Timestamp: forecast.Timestamp,
 	}
@@ -242,7 +250,7 @@ func (s *ForecastService) convertToModel(forecasts []dto.Forecast) []model.Forec
 		tags := make([]model.Tag, len(forecast.Tags))
 		for i, tag := range forecast.Tags {
 			tags[i] = model.Tag{
-				Name: tag,
+				Name: tag.Name,
 			}
 		}
 

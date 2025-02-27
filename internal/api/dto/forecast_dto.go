@@ -13,7 +13,7 @@ type Forecast struct {
 	Outcomes  []Outcome     `json:"outcomes"`
 	Category  util.Category `json:"category"`
 	ImageURL  string        `json:"imageUrl"`
-	Tags      []string      `json:"tags"`
+	Tags      []Tag         `json:"tags"`
 	Sources   []Source      `json:"sources"`
 	Timestamp time.Time     `json:"timestamp"`
 	Related   []Forecast    `json:"related"`

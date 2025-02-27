@@ -68,7 +68,7 @@ templ ForecastContent(f *dto.Forecast) {
         <!-- Left Column -->
         <div class="space-y-8">
           @ForecastSummary(f)
-          @ForecastRelatedDesktop(f.Related)
+          @ForecastRelatedDesktop(f)
         </div>
         <!-- Right Column -->
         <div class="relative h-full overflow-hidden">
@@ -152,13 +152,22 @@ templ ForecastRelatedMobile(related []dto.Forecast) {
   </div>
 }
 
-templ ForecastRelatedDesktop(related []dto.Forecast) {
+templ ForecastRelatedDesktop(f *dto.Forecast) {
   <div>
-    <div class="mb-4">
-      <h2 class="text-xl font-semibold text-white border-b border-gray-600 pb-2">Related</h2>
-    </div>
+     <div class="mb-4">
+          <h2 class="text-xl font-semibold text-white border-b border-gray-600 pb-2">Related:
+          if len(f.Tags) > 0 {
+             for i, r := range f.Tags {
+                if i > 0 {
+                  ,
+                }
+                <em>{r.Name}</em>
+             }
+          }
+          </h2>
+     </div>
     <div class="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
-      for i, r := range related {
+      for i, r := range f.Related {
         if i >= 2 {
           <div hx-get={"/api/forecasts/" + fmt.Sprintf("%v", r.ID)}
                hx-trigger="click"
