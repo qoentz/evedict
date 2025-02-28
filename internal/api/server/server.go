@@ -19,6 +19,7 @@ func InitRouter(reg *registry.Registry) *mux.Router {
 	// Full page endpoints
 	router.HandleFunc("/", page.Home()).Methods("GET")
 	router.HandleFunc("/forecasts/{forecastId}", page.GetForecast(reg.ForecastService)).Methods("GET")
+	router.HandleFunc("/about", page.About()).Methods("GET")
 
 	// Static assets and favicon
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static/"))))
@@ -30,6 +31,7 @@ func InitRouter(reg *registry.Registry) *mux.Router {
 	api := router.PathPrefix("/api").Subrouter()
 	api.Handle("/forecasts", fragment.GetForecastsFragment(reg.ForecastService)).Methods("GET")
 	api.Handle("/forecasts/{forecastId}", fragment.GetForecastFragment(reg.ForecastService)).Methods("GET")
+	api.Handle("/about", fragment.AboutFragment()).Methods("GET")
 
 	api.Handle("/gen", handler.GenerateForecasts(reg.ForecastService)).Methods("POST")
 

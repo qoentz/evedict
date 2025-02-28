@@ -78,74 +78,79 @@ templ HamburgerMenuIcon() {
 templ NavigationMenu() {
   <nav id="nav-menu" class="flex items-center mt-4 lg:mt-0"
        x-data="{
-         activeCategory: '',
-         updateActiveCategory() {
-           let category = (new URLSearchParams(window.location.search).get('category') || '').toLowerCase();
-           this.setActiveCategory(category);
+         activeNav: '',
+         updateActiveNav() {
+           let category = new URLSearchParams(window.location.search).get('category')?.toLowerCase() || '';
+           let page = window.location.pathname.replace('/', '');
+
+           if (category) {
+             this.setActiveNav(category);
+           } else if (page === 'about' || page === 'contact') {
+             this.setActiveNav(page);
+           } else {
+             this.setActiveNav('');
+           }
          },
-         setActiveCategory(category) {
-           this.activeCategory = category;
-           document.querySelectorAll('[data-category]').forEach(el => {
-             el.classList.remove('text-white');
-             el.classList.add('text-gray-300', 'hover:text-white');
-             el.querySelector('span').classList.remove('scale-x-100');
-             el.querySelector('span').classList.add('scale-x-0', 'group-hover:scale-x-100');
+         setActiveNav(nav) {
+           this.activeNav = nav;
+
+           document.querySelectorAll('[data-nav]').forEach(el => {
+             el.classList.toggle('text-white', false);
+             el.classList.toggle('text-gray-300', true);
+             el.classList.toggle('hover:text-white', true);
+             el.querySelector('span').classList.toggle('scale-x-100', false);
+             el.querySelector('span').classList.toggle('scale-x-0', true);
            });
-           let activeEl = document.querySelector(`[data-category='${category}']`);
+
+           let activeEl = document.querySelector(`[data-nav='${nav}']`);
            if (activeEl) {
-             activeEl.classList.remove('text-gray-300', 'hover:text-white');
-             activeEl.classList.add('text-white');
-             activeEl.querySelector('span').classList.remove('scale-x-0', 'group-hover:scale-x-100');
-             activeEl.querySelector('span').classList.add('scale-x-100');
+             activeEl.classList.toggle('text-gray-300', false);
+             activeEl.classList.toggle('hover:text-white', false);
+             activeEl.classList.toggle('text-white', true);
+             activeEl.querySelector('span').classList.toggle('scale-x-0', false);
+             activeEl.querySelector('span').classList.toggle('scale-x-100', true);
            }
          }
        }"
        x-init="
-         updateActiveCategory();
-         document.body.addEventListener('htmx:historyRestore', updateActiveCategory);
-         window.setActiveCategory = (category) => { setActiveCategory(category) };
+         updateActiveNav();
+         document.body.addEventListener('htmx:historyRestore', updateActiveNav);
+         window.setActiveNav = setActiveNav;
        ">
 
     <!-- Categories Group -->
     <div class="flex items-center space-x-6 border-r border-gray-600 pr-6">
-      @CategoryOption("Politics", "politics")
-      @CategoryOption("Economy", "economy")
-      @CategoryOption("Technology", "technology")
-      @CategoryOption("Culture", "culture")
+      @NavigationOption("Politics", "politics", "/api/forecasts?limit=9&offset=0&category=Politics", "/?category=Politics")
+      @NavigationOption("Economy", "economy", "/api/forecasts?limit=9&offset=0&category=Economy", "/?category=Economy")
+      @NavigationOption("Technology", "technology", "/api/forecasts?limit=9&offset=0&category=Technology", "/?category=Technology")
+      @NavigationOption("Culture", "culture", "/api/forecasts?limit=9&offset=0&category=Culture", "/?category=Culture")
     </div>
 
-    <!-- About and Contact Group -->
+    <!-- Static Pages Group -->
     <div class="flex items-center space-x-6 pl-6">
-      <a href="/about"
-         class="relative group text-gray-300 hover:text-white text-base font-palatino transition-colors px-3 py-2">
-         About
-         <span class="absolute left-0 right-0 bottom-0 h-0.5 bg-white scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-center"></span>
-      </a>
-      <a href="/contact"
-         class="relative group text-gray-300 hover:text-white text-base font-palatino transition-colors px-3 py-2">
-         Contact
-         <span class="absolute left-0 right-0 bottom-0 h-0.5 bg-white scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-center"></span>
-      </a>
+      @NavigationOption("About", "about", "/api/about", "/about")
+      @NavigationOption("Contact", "contact", "/api/contact", "/contact")
     </div>
   </nav>
 }
 
-templ CategoryOption(display string, param string) {
+templ NavigationOption(display string, param string, url string, pushUrl string) {
   <a href="#"
-     data-category={ param }
-     hx-get={ "/api/forecasts?limit=9&offset=0&category=" + display }
+     data-nav={ param }
+     hx-get={ url }
      hx-target="#forecast-feed"
      hx-swap="innerHTML"
-     hx-push-url={ "/?category=" + display }
+     hx-push-url={ pushUrl }
      hx-indicator="#loading-indicator"
-     @click={ "setActiveCategory('" + param + "')" }
-     class="relative group text-base font-palatino transition-colors px-3 py-2"
-     x-bind:class={ "activeCategory === '" + param + "' ? 'text-white' : 'text-gray-300 hover:text-white'" }>
+     @click={ "setActiveNav('" + param + "')" }
+     class="relative group text-gray-300 hover:text-white text-base font-palatino transition-colors px-3 py-2"
+     x-bind:class={ "activeNav === '" + param + "' ? 'text-white' : 'text-gray-300 hover:text-white'" }>
     {display}
-    <span class="absolute left-0 right-0 bottom-0 h-0.5 bg-white scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-center"></span>
+    <span class="absolute left-0 right-0 bottom-0 h-0.5 bg-white scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-center"
+          x-bind:class={ "activeNav === '" + param + "' ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'" }>
+    </span>
   </a>
 }
-
 
 templ MobileNavigationMenu() {
   <nav class="flex flex-col p-4 space-y-4 mt-4">

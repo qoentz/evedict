@@ -1,0 +1,31 @@
+package view
+
+templ AboutPage() {
+    @Base() {
+        @AboutFragment()
+    }
+}
+
+templ AboutFragment() {
+    @ViewContainer() {
+        <div class="relative w-full min-h-[600px] bg-gray-800 text-white p-8">
+            <!-- Background Gradient Overlay -->
+            <div class="absolute inset-0 pointer-events-none bg-gradient-to-t from-black/70 to-transparent"></div>
+
+            <!-- Title (Left-Aligned, Styled Like FurtherReadTitle) -->
+            <div class="relative text-center">
+                <h2 class="text-xl font-semibold text-white border-b border-gray-600 pb-2">
+                    About
+                </h2>
+
+                <div class="mt-4">
+                   <p class="text-base md:text-lg text-white">
+                      AI-fueled forecasting engine – generating highly speculative hallucinations.
+                   </p>
+                </div>
+            </div>
+        </div>
+    }
+}
+
+

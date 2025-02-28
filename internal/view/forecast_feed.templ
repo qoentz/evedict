@@ -7,14 +7,14 @@ import (
 )
 
 templ ForecastFeed(forecasts []dto.Forecast) {
-    <div class="relative min-h-[600px]">
+    @ViewContainer() {
         <!-- Highlighted Slider -->
         <div class="highlighted-slider">
             @Carousel(forecasts)
         </div>
         <!-- Bottom Forecasts Section -->
         @BottomSection(forecasts)
-    </div>
+    }
 }
 
 templ Carousel(forecasts []dto.Forecast) {
@@ -24,12 +24,10 @@ templ Carousel(forecasts []dto.Forecast) {
         </div>
     }
 
-    <div id="slider-container" class="relative w-full max-w-screen-xl mx-auto h-auto md:h-[600px] bg-gray-800 rounded-lg shadow-md flex flex-col md:flex-row">
-        <!-- Main Highlighted Slide (full width on mobile & iPad, 70% on desktop) -->
+    <div id="slider-container" class="relative w-full h-auto md:h-[600px] bg-gray-800 rounded-lg shadow-md flex flex-col md:flex-row">
+        <!-- Main Highlighted Slide -->
         <div class="w-full lg:w-7/10 bg-gray-700 relative shadow-md flex p-6 md:p-14 overflow-hidden">
-            <!-- Slides and Navigation -->
             <div class="relative w-full h-full">
-                <!-- Highlight Slides -->
                 for i, p := range forecasts {
                     if i == 0 {
                         <div class="highlight-slide top-0 left-0 w-full h-full flex transition-all duration-700 ease-in-out">
@@ -69,7 +67,7 @@ templ Carousel(forecasts []dto.Forecast) {
             </div>
         </div>
 
-        <!-- Tiny Stacked Cards (approx. 30% width, visible only on desktop) -->
+        <!-- Tiny Stacked Cards -->
         <div id="tinyCardsContainer" class="hidden lg:flex w-full md:w-3/10 bg-gray-900 p-4 pt-14 flex-col space-y-4 items-center overflow-hidden snap-start">
             for i, f := range forecasts {
                 if i != 0 && i <= 4 {
@@ -136,8 +134,8 @@ templ CarouselSideCard(f dto.Forecast) {
 }
 
 templ BottomSection(forecasts []dto.Forecast) {
-  <div class="max-w-screen-xl mx-auto p-6 md:px-4 md:py-8 bg-gray-800">
-    <!-- Grid: 1 col on mobile, 3 on md, 4 on lg -->
+  <div class="p-6 md:px-4 md:py-8 bg-gray-800">
+    <!-- Grid Layout -->
     <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
       for i, p := range forecasts {
         if i >= 5 && i <= 8 {
