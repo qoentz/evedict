@@ -3,6 +3,7 @@ package view
 import (
     "fmt"
     "github.com/qoentz/evedict/internal/api/dto"
+    "github.com/qoentz/evedict/internal/view/component"
 )
 
 templ ForecastDetailPage(f *dto.Forecast) {
@@ -14,14 +15,14 @@ templ ForecastDetailPage(f *dto.Forecast) {
 templ ForecastDetailFragment(f *dto.Forecast) {
   <div class="relative min-h-[600px] bg-gray-50">
     <div class="relative w-full max-w-screen-xl mx-auto h-auto bg-gray-800 shadow-md overflow-hidden">
-      @ForecastBackButton()
-      @ForecastHeader(f)
-      @ForecastContent(f)
+      @component.BackButton()
+      @DetailHeader(f)
+      @DetailContent(f)
     </div>
   </div>
 }
 
-templ ForecastHeader(f *dto.Forecast) {
+templ DetailHeader(f *dto.Forecast) {
   <div class="relative w-full h-[300px] overflow-hidden bg-gray-800">
     <!-- Inner container: 260px tall, bottom aligned, centered content -->
     <div class="absolute bottom-0 left-0 w-full h-[260px] flex items-center justify-center z-10">
@@ -48,18 +49,18 @@ templ ForecastHeader(f *dto.Forecast) {
   </div>
 }
 
-templ ForecastContent(f *dto.Forecast) {
+templ DetailContent(f *dto.Forecast) {
   <div class="max-w-screen-xl mx-auto">
     <div class="bg-gray-800 rounded-lg shadow-md p-8">
 
       <!-- Mobile Layout -->
       <div class="block md:hidden space-y-8 mb-8">
-        @ForecastSummary(f)
-        @ForecastOutcomes(f)
-        @ForecastRelatedMobile(f.Related)
+        @Summary(f)
+        @Outcomes(f)
+        @RelatedSectionMobile(f.Related)
         <div class="space-y-0">
             @FurtherReadTitle()
-            @ForecastFurtherRead(f)
+            @FurtherRead(f)
         </div>
       </div>
 
@@ -67,8 +68,8 @@ templ ForecastContent(f *dto.Forecast) {
       <div class="hidden md:grid grid-cols-2 gap-8 mb-8 items-stretch">
         <!-- Left Column -->
         <div class="space-y-8">
-          @ForecastSummary(f)
-          @ForecastRelatedDesktop(f)
+          @Summary(f)
+          @RelatedSectionDesktop(f)
         </div>
         <!-- Right Column -->
         <div class="relative h-full overflow-hidden">
@@ -76,12 +77,12 @@ templ ForecastContent(f *dto.Forecast) {
           <div class="absolute inset-0 flex flex-col">
             <!-- Outcomes takes natural height -->
             <div>
-              @ForecastOutcomes(f)
+              @Outcomes(f)
             </div>
             @FurtherReadTitle()
             <!-- Further read fills remaining space and scrolls if needed -->
             <div class="flex-1 overflow-y-auto">
-              @ForecastFurtherRead(f)
+              @FurtherRead(f)
             </div>
           </div>
         </div>
@@ -91,13 +92,13 @@ templ ForecastContent(f *dto.Forecast) {
   </div>
 }
 
-templ ForecastSummary(f *dto.Forecast) {
+templ Summary(f *dto.Forecast) {
   <div>
     <p class="text-base md:text-lg text-white">{f.Summary}</p>
   </div>
 }
 
-templ ForecastOutcomes(f *dto.Forecast) {
+templ Outcomes(f *dto.Forecast) {
   <div>
     <!-- Section Heading -->
     <div class="mb-4">
@@ -113,14 +114,14 @@ templ ForecastOutcomes(f *dto.Forecast) {
           <p class="text-base font-libre font-semibold leading-relaxed text-white">
             {o.Content}
           </p>
-          @ProgressBar(&o)
+          @component.ProgressBar(&o)
         </div>
       }
     </div>
   </div>
 }
 
-templ ForecastRelatedMobile(related []dto.Forecast) {
+templ RelatedSectionMobile(related []dto.Forecast) {
   <div>
     <div class="mb-4">
       <h2 class="text-xl font-semibold text-white border-b border-gray-600 pb-2">Related</h2>
@@ -152,60 +153,27 @@ templ ForecastRelatedMobile(related []dto.Forecast) {
   </div>
 }
 
-templ ForecastRelatedDesktop(f *dto.Forecast) {
+templ RelatedSectionDesktop(f *dto.Forecast) {
   <div>
-     <div class="mb-4">
-          <h2 class="text-xl font-semibold text-white border-b border-gray-600 pb-2">Related:
-          if len(f.Tags) > 0 {
-             for i, r := range f.Tags {
-                if i > 0 {
-                  <em>,</em>
-                }
-                <em>{r.Name}</em>
-             }
+    <div class="mb-4">
+      <h2 class="text-xl font-semibold text-white border-b border-gray-600 pb-2">
+        Related:
+        if len(f.Tags) > 0 {
+          for i, r := range f.Tags {
+            if i > 0 {
+              <em>,</em>
+            }
+            <em>{r.Name}</em>
           }
-          </h2>
-     </div>
+        }
+      </h2>
+    </div>
     <div class="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
       for i, r := range f.Related {
         if i >= 2 {
-          <div hx-get={"/api/forecasts/" + fmt.Sprintf("%v", r.ID)}
-               hx-trigger="click"
-               hx-target="#forecast-feed"
-               hx-swap="innerHTML show:window:top"
-               hx-push-url={"/forecasts/" + fmt.Sprintf("%v", r.ID)}
-               class="cursor-pointer bg-gray-600 rounded-lg shadow-md overflow-hidden group hidden lg:block">
-            <img src={r.ImageURL}
-                 alt={r.Headline}
-                 class="w-full h-28 md:h-40 object-cover" />
-            <div class="p-2 md:p-4">
-              <h3 class="text-sm md:text-lg font-semibold text-white mb-1 md:mb-2 group-hover:text-gray-300">
-                {r.Headline}
-              </h3>
-              <p class="text-gray-300 text-xs md:text-sm line-clamp-3 group-hover:text-gray-400">
-                {r.Summary}
-              </p>
-            </div>
-          </div>
+          @component.TileCard(r, "hidden lg:block")
         } else {
-          <div hx-get={"/api/forecasts/" + fmt.Sprintf("%v", r.ID)}
-               hx-trigger="click"
-               hx-target="#forecast-feed"
-               hx-swap="innerHTML show:window:top"
-               hx-push-url={"/forecasts/" + fmt.Sprintf("%v", r.ID)}
-               class="cursor-pointer bg-gray-600 rounded-lg shadow-md overflow-hidden group">
-            <img src={r.ImageURL}
-                 alt={r.Headline}
-                 class="w-full h-28 md:h-40 object-cover" />
-            <div class="p-2 md:p-4">
-              <h3 class="text-sm md:text-lg font-semibold text-white mb-1 md:mb-2 group-hover:text-gray-300">
-                {r.Headline}
-              </h3>
-              <p class="text-gray-300 text-xs md:text-sm line-clamp-3 group-hover:text-gray-400">
-                {r.Summary}
-              </p>
-            </div>
-          </div>
+          @component.TileCard(r, "")
         }
       }
     </div>
@@ -218,7 +186,7 @@ templ FurtherReadTitle() {
    </div>
 }
 
-templ ForecastFurtherRead(f *dto.Forecast) {
+templ FurtherRead(f *dto.Forecast) {
   <div>
     <ul class="space-y-4">
       for _, s := range f.Sources {
@@ -237,109 +205,6 @@ templ ForecastFurtherRead(f *dto.Forecast) {
         </li>
       }
     </ul>
-  </div>
-}
-
-templ ProgressBar(o *dto.Outcome) {
-  <!-- Animated Progress Indicator: Horizontal Bar with Floating Circular Indicator -->
-  <div x-data={ fmt.Sprintf(`{
-      progress: 0,
-      count: 0,
-      target: %d,
-      animateCount() {
-        const duration = 1700; // counter duration in ms
-        const stepTime = 20;   // update every 20ms
-        const steps = duration / stepTime;
-        const increment = this.target / steps;
-        const self = this;
-        let counter = setInterval(function() {
-          self.count += increment;
-          if(self.count >= self.target) {
-            self.count = self.target;
-            clearInterval(counter);
-          }
-        }, stepTime);
-      }
-  }`, o.ConfidenceLevel) }
-       x-init="setTimeout(() => { progress = target; animateCount() }, 100)"
-       class="mt-6 relative">
-
-    <!-- Horizontal Progress Bar (Now Darker) -->
-    <div class="relative h-2 bg-gray-600 rounded-full overflow-hidden">
-      <div class="h-2 rounded-full shadow-md"
-           :class="{
-              'bg-gradient-to-r from-green-300 via-green-400 to-green-500': progress >= 75,
-              'bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-500': progress >= 35 && progress < 75,
-              'bg-gradient-to-r from-red-300 via-red-400 to-red-500': progress < 35
-           }"
-           :style="'width: ' + progress + '%; transition: width 2s ease;'">
-      </div>
-    </div>
-
-    <!-- Floating Circular Pie Chart Indicator -->
-    <div class="absolute"
-         :style="'top: -1rem; left: calc(' + progress + '% - 1.25rem); transition: left 2s ease;'">
-
-      <svg class="w-10 h-10 transform -rotate-90" viewBox="0 0 36 36">
-        <!-- Background Circle (Now Lighter) -->
-        <circle class="text-gray-300"
-                stroke="currentColor"
-                stroke-width="3"
-                fill="#374151"
-                r="16" cx="18" cy="18" />
-
-        <!-- Animated Circle Progress -->
-        <circle stroke={ getProgressBarStroke(o.ConfidenceLevel) }
-                stroke-width="3"
-                fill="transparent"
-                r="16" cx="18" cy="18"
-                stroke-dasharray="100"
-                :stroke-dashoffset="100 - progress"
-                style="transition: stroke-dashoffset 2s ease, stroke 2s ease;" />
-      </svg>
-
-      <!-- Centered Percentage Text (Smooth Count-Up) -->
-      <div class="absolute inset-0 flex items-center justify-center">
-        <span class="text-xs text-white font-gillsans" x-text="Math.floor(count) + '%'"></span>
-      </div>
-    </div>
-  </div>
-}
-
-func getProgressBarStroke(confidenceLevel int) string {
-    if confidenceLevel >= 75 {
-        return "#10B981" // Tailwind's green-500
-    } else if confidenceLevel >= 35 {
-        return "#F59E0B" // Tailwind's orange-500
-    } else {
-        return "#EF4444" // Tailwind's red-500
-    }
-}
-
-templ ForecastBackButton() {
-  <div class="absolute top-6 left-4 z-30" x-data="{
-    category: new URLSearchParams(window.location.search).get('category') || '',
-    get backUrl() { return this.category ? '/?category=' + this.category : '/' },
-    get forecastsUrl() { return '/api/forecasts?limit=9&offset=0' + (this.category ? '&category=' + this.category : '') }
-  }">
-    <button
-      x-bind:hx-get="forecastsUrl"
-      hx-target="#forecast-feed"
-      hx-swap="innerHTML show:window:top"
-      x-bind:hx-push-url="backUrl"
-      class="p-2 transition duration-150 transform hover:scale-110 hover:bg-gray-300 hover:text-gray-800 rounded-full focus:outline-none"
-      aria-label="Go back">
-      <svg xmlns="http://www.w3.org/2000/svg"
-           fill="none"
-           viewBox="0 0 24 24"
-           stroke="currentColor"
-           class="w-6 h-6 text-gray-500">
-        <path stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M15 19l-7-7 7-7" />
-      </svg>
-    </button>
   </div>
 }
 
