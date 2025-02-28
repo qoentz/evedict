@@ -77,8 +77,35 @@ templ HamburgerMenuIcon() {
 
 templ NavigationMenu() {
   <nav id="nav-menu" class="flex items-center mt-4 lg:mt-0"
-       x-data="{ activeCategory: (new URLSearchParams(window.location.search).get('category') || '').toLowerCase() }"
-       x-on:clear-active-category.window="activeCategory = $event.detail.activeCategory">
+       x-data="{
+         activeCategory: '',
+         updateActiveCategory() {
+           let category = (new URLSearchParams(window.location.search).get('category') || '').toLowerCase();
+           this.setActiveCategory(category);
+         },
+         setActiveCategory(category) {
+           this.activeCategory = category;
+           document.querySelectorAll('[data-category]').forEach(el => {
+             el.classList.remove('text-white');
+             el.classList.add('text-gray-300', 'hover:text-white');
+             el.querySelector('span').classList.remove('scale-x-100');
+             el.querySelector('span').classList.add('scale-x-0', 'group-hover:scale-x-100');
+           });
+           let activeEl = document.querySelector(`[data-category='${category}']`);
+           if (activeEl) {
+             activeEl.classList.remove('text-gray-300', 'hover:text-white');
+             activeEl.classList.add('text-white');
+             activeEl.querySelector('span').classList.remove('scale-x-0', 'group-hover:scale-x-100');
+             activeEl.querySelector('span').classList.add('scale-x-100');
+           }
+         }
+       }"
+       x-init="
+         updateActiveCategory();
+         document.body.addEventListener('htmx:historyRestore', updateActiveCategory);
+         window.setActiveCategory = (category) => { setActiveCategory(category) };
+       ">
+
     <!-- Categories Group -->
     <div class="flex items-center space-x-6 border-r border-gray-600 pr-6">
       @CategoryOption("Politics", "politics")
@@ -86,6 +113,7 @@ templ NavigationMenu() {
       @CategoryOption("Technology", "technology")
       @CategoryOption("Culture", "culture")
     </div>
+
     <!-- About and Contact Group -->
     <div class="flex items-center space-x-6 pl-6">
       <a href="/about"
@@ -110,12 +138,11 @@ templ CategoryOption(display string, param string) {
      hx-swap="innerHTML"
      hx-push-url={ "/?category=" + display }
      hx-indicator="#loading-indicator"
-     @click={ "activeCategory = '" + param + "'" }
+     @click={ "setActiveCategory('" + param + "')" }
      class="relative group text-base font-palatino transition-colors px-3 py-2"
      x-bind:class={ "activeCategory === '" + param + "' ? 'text-white' : 'text-gray-300 hover:text-white'" }>
     {display}
-    <span x-bind:class={ "activeCategory === '" + param + "' ? 'absolute left-0 right-0 bottom-0 h-0.5 bg-white transition-transform duration-300 origin-center scale-x-100' : 'absolute left-0 right-0 bottom-0 h-0.5 bg-white scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-center'" }>
-    </span>
+    <span class="absolute left-0 right-0 bottom-0 h-0.5 bg-white scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-center"></span>
   </a>
 }
 

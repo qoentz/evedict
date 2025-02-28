@@ -21,7 +21,9 @@ templ Logo() {
                void el.offsetWidth;
                el.classList.add('animate-letter-slide-in');
            });
-           window.dispatchEvent(new CustomEvent('clear-active-category', { bubbles: true, detail: { activeCategory: '' } }));
+           if (window.setActiveCategory) {
+               window.setActiveCategory('');
+           }
          "
          class="absolute cursor-pointer z-10"
          style="top: -19px; left: 8px;">
@@ -42,3 +44,4 @@ templ Logo() {
     </h1>
   </div>
 }
+
