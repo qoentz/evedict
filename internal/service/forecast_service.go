@@ -11,6 +11,7 @@ import (
 	"github.com/qoentz/evedict/internal/llm/replicate"
 	"github.com/qoentz/evedict/internal/promptgen"
 	"github.com/qoentz/evedict/internal/util"
+	"log"
 	"time"
 )
 
@@ -49,6 +50,12 @@ func (s *ForecastService) GenerateForecasts(category newsapi.Category) ([]dto.Fo
 	var forecasts []dto.Forecast
 	for _, idx := range articleSelection {
 		mainArticle := headlines[idx]
+
+		exists, _ := s.ForecastRepository.CheckImageURL(mainArticle.URLToImage)
+		if exists {
+			log.Println(mainArticle.Title + " already exists!")
+			continue
+		}
 
 		extractionPrompt, err := s.PromptTemplate.CreateKeywordExtractionPrompt(mainArticle)
 		if err != nil {

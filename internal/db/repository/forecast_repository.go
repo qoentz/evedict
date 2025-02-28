@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"database/sql"
+	"errors"
 	"fmt"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
@@ -310,4 +312,17 @@ func (r *ForecastRepository) getSourcesByForecastID(forecastID uuid.UUID) ([]mod
 	var sources []model.Source
 	err := r.DB.Select(&sources, `SELECT id, forecast_id, name, title, url, image_url FROM source WHERE forecast_id = $1`, forecastID)
 	return sources, err
+}
+
+func (r *ForecastRepository) CheckImageURL(imageURL string) (bool, error) {
+	var exists bool
+	query := `SELECT EXISTS (SELECT 1 FROM forecast WHERE image_url = $1)`
+	err := r.DB.QueryRow(query, imageURL).Scan(&exists)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return false, nil
+		}
+		return false, err
+	}
+	return exists, nil
 }
