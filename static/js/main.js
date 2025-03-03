@@ -19,3 +19,8 @@ document.addEventListener('htmx:afterSwap', (event) => {
     }
 });
 
+window.addEventListener('htmx:historyRestore', () => {
+    if (document.querySelector('#slider-container')) {
+        initSlider();
+    }
+});
