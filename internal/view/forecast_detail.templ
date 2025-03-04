@@ -171,9 +171,9 @@ templ RelatedSectionDesktop(f *dto.Forecast) {
     <div class="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
       for i, r := range f.Related {
         if i >= 2 {
-          @component.TileCard(r, "hidden lg:block")
+          @component.TileCard(r, "shadow-md group hidden lg:block")
         } else {
-          @component.TileCard(r, "")
+          @component.TileCard(r, "shadow-md group")
         }
       }
     </div>

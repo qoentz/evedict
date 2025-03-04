@@ -8,6 +8,26 @@
     }
 }
 
+/* Hover issues touch devices  */
+@media (hover: none) {
+    .logo-ball:hover {
+        filter: none !important;
+    }
+
+    .logo-ball:active {
+        opacity: 0.4 !important;
+    }
+
+    .carousel-btn:hover {
+        background-color: #1f2937 !important;
+    }
+
+    .carousel-btn:active {
+        background-color: #4b5563 !important;
+    }
+}
+
+
 @layer components {
     .htmx-indicator {
         @apply opacity-0 pointer-events-none transition-opacity duration-500;
