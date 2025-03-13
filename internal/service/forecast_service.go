@@ -1,12 +1,14 @@
 package service
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/google/uuid"
 	"github.com/qoentz/evedict/internal/api/dto"
 	"github.com/qoentz/evedict/internal/db/model"
 	"github.com/qoentz/evedict/internal/db/repository"
 	"github.com/qoentz/evedict/internal/eventfeed/newsapi"
+	"github.com/qoentz/evedict/internal/eventfeed/polymarket"
 	"github.com/qoentz/evedict/internal/llm"
 	"github.com/qoentz/evedict/internal/llm/replicate"
 	"github.com/qoentz/evedict/internal/promptgen"
@@ -20,15 +22,137 @@ type ForecastService struct {
 	AIService          llm.Service
 	NewsAPIService     *newsapi.Service
 	PromptTemplate     *promptgen.PromptTemplate
+	PolyMarketService  *polymarket.Service
 }
 
-func NewForecastService(forecastRepository *repository.ForecastRepository, replicateService *replicate.Service, newsAPIService *newsapi.Service, template *promptgen.PromptTemplate) *ForecastService {
+func NewForecastService(forecastRepository *repository.ForecastRepository, replicateService *replicate.Service, newsAPIService *newsapi.Service, template *promptgen.PromptTemplate, polyMarketService *polymarket.Service) *ForecastService {
 	return &ForecastService{
 		ForecastRepository: forecastRepository,
 		AIService:          replicateService,
 		NewsAPIService:     newsAPIService,
 		PromptTemplate:     template,
+		PolyMarketService:  polyMarketService,
 	}
+}
+
+func (s *ForecastService) GeneratePolyForecasts() ([]dto.Forecast, error) {
+	// fetch events
+	events, err := s.PolyMarketService.FetchTopEvents()
+	if err != nil {
+		return nil, fmt.Errorf("error fetching events: %v", err)
+	}
+
+	var SMPEvents []polymarket.Event
+	for _, e := range events {
+		if len(e.Markets) == 1 {
+			SMPEvents = append(SMPEvents, e)
+		}
+	}
+
+	// extract a relevant market
+	marketSelection, err := s.PromptTemplate.CreateMarketSelectionPrompt(SMPEvents)
+	if err != nil {
+		return nil, fmt.Errorf("error creating market selection prompt: %v", err)
+	}
+
+	eventSelection, err := s.AIService.SelectArticles(marketSelection)
+	if err != nil {
+		return nil, fmt.Errorf("error selecting articles: %v", err)
+	}
+
+	fmt.Println(eventSelection)
+
+	var forecasts []dto.Forecast
+	for _, idx := range eventSelection {
+		mainEvent := events[idx]
+
+		var keywords []string
+		for _, tag := range mainEvent.Tags {
+			keywords = append(keywords, tag.Label)
+		}
+
+		// with the tags from this market, fetch news (on keywords)
+		articles, err := s.NewsAPIService.FetchWithKeywords(keywords)
+		if err != nil {
+			return nil, fmt.Errorf("error fetching articles from NewsAPI with keywords: %v", err)
+		}
+
+		eventArticlePrompt, err := s.PromptTemplate.CreateEventArticlePrompt(events[idx], articles)
+		if err != nil {
+			return nil, fmt.Errorf("error creating eventArticle prompt: %v", err)
+		}
+
+		mainArticleIdx, err := s.AIService.SelectArticle(eventArticlePrompt)
+		if err != nil {
+			return nil, fmt.Errorf("error selecting main article: %v", err)
+		}
+
+		forecastPrompt, err := s.PromptTemplate.CreatePolyForecastPrompt(articles[mainArticleIdx], articles, mainEvent)
+		if err != nil {
+			return nil, fmt.Errorf("error creating forecast prompt: %v", err)
+		}
+
+		forecast, err := s.AIService.GetForecast(forecastPrompt)
+		if err != nil {
+			return nil, fmt.Errorf("error generating forecast: %v", err)
+		}
+
+		var firstMarket polymarket.Market
+		if len(mainEvent.Markets) > 0 {
+			firstMarket = mainEvent.Markets[0]
+		}
+
+		// Market json
+		forecast.Market = &dto.Market{
+			Question:      firstMarket.Question,
+			Outcomes:      firstMarket.Outcomes,
+			OutcomePrices: firstMarket.OutcomePrices,
+			Volume:        firstMarket.Volume,
+			ImageURL:      mainEvent.Image,
+			ExternalID:    firstMarket.ID,
+		}
+
+		forecast.ImageURL = articles[mainArticleIdx].URLToImage
+
+		tags := make([]dto.Tag, len(keywords))
+		for i, t := range keywords {
+			tags[i].Name = t
+		}
+
+		forecast.Tags = tags
+
+		var sources []dto.Source
+
+		mainSource := dto.Source{
+			Name:     articles[mainArticleIdx].Source.Name,
+			Title:    articles[mainArticleIdx].Title,
+			URL:      articles[mainArticleIdx].URL,
+			ImageURL: articles[mainArticleIdx].URLToImage,
+		}
+
+		sources = append(sources, mainSource)
+
+		for _, article := range articles {
+			if article.URL == articles[mainArticleIdx].URL || article.Title == "[Removed]" {
+				continue
+			}
+
+			source := dto.Source{
+				Name:     article.Source.Name,
+				Title:    article.Title,
+				URL:      article.URL,
+				ImageURL: article.URLToImage,
+			}
+
+			sources = append(sources, source)
+		}
+
+		forecast.Sources = sources
+		forecast.Timestamp = time.Now().UTC()
+		forecasts = append(forecasts, *forecast)
+	}
+
+	return forecasts, nil
 }
 
 func (s *ForecastService) GenerateForecasts(category newsapi.Category) ([]dto.Forecast, error) {
@@ -177,6 +301,15 @@ func (s *ForecastService) GetForecast(forecastID uuid.UUID) (*dto.Forecast, erro
 	return dtoForecast, nil
 }
 
+func (s *ForecastService) SavePolyForecasts(forecasts []dto.Forecast) error {
+	modelForecasts := s.convertToModel(forecasts)
+	err := s.ForecastRepository.SavePolyForecasts(modelForecasts)
+	if err != nil {
+		return fmt.Errorf("failed to save forecasts: %v", err)
+	}
+	return nil
+}
+
 func (s *ForecastService) SaveForecasts(forecasts []dto.Forecast) error {
 	modelForecasts := s.convertToModel(forecasts)
 	fmt.Println("CATEGORY: ", modelForecasts[0].Category, " ", modelForecasts[1].Category)
@@ -225,6 +358,19 @@ func (s *ForecastService) convertToDTO(forecast *model.Forecast) *dto.Forecast {
 		}
 	}
 
+	var dtoMarket *dto.Market
+	if forecast.Market != nil {
+		dtoMarket = &dto.Market{
+			Question:      forecast.Market.Question,
+			Outcomes:      forecast.Market.Outcomes,
+			OutcomePrices: forecast.Market.OutcomePrices,
+			Volume:        forecast.Market.Volume,
+			ImageURL:      forecast.Market.ImageURL,
+		}
+
+		_ = ParseOutcomesAndPrices(dtoMarket)
+	}
+
 	return &dto.Forecast{
 		ID:        forecast.ID,
 		Headline:  forecast.Headline,
@@ -234,6 +380,7 @@ func (s *ForecastService) convertToDTO(forecast *model.Forecast) *dto.Forecast {
 		Tags:      dtoTags,
 		Sources:   dtoSources,
 		Timestamp: forecast.Timestamp,
+		Market:    dtoMarket,
 	}
 }
 
@@ -275,6 +422,19 @@ func (s *ForecastService) convertToModel(forecasts []dto.Forecast) []model.Forec
 			}
 		}
 
+		var market *model.Market
+		if forecast.Market != nil {
+			market = &model.Market{
+				ID:            uuid.New(),
+				Question:      forecast.Market.Question,
+				Outcomes:      forecast.Market.Outcomes,
+				OutcomePrices: forecast.Market.OutcomePrices,
+				Volume:        forecast.Market.Volume,
+				ImageURL:      forecast.Market.ImageURL,
+				ExternalID:    forecast.Market.ExternalID,
+			}
+		}
+
 		// Construct the model forecast with the generated UUID and associations
 		modelForecasts[i] = model.Forecast{
 			ID:        forecastID, // Set the generated UUID for the forecast
@@ -286,8 +446,21 @@ func (s *ForecastService) convertToModel(forecasts []dto.Forecast) []model.Forec
 			Outcomes:  outcomes,
 			Tags:      tags,
 			Sources:   sources,
+			Market:    market,
 		}
 	}
 
 	return modelForecasts
+}
+
+func ParseOutcomesAndPrices(m *dto.Market) error {
+	if err := json.Unmarshal([]byte(m.Outcomes), &m.OutcomeList); err != nil {
+		return fmt.Errorf("unable to parse outcomes: %w", err)
+	}
+
+	if err := json.Unmarshal([]byte(m.OutcomePrices), &m.OutcomePricesList); err != nil {
+		return fmt.Errorf("unable to parse outcomePrices: %w", err)
+	}
+
+	return nil
 }

@@ -54,7 +54,7 @@ templ DetailContent(f *dto.Forecast) {
     <div class="bg-gray-800 shadow-md p-8">
 
       <!-- Mobile Layout -->
-      <div class="block md:hidden space-y-8 mb-8">
+      <div class="block md:hidden space-y-6 mb-6"> <!-- Reduced space-y-6 -->
         @Summary(f)
         @Outcomes(f)
         @RelatedSectionMobile(f.Related)
@@ -65,10 +65,11 @@ templ DetailContent(f *dto.Forecast) {
       </div>
 
       <!-- Desktop/iPad Layout -->
-      <div class="hidden md:grid grid-cols-2 gap-8 mb-8 items-stretch">
+      <div class="hidden md:grid grid-cols-2 gap-6 mb-6 items-stretch"> <!-- Reduced gap-6 -->
         <!-- Left Column -->
-        <div class="space-y-8">
+        <div class="space-y-6"> <!-- Reduced space-y-6 -->
           @Summary(f)
+          @MarketSentiment(f.Market)
           @RelatedSectionDesktop(f)
         </div>
         <!-- Right Column -->
@@ -97,6 +98,23 @@ templ Summary(f *dto.Forecast) {
     <p class="text-base md:text-lg text-white">{f.Summary}</p>
   </div>
 }
+
+templ MarketSentiment(m *dto.Market) {
+    if m == nil {
+        <div></div>
+    } else {
+        <!-- Section Title (Outside the Card) -->
+        <h2 class="text-xl font-semibold text-white border-b border-gray-600 pb-2">
+            Market Sentiment
+        </h2>
+
+        <!-- Market Sentiment Card (Force it up) -->
+        <div class="mt-[-20px]">
+            @component.MarketCard(m)
+        </div>
+    }
+}
+
 
 templ Outcomes(f *dto.Forecast) {
   <div>
@@ -182,7 +200,7 @@ templ RelatedSectionDesktop(f *dto.Forecast) {
 
 templ FurtherReadTitle() {
    <div class="mt-8 mb-4">
-     <h2 class="text-xl font-semibold text-white border-b border-gray-600 pb-2">Further read</h2>
+     <h2 class="text-xl font-semibold text-white border-b border-gray-600 pb-2">Further Read</h2>
    </div>
 }
 

@@ -8,10 +8,11 @@ type EnvConfig struct {
 }
 
 type ExternalServiceConfig struct {
-	ReplicateModel  string
-	ReplicateAPIKey string
-	NewsAPIURL      string
-	NewsAPIKey      string
+	ReplicateModel    string
+	ReplicateAPIKey   string
+	NewsAPIURL        string
+	NewsAPIKey        string
+	PolyMarketBaseURL string
 }
 
 func NewEnvConfig() *EnvConfig {
@@ -24,10 +25,11 @@ func NewEnvConfig() *EnvConfig {
 			Port:     os.Getenv("DB_PORT"),
 		},
 		ExternalServiceConfig: &ExternalServiceConfig{
-			ReplicateModel:  os.Getenv("REPLICATE_MODEL"),
-			ReplicateAPIKey: os.Getenv("REPLICATE_KEY"),
-			NewsAPIURL:      os.Getenv("NEWS_API_URL"),
-			NewsAPIKey:      os.Getenv("NEWS_API_KEY"),
+			ReplicateModel:    os.Getenv("REPLICATE_MODEL"),
+			ReplicateAPIKey:   os.Getenv("REPLICATE_KEY"),
+			NewsAPIURL:        os.Getenv("NEWS_API_URL"),
+			NewsAPIKey:        os.Getenv("NEWS_API_KEY"),
+			PolyMarketBaseURL: os.Getenv("POLYMARKET_BASE_URL"),
 		},
 	}
 }

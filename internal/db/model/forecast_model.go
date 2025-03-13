@@ -16,4 +16,5 @@ type Forecast struct {
 	Outcomes  []Outcome     `db:"-"`
 	Tags      []Tag         `db:"-"`
 	Sources   []Source      `db:"-"`
+	Market    *Market       `db:"-"`
 }

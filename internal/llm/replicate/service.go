@@ -66,6 +66,25 @@ func (s *Service) SelectArticles(prompt string) ([]int, error) {
 	return selection.Selected, nil
 }
 
+func (s *Service) SelectArticle(prompt string) (int, error) {
+	outputStr, err := s.processRequest(prompt, 100)
+	if err != nil {
+		return -1, err
+	}
+
+	type SingleSelectionResponse struct {
+		Selected int `json:"selected"`
+	}
+
+	var selection SingleSelectionResponse
+	err = json.Unmarshal([]byte(outputStr), &selection)
+	if err != nil {
+		return -1, fmt.Errorf("error parsing single-article selection output: %v\nOutput Data:\n%s", err, outputStr)
+	}
+
+	return selection.Selected, nil
+}
+
 func (s *Service) ExtractKeywords(prompt string) ([]string, error) {
 	outputStr, err := s.processRequest(prompt, 50)
 	if err != nil {

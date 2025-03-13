@@ -81,6 +81,12 @@ func (r *ForecastRepository) GetForecast(forecastID uuid.UUID) (*model.Forecast,
 	}
 	f.Tags = tags
 
+	m, err := r.getMarketByForecastID(forecastID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch market: %v", err)
+	}
+	f.Market = m
+
 	return &f, nil
 }
 
@@ -165,6 +171,143 @@ func (r *ForecastRepository) SaveForecast(forecast *model.Forecast) error {
 		if err != nil {
 			tx.Rollback()
 			return fmt.Errorf("failed to insert source: %v", err)
+		}
+	}
+
+	// Commit the transaction
+	if err = tx.Commit(); err != nil {
+		return fmt.Errorf("failed to commit transaction: %v", err)
+	}
+
+	return nil
+}
+
+func (r *ForecastRepository) SavePolyForecasts(forecasts []model.Forecast) error {
+	// Start a transaction
+	tx, err := r.DB.Beginx()
+	if err != nil {
+		return fmt.Errorf("failed to begin transaction: %v", err)
+	}
+
+	// Prepare the forecast INSERT query (note the "category" field)
+	forecastQuery := `
+        INSERT INTO forecast (id, headline, summary, image_url, category, timestamp)
+        VALUES ($1, $2, $3, $4, $5, $6)
+    `
+
+	outcomeQuery := `
+        INSERT INTO outcome (id, forecast_id, content, confidence_level)
+        VALUES ($1, $2, $3, $4)
+    `
+
+	sourceQuery := `
+        INSERT INTO source (id, forecast_id, name, title, url, image_url)
+        VALUES ($1, $2, $3, $4, $5, $6)
+    `
+
+	tagUpsertQuery := `
+        INSERT INTO tag (name)
+        VALUES ($1)
+        ON CONFLICT (name)
+        DO UPDATE SET name = EXCLUDED.name
+        RETURNING id
+    `
+	forecastTagQuery := `
+        INSERT INTO forecast_tag (forecast_id, tag_id)
+        VALUES ($1, $2)
+    `
+
+	// NEW: Market insertion
+	// We'll assume your market table schema is something like:
+	//  market(id UUID, forecast_id UUID UNIQUE, question TEXT, outcomes TEXT, outcome_prices TEXT, volume TEXT, image_url TEXT)
+	marketQuery := `
+        INSERT INTO market (id, forecast_id, question, outcomes, outcome_prices, volume, image_url, external_id)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+    `
+
+	// Insert each forecast + associated records
+	for i := range forecasts {
+		forecast := &forecasts[i]
+
+		// === INSERT MAIN FORECAST (with category) ===
+		_, err = tx.Exec(forecastQuery,
+			forecast.ID,
+			forecast.Headline,
+			forecast.Summary,
+			forecast.ImageURL,
+			forecast.Category, // category included here
+			forecast.Timestamp,
+		)
+		if err != nil {
+			tx.Rollback()
+			return fmt.Errorf("failed to insert forecast: %v", err)
+		}
+
+		// === OUTCOMES ===
+		for _, outcome := range forecast.Outcomes {
+			_, err = tx.Exec(outcomeQuery,
+				outcome.ID,
+				forecast.ID,
+				outcome.Content,
+				outcome.ConfidenceLevel,
+			)
+			if err != nil {
+				tx.Rollback()
+				return fmt.Errorf("failed to insert outcome: %v", err)
+			}
+		}
+
+		// === TAGS ===
+		for _, tag := range forecast.Tags {
+			// 1. Upsert the tag by name
+			var tagID uuid.UUID
+			err = tx.QueryRow(tagUpsertQuery, tag.Name).Scan(&tagID)
+			if err != nil {
+				tx.Rollback()
+				return fmt.Errorf("failed to upsert tag (name=%q): %v", tag.Name, err)
+			}
+
+			// 2. Insert into forecast_tag
+			_, err = tx.Exec(forecastTagQuery, forecast.ID, tagID)
+			if err != nil {
+				tx.Rollback()
+				return fmt.Errorf("failed to insert forecast_tag link: %v", err)
+			}
+		}
+
+		// === SOURCES ===
+		for _, source := range forecast.Sources {
+			_, err = tx.Exec(sourceQuery,
+				source.ID,
+				forecast.ID,
+				source.Name,
+				source.Title,
+				source.URL,
+				source.ImageURL,
+			)
+			if err != nil {
+				tx.Rollback()
+				return fmt.Errorf("failed to insert source: %v", err)
+			}
+		}
+
+		// === MARKET (1:1) ===
+		// If forecast.Market is not nil, insert a row into the market table
+		if forecast.Market != nil {
+			_, err = tx.Exec(marketQuery,
+				forecast.Market.ID, // might be a UUID
+				forecast.ID,        // link it to the forecast
+				forecast.Market.Question,
+				forecast.Market.Outcomes,
+				forecast.Market.OutcomePrices,
+				forecast.Market.Volume,
+				forecast.Market.ImageURL,
+				forecast.Market.ExternalID,
+			)
+			if err != nil {
+				tx.Rollback()
+				return fmt.Errorf("failed to insert market: %v", err)
+			}
 		}
 	}
 
@@ -312,6 +455,30 @@ func (r *ForecastRepository) getSourcesByForecastID(forecastID uuid.UUID) ([]mod
 	var sources []model.Source
 	err := r.DB.Select(&sources, `SELECT id, forecast_id, name, title, url, image_url FROM source WHERE forecast_id = $1`, forecastID)
 	return sources, err
+}
+
+func (r *ForecastRepository) getMarketByForecastID(forecastID uuid.UUID) (*model.Market, error) {
+	var market model.Market
+
+	// You might store the "id" from DB if you want it:
+	//   (assuming your Market struct has ID, ForecastID, etc.)
+	query := `
+        SELECT id, question, outcomes, outcome_prices, volume, image_url
+        FROM market
+        WHERE forecast_id = $1
+    `
+	err := r.DB.Get(&market, query, forecastID)
+	if err != nil {
+		// If no row found, we can return nil *and* nil error,
+		// or handle the sql.ErrNoRows specifically:
+		if errors.Is(err, sql.ErrNoRows) {
+			// no market row for this forecast
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return &market, nil
 }
 
 func (r *ForecastRepository) CheckImageURL(imageURL string) (bool, error) {

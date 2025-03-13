@@ -7,5 +7,6 @@ import (
 type Service interface {
 	GetForecast(prompt string) (*dto.Forecast, error)
 	SelectArticles(prompt string) ([]int, error)
+	SelectArticle(prompt string) (int, error)
 	ExtractKeywords(prompt string) ([]string, error)
 }

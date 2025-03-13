@@ -33,7 +33,7 @@ func InitRouter(reg *registry.Registry) *mux.Router {
 	api.Handle("/forecasts/{forecastId}", fragment.GetForecastFragment(reg.ForecastService)).Methods("GET")
 	api.Handle("/about", fragment.AboutFragment()).Methods("GET")
 
-	api.Handle("/gen", handler.GenerateForecasts(reg.ForecastService)).Methods("POST")
+	api.Handle("/gen", handler.GeneratePolyForecasts(reg.ForecastService)).Methods("POST")
 
 	router.NotFoundHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "", http.StatusNotFound)

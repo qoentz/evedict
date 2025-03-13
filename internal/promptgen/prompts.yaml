@@ -44,7 +44,60 @@ predict_events: |
     ]
   }
 
+predict_poly_events: |
+  IMPORTANT: Output exactly one forecast prediction as a single JSON object.
+  IMPORTANT: The "category" field must be exactly one of the following four words—no more, no less: "Politics", "Economy", "Technology", "Culture". Under no circumstances should any other category (such as "Health", "Sports", "Entertainment", etc.) appear in the output.
 
+  Based on the following main news article, generate a reflective summary prediction that substantiates two possible outcomes, each with a confidence level between 0 and 100.
+  The confidence levels should be realistic and reflect the actual likelihood of each outcome, rather than using fixed placeholder values.
+
+  The summary should provide insightful support for the outcomes by incorporating key points from the main article and adding context from related articles. 
+  Craft a headline that highlights the most intriguing aspect of the prediction, focusing on the most captivating outcome rather than the one with the highest confidence level.
+
+  Additionally, choose exactly one category from the following set: "Politics", "Economy", "Technology", "Culture" and include it in the output.
+  If the subject matter seems to naturally belong to another category (for example, if it relates to health or sports), you must map it to one of the allowed categories.
+
+  Main Article Title: {{.MainArticle.Title}}
+  Main Article Content: {{.MainArticle.Content}}
+
+  Here are the related articles:
+  {{range .RelatedArticles}}
+  - Title: {{.Title}}
+    Description: {{.Description}}
+  {{end}}
+
+  Also consider the following Polymarket event, which may shed light on market sentiment for this topic:
+    Event Title: {{.Event.Title}}
+    Event Description: {{.Event.Description}}
+    Market Question: {{(index .Event.Markets 0).Question}}
+    Market Description: {{(index .Event.Markets 0).Description}}
+    Market Volume: {{(index .Event.Markets 0).Volume}}
+    Market Outcomes: {{(index .Event.Markets 0).Outcomes}}
+    Market OutcomePrices: {{(index .Event.Markets 0).OutcomePrices}}
+
+  Ensure the headline, summary, category, and each outcome are written in complete sentences with proper punctuation.
+  The summary should be at least two to three sentences long, providing a detailed and reflective account that supports the outcomes.
+
+  Output the predictions as a single JSON object exactly matching the following format.
+  Do not include any additional text or explanations. Ensure that the JSON is compact, with
+  field names and values properly formatted without extra spaces or line breaks. Do not include
+  any extra spaces before or after colons or field names.
+
+  {
+    "headline": "Prediction Headline",
+    "summary": "Detailed summary of the prediction",
+    "category": "Politics",
+    "outcomes": [
+      {
+        "content": "First possible outcome",
+        "confidenceLevel": 80
+      },
+      {
+        "content": "Second possible outcome",
+        "confidenceLevel": 60
+      }
+    ]
+  }
 
 select_articles: |
   Based on the following articles, select two articles that would make for interesting predictions.
@@ -64,6 +117,62 @@ select_articles: |
     "selected": [index1, index2]
   }
 
+select_article_for_event: |
+  The following is a Polymarket event that might make for an interesting article tie-in:
+
+  Event:
+    Title: {{ .Event.Title }}
+    Description: {{ .Event.Description }}
+    Start Date: {{ .Event.StartDate }}
+    Volume: {{ .Event.Volume }}
+    Tags: {{range $i, $tag := .Event.Tags}}{{$tag.Label}}, {{end}}
+    {{if eq (len .Event.Markets) 1}}
+    Market question: {{(index .Event.Markets 0).Question}}
+    {{else}}
+    Markets count: {{len .Event.Markets}}
+    {{end}}
+
+  Below are candidate articles:
+
+  {{range $index, $article := .Articles}}
+  {{$index}}. Title: {{ $article.Title }}
+       Description: {{ $article.Description }}
+  {{end}}
+
+  Identify which single article best aligns with or is most relevant to the event above. Then return only its index as a single JSON object with the format:
+
+  {
+    "selected": index
+  }
+
+  Do not include any explanations or extra text. Do not introduce line breaks or spaces before or after colons or field names. No additional fields or punctuation.
+
+
+select_markets: |
+  Based on the following Polymarket events, select two events that would make for interesting predictions.
+
+  Events:
+  {{range $index, $evt := .Events}}
+  {{$index}}. Title: {{ $evt.Title }}
+      Description: {{ $evt.Description }}
+      Start Date: {{ $evt.StartDate }}
+      Volume: {{ $evt.Volume }}
+      Tags: {{range $i, $tag := $evt.Tags}}{{$tag.Label}}, {{end}}
+      {{if eq (len $evt.Markets) 1}}
+      Market question: {{(index $evt.Markets 0).Question}}
+      {{else}}
+      Markets count: {{len $evt.Markets}}
+      {{end}}
+  {{end}}
+
+  Return only the array positions (indices) of the two chosen events, in a single JSON object 
+  exactly matching the format:
+
+  {
+    "selected": [index1, index2]
+  }
+
+  Do not add any text or explanations. No extra spaces or lines. Just valid JSON.
 
 extract_keywords: |
   Given the following news article, extract the two most important keywords that represent the central topics of the article:
