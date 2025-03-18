@@ -5,7 +5,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/qoentz/evedict/internal/api/dto"
+	"github.com/qoentz/evedict/internal/eventfeed/newsapi"
+	"github.com/qoentz/evedict/internal/eventfeed/polymarket"
 	"github.com/qoentz/evedict/internal/llm"
+	"github.com/qoentz/evedict/internal/promptgen"
 	"io"
 	"net/http"
 	"strings"
@@ -13,79 +16,122 @@ import (
 )
 
 type Service struct {
-	HTTPClient *http.Client
-	ModelURL   string
-	APIKey     string
+	HTTPClient     *http.Client
+	PromptTemplate *promptgen.PromptTemplate
+	ModelURL       string
+	APIKey         string
 }
 
 var _ llm.Service = &Service{}
 
-func NewReplicateService(client *http.Client, modelURL string, apiKey string) *Service {
+func NewReplicateService(client *http.Client, promptTemplate *promptgen.PromptTemplate, modelURL string, apiKey string) *Service {
 	return &Service{
-		HTTPClient: client,
-		ModelURL:   modelURL,
-		APIKey:     apiKey,
+		HTTPClient:     client,
+		PromptTemplate: promptTemplate,
+		ModelURL:       modelURL,
+		APIKey:         apiKey,
 	}
 }
 
-func (s *Service) GetForecast(prompt string) (*dto.Forecast, error) {
+func (s *Service) GetForecast(mainArticle newsapi.Article, relatedArticles []newsapi.Article, event *polymarket.Event) (*dto.Forecast, error) {
+	if mainArticle.Title == "" || mainArticle.Description == "" {
+		return nil, fmt.Errorf("main article is missing title or description")
+	}
+
+	var (
+		prompt string
+		err    error
+	)
+
+	if event != nil {
+		prompt, err = s.PromptTemplate.CreatePrompt(promptgen.GenerateMarketForecast, struct {
+			MainArticle     newsapi.Article
+			RelatedArticles []newsapi.Article
+			Event           polymarket.Event
+		}{
+			MainArticle:     mainArticle,
+			RelatedArticles: relatedArticles,
+			Event:           *event,
+		})
+	} else {
+		prompt, err = s.PromptTemplate.CreatePrompt(promptgen.GenerateNewsForecast, struct {
+			MainArticle     newsapi.Article
+			RelatedArticles []newsapi.Article
+		}{
+			MainArticle:     mainArticle,
+			RelatedArticles: relatedArticles,
+		})
+	}
+
+	if err != nil {
+		return nil, fmt.Errorf("error creating forecast prompt: %v", err)
+	}
+
 	output, err := s.processRequest(prompt, 1024)
 	if err != nil {
 		return nil, err
 	}
 
 	var result dto.Forecast
-	err = json.Unmarshal([]byte(output), &result)
-	if err != nil {
+	if err := json.Unmarshal([]byte(output), &result); err != nil {
 		return nil, fmt.Errorf("error parsing forecast output: %v\nOutput Data:\n%s", err, output)
 	}
 
 	return &result, nil
 }
 
-func (s *Service) SelectArticles(prompt string) ([]int, error) {
+func (s *Service) SelectIndexes(templateType promptgen.TemplateType, data interface{}, minSelection int) ([]int, error) {
+	prompt, err := s.PromptTemplate.CreatePrompt(templateType, data)
+	if err != nil {
+		return nil, fmt.Errorf("error creating prompt for %s: %v", templateType, err)
+	}
+
 	outputStr, err := s.processRequest(prompt, 100)
 	if err != nil {
 		return nil, err
 	}
 
-	type SelectionResponse struct {
+	var selection struct {
 		Selected []int `json:"selected"`
 	}
-
-	var selection SelectionResponse
-	err = json.Unmarshal([]byte(outputStr), &selection)
-	if err != nil {
+	if err := json.Unmarshal([]byte(outputStr), &selection); err != nil {
 		return nil, fmt.Errorf("error parsing selection output: %v\nOutput Data:\n%s", err, outputStr)
 	}
 
-	if len(selection.Selected) < 2 {
-		return nil, fmt.Errorf("expected 2 selected articles, got %d: %v", len(selection.Selected), selection.Selected)
+	if len(selection.Selected) < minSelection {
+		return nil, fmt.Errorf("expected at least %d selected items, got %d: %v", minSelection, len(selection.Selected), selection.Selected)
 	}
 
 	return selection.Selected, nil
 }
 
-func (s *Service) SelectArticle(prompt string) (int, error) {
+func (s *Service) SelectIndex(templateType promptgen.TemplateType, data interface{}) (int, error) {
+	prompt, err := s.PromptTemplate.CreatePrompt(templateType, data)
+	if err != nil {
+		return -1, fmt.Errorf("error creating prompt for %s: %v", templateType, err)
+	}
+
 	outputStr, err := s.processRequest(prompt, 100)
 	if err != nil {
 		return -1, err
 	}
 
-	type SingleSelectionResponse struct {
+	var selection struct {
 		Selected int `json:"selected"`
 	}
-
-	var selection SingleSelectionResponse
-	err = json.Unmarshal([]byte(outputStr), &selection)
-	if err != nil {
-		return -1, fmt.Errorf("error parsing single-article selection output: %v\nOutput Data:\n%s", err, outputStr)
+	if err := json.Unmarshal([]byte(outputStr), &selection); err != nil {
+		return -1, fmt.Errorf("error parsing single selection output: %v\nOutput Data:\n%s", err, outputStr)
 	}
 
 	return selection.Selected, nil
 }
 
-func (s *Service) ExtractKeywords(prompt string) ([]string, error) {
+func (s *Service) ExtractKeywords(article newsapi.Article) ([]string, error) {
+	prompt, err := s.PromptTemplate.CreatePrompt(promptgen.ExtractKeywords, article)
+	if err != nil {
+		return nil, fmt.Errorf("error creating keyword extraction prompt: %v", err)
+	}
+
 	outputStr, err := s.processRequest(prompt, 50)
 	if err != nil {
 		return nil, err

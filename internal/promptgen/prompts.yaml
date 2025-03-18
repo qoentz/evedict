@@ -1,4 +1,4 @@
-predict_events: |
+generate_news_forecast: |
   IMPORTANT: Output exactly one forecast prediction as a single JSON object.
   IMPORTANT: The "category" field must be exactly one of the following four words—no more, no less: "Politics", "Economy", "Technology", "Culture". Under no circumstances should any other category (such as "Health", "Sports", "Entertainment", etc.) appear in the output.
   
@@ -44,7 +44,7 @@ predict_events: |
     ]
   }
 
-predict_poly_events: |
+generate_market_forecast: |
   IMPORTANT: Output exactly one forecast prediction as a single JSON object.
   IMPORTANT: The "category" field must be exactly one of the following four words—no more, no less: "Politics", "Economy", "Technology", "Culture". Under no circumstances should any other category (such as "Health", "Sports", "Entertainment", etc.) appear in the output.
 

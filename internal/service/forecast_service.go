@@ -14,6 +14,7 @@ import (
 	"github.com/qoentz/evedict/internal/promptgen"
 	"github.com/qoentz/evedict/internal/util"
 	"log"
+	"strconv"
 	"time"
 )
 
@@ -21,22 +22,19 @@ type ForecastService struct {
 	ForecastRepository *repository.ForecastRepository
 	AIService          llm.Service
 	NewsAPIService     *newsapi.Service
-	PromptTemplate     *promptgen.PromptTemplate
 	PolyMarketService  *polymarket.Service
 }
 
-func NewForecastService(forecastRepository *repository.ForecastRepository, replicateService *replicate.Service, newsAPIService *newsapi.Service, template *promptgen.PromptTemplate, polyMarketService *polymarket.Service) *ForecastService {
+func NewForecastService(forecastRepository *repository.ForecastRepository, replicateService *replicate.Service, newsAPIService *newsapi.Service, polyMarketService *polymarket.Service) *ForecastService {
 	return &ForecastService{
 		ForecastRepository: forecastRepository,
 		AIService:          replicateService,
 		NewsAPIService:     newsAPIService,
-		PromptTemplate:     template,
 		PolyMarketService:  polyMarketService,
 	}
 }
 
 func (s *ForecastService) GeneratePolyForecasts() ([]dto.Forecast, error) {
-	// fetch events
 	events, err := s.PolyMarketService.FetchTopEvents()
 	if err != nil {
 		return nil, fmt.Errorf("error fetching events: %v", err)
@@ -49,18 +47,12 @@ func (s *ForecastService) GeneratePolyForecasts() ([]dto.Forecast, error) {
 		}
 	}
 
-	// extract a relevant market
-	marketSelection, err := s.PromptTemplate.CreateMarketSelectionPrompt(SMPEvents)
+	eventSelection, err := s.AIService.SelectIndexes(promptgen.SelectMarkets, struct {
+		Events []polymarket.Event
+	}{Events: SMPEvents}, 2)
 	if err != nil {
-		return nil, fmt.Errorf("error creating market selection prompt: %v", err)
+		return nil, fmt.Errorf("error selecting markets: %v", err)
 	}
-
-	eventSelection, err := s.AIService.SelectArticles(marketSelection)
-	if err != nil {
-		return nil, fmt.Errorf("error selecting articles: %v", err)
-	}
-
-	fmt.Println(eventSelection)
 
 	var forecasts []dto.Forecast
 	for _, idx := range eventSelection {
@@ -71,28 +63,26 @@ func (s *ForecastService) GeneratePolyForecasts() ([]dto.Forecast, error) {
 			keywords = append(keywords, tag.Label)
 		}
 
-		// with the tags from this market, fetch news (on keywords)
 		articles, err := s.NewsAPIService.FetchWithKeywords(keywords)
 		if err != nil {
 			return nil, fmt.Errorf("error fetching articles from NewsAPI with keywords: %v", err)
 		}
 
-		eventArticlePrompt, err := s.PromptTemplate.CreateEventArticlePrompt(events[idx], articles)
-		if err != nil {
-			return nil, fmt.Errorf("error creating eventArticle prompt: %v", err)
+		mainArticleIdx, err := s.AIService.SelectIndex(promptgen.SelectArticleForEvent, struct {
+			Event    polymarket.Event
+			Articles []newsapi.Article
+		}{
+			Event:    mainEvent,
+			Articles: articles,
+		})
+
+		exists, _ := s.ForecastRepository.CheckImageURL(articles[mainArticleIdx].URLToImage)
+		if exists {
+			log.Println(articles[mainArticleIdx].Title + " already exists!")
+			continue
 		}
 
-		mainArticleIdx, err := s.AIService.SelectArticle(eventArticlePrompt)
-		if err != nil {
-			return nil, fmt.Errorf("error selecting main article: %v", err)
-		}
-
-		forecastPrompt, err := s.PromptTemplate.CreatePolyForecastPrompt(articles[mainArticleIdx], articles, mainEvent)
-		if err != nil {
-			return nil, fmt.Errorf("error creating forecast prompt: %v", err)
-		}
-
-		forecast, err := s.AIService.GetForecast(forecastPrompt)
+		forecast, err := s.AIService.GetForecast(articles[mainArticleIdx], articles, &mainEvent)
 		if err != nil {
 			return nil, fmt.Errorf("error generating forecast: %v", err)
 		}
@@ -102,14 +92,19 @@ func (s *ForecastService) GeneratePolyForecasts() ([]dto.Forecast, error) {
 			firstMarket = mainEvent.Markets[0]
 		}
 
+		marketID, err := strconv.ParseInt(firstMarket.ID, 10, 64)
+		if err != nil {
+			log.Printf("warning: invalid market ID %q, skipping market assignment", forecast.Market.ID)
+		}
+
 		// Market json
 		forecast.Market = &dto.Market{
+			ID:            marketID,
 			Question:      firstMarket.Question,
 			Outcomes:      firstMarket.Outcomes,
 			OutcomePrices: firstMarket.OutcomePrices,
 			Volume:        firstMarket.Volume,
 			ImageURL:      mainEvent.Image,
-			ExternalID:    firstMarket.ID,
 		}
 
 		forecast.ImageURL = articles[mainArticleIdx].URLToImage
@@ -161,14 +156,9 @@ func (s *ForecastService) GenerateForecasts(category newsapi.Category) ([]dto.Fo
 		return nil, fmt.Errorf("error fetching headlines from NewsAPI: %v", err)
 	}
 
-	selectionPrompt, err := s.PromptTemplate.CreateArticleSelectionPrompt(headlines)
+	articleSelection, err := s.AIService.SelectIndexes(promptgen.SelectArticles, headlines, 2)
 	if err != nil {
-		return nil, fmt.Errorf("error creating article selection prompt: %v", err)
-	}
-
-	articleSelection, err := s.AIService.SelectArticles(selectionPrompt)
-	if err != nil {
-		return nil, fmt.Errorf("error selecting articles: %v", err)
+		return nil, fmt.Errorf("error selecting markets: %v", err)
 	}
 
 	var forecasts []dto.Forecast
@@ -181,12 +171,7 @@ func (s *ForecastService) GenerateForecasts(category newsapi.Category) ([]dto.Fo
 			continue
 		}
 
-		extractionPrompt, err := s.PromptTemplate.CreateKeywordExtractionPrompt(mainArticle)
-		if err != nil {
-			return nil, fmt.Errorf("error creating keyword extraction prompt: %v", err)
-		}
-
-		keywords, err := s.AIService.ExtractKeywords(extractionPrompt)
+		keywords, err := s.AIService.ExtractKeywords(mainArticle)
 		if err != nil {
 			return nil, fmt.Errorf("error extracting keywords: %v", err)
 		}
@@ -196,12 +181,7 @@ func (s *ForecastService) GenerateForecasts(category newsapi.Category) ([]dto.Fo
 			return nil, fmt.Errorf("error fetching articles from NewsAPI with keywords: %v", err)
 		}
 
-		forecastPrompt, err := s.PromptTemplate.CreateForecastPrompt(mainArticle, articles)
-		if err != nil {
-			return nil, fmt.Errorf("error creating forecast prompt: %v", err)
-		}
-
-		forecast, err := s.AIService.GetForecast(forecastPrompt)
+		forecast, err := s.AIService.GetForecast(mainArticle, articles, nil)
 		if err != nil {
 			return nil, fmt.Errorf("error generating forecast: %v", err)
 		}
@@ -361,6 +341,7 @@ func (s *ForecastService) convertToDTO(forecast *model.Forecast) *dto.Forecast {
 	var dtoMarket *dto.Market
 	if forecast.Market != nil {
 		dtoMarket = &dto.Market{
+			ID:            forecast.Market.ID,
 			Question:      forecast.Market.Question,
 			Outcomes:      forecast.Market.Outcomes,
 			OutcomePrices: forecast.Market.OutcomePrices,
@@ -425,13 +406,12 @@ func (s *ForecastService) convertToModel(forecasts []dto.Forecast) []model.Forec
 		var market *model.Market
 		if forecast.Market != nil {
 			market = &model.Market{
-				ID:            uuid.New(),
+				ID:            forecast.Market.ID,
 				Question:      forecast.Market.Question,
 				Outcomes:      forecast.Market.Outcomes,
 				OutcomePrices: forecast.Market.OutcomePrices,
 				Volume:        forecast.Market.Volume,
 				ImageURL:      forecast.Market.ImageURL,
-				ExternalID:    forecast.Market.ExternalID,
 			}
 		}
 

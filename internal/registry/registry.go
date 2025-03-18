@@ -20,12 +20,12 @@ type Registry struct {
 func NewRegistry(c *config.SystemConfig, db *sqlx.DB) *Registry {
 	forecastRepository := repository.NewForecastRepository(db)
 
-	replicateService := replicate.NewReplicateService(c.HTTPClient, c.EnvConfig.ExternalServiceConfig.ReplicateModel, c.EnvConfig.ExternalServiceConfig.ReplicateAPIKey)
+	replicateService := replicate.NewReplicateService(c.HTTPClient, c.PromptTemplate, c.EnvConfig.ExternalServiceConfig.ReplicateModel, c.EnvConfig.ExternalServiceConfig.ReplicateAPIKey)
 	newsAPIService := newsapi.NewNewsAPIService(c.HTTPClient, c.EnvConfig.ExternalServiceConfig.NewsAPIKey, c.EnvConfig.ExternalServiceConfig.NewsAPIURL)
 
 	polyMarketService := polymarket.NewPolyMarketService(c.HTTPClient, c.EnvConfig.ExternalServiceConfig.PolyMarketBaseURL)
 
-	forecastService := service.NewForecastService(forecastRepository, replicateService, newsAPIService, c.PromptTemplate, polyMarketService)
+	forecastService := service.NewForecastService(forecastRepository, replicateService, newsAPIService, polyMarketService)
 
 	return &Registry{
 		ForecastService:   forecastService,

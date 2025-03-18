@@ -183,13 +183,13 @@ func (r *ForecastRepository) SaveForecast(forecast *model.Forecast) error {
 }
 
 func (r *ForecastRepository) SavePolyForecasts(forecasts []model.Forecast) error {
-	// Start a transaction
+	// Start transaction
 	tx, err := r.DB.Beginx()
 	if err != nil {
 		return fmt.Errorf("failed to begin transaction: %v", err)
 	}
 
-	// Prepare the forecast INSERT query (note the "category" field)
+	// Forecast INSERT query
 	forecastQuery := `
         INSERT INTO forecast (id, headline, summary, image_url, category, timestamp)
         VALUES ($1, $2, $3, $4, $5, $6)
@@ -217,25 +217,36 @@ func (r *ForecastRepository) SavePolyForecasts(forecasts []model.Forecast) error
         VALUES ($1, $2)
     `
 
-	// NEW: Market insertion
-	// We'll assume your market table schema is something like:
-	//  market(id UUID, forecast_id UUID UNIQUE, question TEXT, outcomes TEXT, outcome_prices TEXT, volume TEXT, image_url TEXT)
+	// Market INSERT query
 	marketQuery := `
-        INSERT INTO market (id, forecast_id, question, outcomes, outcome_prices, volume, image_url, external_id)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+    INSERT INTO market (id, question, outcomes, outcome_prices, volume, image_url)
+    VALUES ($1, $2, $3, $4, $5, $6)
+    ON CONFLICT (id) 
+    DO UPDATE SET 
+        question = EXCLUDED.question,
+        outcomes = EXCLUDED.outcomes,
+        outcome_prices = EXCLUDED.outcome_prices,
+        volume = EXCLUDED.volume,
+        image_url = EXCLUDED.image_url;
+`
+
+	// Forecast-Market relation insert query
+	forecastMarketQuery := `
+        INSERT INTO forecast_market (forecast_id, market_id)
+        VALUES ($1, $2)
     `
 
 	// Insert each forecast + associated records
 	for i := range forecasts {
 		forecast := &forecasts[i]
 
-		// === INSERT MAIN FORECAST (with category) ===
+		// === INSERT MAIN FORECAST ===
 		_, err = tx.Exec(forecastQuery,
 			forecast.ID,
 			forecast.Headline,
 			forecast.Summary,
 			forecast.ImageURL,
-			forecast.Category, // category included here
+			forecast.Category,
 			forecast.Timestamp,
 		)
 		if err != nil {
@@ -292,21 +303,26 @@ func (r *ForecastRepository) SavePolyForecasts(forecasts []model.Forecast) error
 		}
 
 		// === MARKET (1:1) ===
-		// If forecast.Market is not nil, insert a row into the market table
 		if forecast.Market != nil {
+			// Insert into market table
 			_, err = tx.Exec(marketQuery,
-				forecast.Market.ID, // might be a UUID
-				forecast.ID,        // link it to the forecast
+				forecast.Market.ID,
 				forecast.Market.Question,
 				forecast.Market.Outcomes,
 				forecast.Market.OutcomePrices,
 				forecast.Market.Volume,
 				forecast.Market.ImageURL,
-				forecast.Market.ExternalID,
 			)
 			if err != nil {
 				tx.Rollback()
 				return fmt.Errorf("failed to insert market: %v", err)
+			}
+
+			// Insert into forecast_market join table
+			_, err = tx.Exec(forecastMarketQuery, forecast.ID, forecast.Market.ID)
+			if err != nil {
+				tx.Rollback()
+				return fmt.Errorf("failed to insert into forecast_market relation: %v", err)
 			}
 		}
 	}
@@ -458,24 +474,33 @@ func (r *ForecastRepository) getSourcesByForecastID(forecastID uuid.UUID) ([]mod
 }
 
 func (r *ForecastRepository) getMarketByForecastID(forecastID uuid.UUID) (*model.Market, error) {
-	var market model.Market
+	var marketID int64
 
-	// You might store the "id" from DB if you want it:
-	//   (assuming your Market struct has ID, ForecastID, etc.)
-	query := `
+	// Step 1: Get the market_id from forecast_market
+	getMarketIDQuery := `
+        SELECT market_id FROM forecast_market WHERE forecast_id = $1
+    `
+	err := r.DB.Get(&marketID, getMarketIDQuery, forecastID)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, nil // No market linked to this forecast
+		}
+		return nil, fmt.Errorf("failed to fetch market_id: %v", err)
+	}
+
+	// Step 2: Fetch the market details using the retrieved market_id
+	var market model.Market
+	getMarketQuery := `
         SELECT id, question, outcomes, outcome_prices, volume, image_url
         FROM market
-        WHERE forecast_id = $1
+        WHERE id = $1
     `
-	err := r.DB.Get(&market, query, forecastID)
+	err = r.DB.Get(&market, getMarketQuery, marketID)
 	if err != nil {
-		// If no row found, we can return nil *and* nil error,
-		// or handle the sql.ErrNoRows specifically:
 		if errors.Is(err, sql.ErrNoRows) {
-			// no market row for this forecast
-			return nil, nil
+			return nil, nil // Market does not exist, return nil
 		}
-		return nil, err
+		return nil, fmt.Errorf("failed to fetch market details: %v", err)
 	}
 
 	return &market, nil
