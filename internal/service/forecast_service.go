@@ -14,7 +14,6 @@ import (
 	"github.com/qoentz/evedict/internal/promptgen"
 	"github.com/qoentz/evedict/internal/util"
 	"log"
-	"strconv"
 	"time"
 )
 
@@ -22,128 +21,66 @@ type ForecastService struct {
 	ForecastRepository *repository.ForecastRepository
 	AIService          llm.Service
 	NewsAPIService     *newsapi.Service
-	PolyMarketService  *polymarket.Service
+	MarketService      *MarketService
 }
 
-func NewForecastService(forecastRepository *repository.ForecastRepository, replicateService *replicate.Service, newsAPIService *newsapi.Service, polyMarketService *polymarket.Service) *ForecastService {
+func NewForecastService(forecastRepository *repository.ForecastRepository, replicateService *replicate.Service, newsAPIService *newsapi.Service, marketService *MarketService) *ForecastService {
 	return &ForecastService{
 		ForecastRepository: forecastRepository,
 		AIService:          replicateService,
 		NewsAPIService:     newsAPIService,
-		PolyMarketService:  polyMarketService,
+		MarketService:      marketService,
 	}
 }
 
 func (s *ForecastService) GeneratePolyForecasts() ([]dto.Forecast, error) {
-	events, err := s.PolyMarketService.FetchTopEvents()
+	selectedEvents, err := s.MarketService.GetMarketEvents(2)
 	if err != nil {
-		return nil, fmt.Errorf("error fetching events: %v", err)
-	}
-
-	var SMPEvents []polymarket.Event
-	for _, e := range events {
-		if len(e.Markets) == 1 {
-			SMPEvents = append(SMPEvents, e)
-		}
-	}
-
-	eventSelection, err := s.AIService.SelectIndexes(promptgen.SelectMarkets, struct {
-		Events []polymarket.Event
-	}{Events: SMPEvents}, 2)
-	if err != nil {
-		return nil, fmt.Errorf("error selecting markets: %v", err)
+		return nil, err
 	}
 
 	var forecasts []dto.Forecast
-	for _, idx := range eventSelection {
-		mainEvent := events[idx]
-
+	for _, e := range selectedEvents {
 		var keywords []string
-		for _, tag := range mainEvent.Tags {
+		for _, tag := range e.Tags {
 			keywords = append(keywords, tag.Label)
 		}
 
 		articles, err := s.NewsAPIService.FetchWithKeywords(keywords)
 		if err != nil {
-			return nil, fmt.Errorf("error fetching articles from NewsAPI with keywords: %v", err)
+			return nil, fmt.Errorf("error fetching articles from NewsAPI: %v", err)
 		}
 
 		mainArticleIdx, err := s.AIService.SelectIndex(promptgen.SelectArticleForEvent, struct {
 			Event    polymarket.Event
 			Articles []newsapi.Article
-		}{
-			Event:    mainEvent,
-			Articles: articles,
-		})
-
-		exists, _ := s.ForecastRepository.CheckImageURL(articles[mainArticleIdx].URLToImage)
-		if exists {
-			log.Println(articles[mainArticleIdx].Title + " already exists!")
+		}{Event: e, Articles: articles})
+		if err != nil {
+			log.Printf("Error selecting article for event %s: %v", e.Title, err)
 			continue
 		}
 
-		forecast, err := s.AIService.GetForecast(articles[mainArticleIdx], articles, &mainEvent)
+		if mainArticleIdx < 0 || mainArticleIdx >= len(articles) {
+			log.Printf("Invalid article index (%d) for event: %s", mainArticleIdx, e.Title)
+			continue
+		}
+
+		mainArticle := articles[mainArticleIdx]
+
+		if exists, _ := s.ForecastRepository.CheckImageURL(mainArticle.URLToImage); exists {
+			log.Println(mainArticle.Title + " already exists!")
+			continue
+		}
+
+		forecast, err := s.AIService.GetForecast(mainArticle, articles, &e)
 		if err != nil {
-			return nil, fmt.Errorf("error generating forecast: %v", err)
+			log.Printf("Error generating forecast for event %s: %v", e.Title, err)
+			continue
 		}
 
-		var firstMarket polymarket.Market
-		if len(mainEvent.Markets) > 0 {
-			firstMarket = mainEvent.Markets[0]
-		}
+		s.MarketService.AttachMarketData(e, forecast)
+		s.attachMetadata(mainArticle, forecast, keywords, articles)
 
-		marketID, err := strconv.ParseInt(firstMarket.ID, 10, 64)
-		if err != nil {
-			log.Printf("warning: invalid market ID %q, skipping market assignment", forecast.Market.ID)
-		}
-
-		// Market json
-		forecast.Market = &dto.Market{
-			ID:            marketID,
-			Question:      firstMarket.Question,
-			Outcomes:      firstMarket.Outcomes,
-			OutcomePrices: firstMarket.OutcomePrices,
-			Volume:        firstMarket.Volume,
-			ImageURL:      mainEvent.Image,
-		}
-
-		forecast.ImageURL = articles[mainArticleIdx].URLToImage
-
-		tags := make([]dto.Tag, len(keywords))
-		for i, t := range keywords {
-			tags[i].Name = t
-		}
-
-		forecast.Tags = tags
-
-		var sources []dto.Source
-
-		mainSource := dto.Source{
-			Name:     articles[mainArticleIdx].Source.Name,
-			Title:    articles[mainArticleIdx].Title,
-			URL:      articles[mainArticleIdx].URL,
-			ImageURL: articles[mainArticleIdx].URLToImage,
-		}
-
-		sources = append(sources, mainSource)
-
-		for _, article := range articles {
-			if article.URL == articles[mainArticleIdx].URL || article.Title == "[Removed]" {
-				continue
-			}
-
-			source := dto.Source{
-				Name:     article.Source.Name,
-				Title:    article.Title,
-				URL:      article.URL,
-				ImageURL: article.URLToImage,
-			}
-
-			sources = append(sources, source)
-		}
-
-		forecast.Sources = sources
-		forecast.Timestamp = time.Now().UTC()
 		forecasts = append(forecasts, *forecast)
 	}
 
@@ -186,47 +123,43 @@ func (s *ForecastService) GenerateForecasts(category newsapi.Category) ([]dto.Fo
 			return nil, fmt.Errorf("error generating forecast: %v", err)
 		}
 
-		forecast.ImageURL = mainArticle.URLToImage
-
-		tags := make([]dto.Tag, len(keywords))
-		for i, t := range keywords {
-			tags[i].Name = t
-		}
-
-		forecast.Tags = tags
-
-		var sources []dto.Source
-
-		mainSource := dto.Source{
-			Name:     mainArticle.Source.Name,
-			Title:    mainArticle.Title,
-			URL:      mainArticle.URL,
-			ImageURL: mainArticle.URLToImage,
-		}
-
-		sources = append(sources, mainSource)
-
-		for _, article := range articles {
-			if article.URL == mainArticle.URL || article.Title == "[Removed]" {
-				continue
-			}
-
-			source := dto.Source{
-				Name:     article.Source.Name,
-				Title:    article.Title,
-				URL:      article.URL,
-				ImageURL: article.URLToImage,
-			}
-
-			sources = append(sources, source)
-		}
-
-		forecast.Sources = sources
-		forecast.Timestamp = time.Now().UTC()
+		s.attachMetadata(mainArticle, forecast, keywords, articles)
 		forecasts = append(forecasts, *forecast)
 	}
 
 	return forecasts, nil
+}
+
+func (s *ForecastService) attachMetadata(mainArticle newsapi.Article, forecast *dto.Forecast, keywords []string, articles []newsapi.Article) {
+	forecast.ImageURL = mainArticle.URLToImage
+	forecast.Timestamp = time.Now().UTC()
+
+	forecast.Tags = make([]dto.Tag, len(keywords))
+	for i, keyword := range keywords {
+		forecast.Tags[i] = dto.Tag{Name: keyword}
+	}
+
+	var sources []dto.Source
+	sources = append(sources, dto.Source{
+		Name:     mainArticle.Source.Name,
+		Title:    mainArticle.Title,
+		URL:      mainArticle.URL,
+		ImageURL: mainArticle.URLToImage,
+	})
+
+	for _, article := range articles {
+		if article.URL == mainArticle.URL || article.Title == "[Removed]" {
+			continue
+		}
+		sources = append(sources, dto.Source{
+			Name:     article.Source.Name,
+			Title:    article.Title,
+			URL:      article.URL,
+			ImageURL: article.URLToImage,
+		})
+	}
+
+	forecast.Sources = sources
 }
 
 func (s *ForecastService) GetForecasts(limit int, offset int, category *util.Category) ([]dto.Forecast, error) {
@@ -292,7 +225,6 @@ func (s *ForecastService) SavePolyForecasts(forecasts []dto.Forecast) error {
 
 func (s *ForecastService) SaveForecasts(forecasts []dto.Forecast) error {
 	modelForecasts := s.convertToModel(forecasts)
-	fmt.Println("CATEGORY: ", modelForecasts[0].Category, " ", modelForecasts[1].Category)
 	err := s.ForecastRepository.SaveForecasts(modelForecasts)
 	if err != nil {
 		return fmt.Errorf("failed to save forecasts: %v", err)

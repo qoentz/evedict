@@ -25,7 +25,8 @@ func NewRegistry(c *config.SystemConfig, db *sqlx.DB) *Registry {
 
 	polyMarketService := polymarket.NewPolyMarketService(c.HTTPClient, c.EnvConfig.ExternalServiceConfig.PolyMarketBaseURL)
 
-	forecastService := service.NewForecastService(forecastRepository, replicateService, newsAPIService, polyMarketService)
+	marketService := service.NewMarketService(polyMarketService, replicateService)
+	forecastService := service.NewForecastService(forecastRepository, replicateService, newsAPIService, marketService)
 
 	return &Registry{
 		ForecastService:   forecastService,
