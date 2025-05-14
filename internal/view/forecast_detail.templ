@@ -30,7 +30,7 @@ templ DetailHeader(f *dto.Forecast) {
       <div class="w-[70%] rounded-lg overflow-hidden" style="border-radius: 1rem;">
         <img
           src={f.ImageURL}
-          alt="Forecast Image"
+          alt=""
           loading="lazy"
           class="w-full object-cover block" />
       </div>
@@ -209,7 +209,7 @@ templ FurtherRead(f *dto.Forecast) {
     <ul class="space-y-4">
       for _, s := range f.Sources {
         <li class="relative rounded-lg shadow overflow-hidden border border-gray-600" style="height:6.5rem;">
-          <img src={ s.ImageURL } alt={ s.Name } class="absolute inset-0 w-full h-full object-cover filter brightness-75" />
+          <img src={ s.ImageURL } alt="" class="absolute inset-0 w-full h-full object-cover filter brightness-75" />
           <div class="absolute inset-0 bg-gradient-to-r from-transparent to-black"></div>
           <div class="relative z-10 p-4 flex flex-col md:flex-row items-center justify-between h-full">
             <div class="flex-1 min-h-[3rem]">

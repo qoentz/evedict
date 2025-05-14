@@ -18,7 +18,7 @@ templ TileCard(p dto.Forecast, extraClasses string) {
        x-bind:hx-push-url="detailUrl"
        class={"cursor-pointer bg-gray-600 rounded-lg overflow-hidden", extraClasses}>
     <img src={p.ImageURL}
-         alt={p.Headline}
+         alt=""
          class="w-full h-28 md:h-40 object-cover" />
     <div class="p-2 md:p-4">
       <h3 class="text-sm md:text-lg font-semibold text-white mb-1 md:mb-2 group-hover:text-gray-300">

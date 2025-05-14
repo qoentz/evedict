@@ -160,7 +160,7 @@ function createTinyCard(slide) {
     card.setAttribute('hx-swap', 'innerHTML');
 
     card.innerHTML = `
-        <img src="${imgSrc}" alt="Tiny Card Image" class="w-full h-full object-cover opacity-70 group-hover:opacity-50 transition-opacity duration-300"/>
+        <img src="${imgSrc}" alt="" class="w-full h-full object-cover opacity-70 group-hover:opacity-50 transition-opacity duration-300"/>
         <div class="absolute inset-0 flex items-center justify-center p-2">
             <p class="text-white text-sm font-bold text-center leading-tight">${headline}</p>
         </div>

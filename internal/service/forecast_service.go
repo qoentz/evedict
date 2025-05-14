@@ -93,7 +93,9 @@ func (s *ForecastService) GenerateForecasts(category newsapi.Category) ([]dto.Fo
 		return nil, fmt.Errorf("error fetching headlines from NewsAPI: %v", err)
 	}
 
-	articleSelection, err := s.AIService.SelectIndexes(promptgen.SelectArticles, headlines, 2)
+	articleSelection, err := s.AIService.SelectIndexes(promptgen.SelectArticles, struct {
+		Articles []newsapi.Article
+	}{Articles: headlines}, 2)
 	if err != nil {
 		return nil, fmt.Errorf("error selecting markets: %v", err)
 	}
