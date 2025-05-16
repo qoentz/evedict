@@ -20,6 +20,7 @@ func InitRouter(reg *registry.Registry) *mux.Router {
 	router.HandleFunc("/", page.Home()).Methods("GET")
 	router.HandleFunc("/forecasts/{forecastId}", page.GetForecast(reg.ForecastService)).Methods("GET")
 	router.HandleFunc("/about", page.About()).Methods("GET")
+	router.HandleFunc("/contact", page.Contact()).Methods("GET")
 
 	// Static assets and favicon
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static/"))))
@@ -32,8 +33,9 @@ func InitRouter(reg *registry.Registry) *mux.Router {
 	api.Handle("/forecasts", fragment.GetForecastsFragment(reg.ForecastService)).Methods("GET")
 	api.Handle("/forecasts/{forecastId}", fragment.GetForecastFragment(reg.ForecastService)).Methods("GET")
 	api.Handle("/about", fragment.AboutFragment()).Methods("GET")
+	api.Handle("/contact", fragment.ContactFragment()).Methods("GET")
 
-	api.Handle("/gen", handler.GenerateForecasts(reg.ForecastService)).Methods("POST")
+	api.Handle("/gen", handler.GeneratePolyForecasts(reg.ForecastService)).Methods("POST")
 
 	router.NotFoundHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "", http.StatusNotFound)
