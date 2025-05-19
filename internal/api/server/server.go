@@ -7,6 +7,7 @@ import (
 	"github.com/qoentz/evedict/internal/api/handler"
 	"github.com/qoentz/evedict/internal/api/handler/fragment"
 	"github.com/qoentz/evedict/internal/api/handler/page"
+	"github.com/qoentz/evedict/internal/api/middleware"
 	"github.com/qoentz/evedict/internal/registry"
 	"log"
 	"net"
@@ -16,29 +17,35 @@ import (
 func InitRouter(reg *registry.Registry) *mux.Router {
 	router := mux.NewRouter().StrictSlash(true)
 
-	// Full page endpoints
-	router.HandleFunc("/", page.Home()).Methods("GET")
-	router.HandleFunc("/forecasts/{forecastId}", page.GetForecast(reg.ForecastService)).Methods("GET")
-	router.HandleFunc("/about", page.About()).Methods("GET")
-	router.HandleFunc("/contact", page.Contact()).Methods("GET")
-
-	// Static assets and favicon
+	// Public routes — no auth
+	router.HandleFunc("/login", page.Login()).Methods("GET")
+	router.HandleFunc("/login", handler.SubmitPassword(reg.AuthService)).Methods("POST")
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static/"))))
 	router.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "./static/favicon.ico")
 	}).Methods("GET")
 
+	// Protected subrouter
+	protected := router.NewRoute().Subrouter()
+	protected.Use(middleware.AuthShield(reg.AuthService)) // <- wrap everything below
+
+	// Full page endpoints
+	protected.HandleFunc("/", page.Home()).Methods("GET")
+	protected.HandleFunc("/forecasts/{forecastId}", page.GetForecast(reg.ForecastService)).Methods("GET")
+	protected.HandleFunc("/about", page.About()).Methods("GET")
+	protected.HandleFunc("/contact", page.Contact()).Methods("GET")
+
 	// API endpoints for htmx partial updates
-	api := router.PathPrefix("/api").Subrouter()
+	api := protected.PathPrefix("/api").Subrouter()
 	api.Handle("/forecasts", fragment.GetForecastsFragment(reg.ForecastService)).Methods("GET")
 	api.Handle("/forecasts/{forecastId}", fragment.GetForecastFragment(reg.ForecastService)).Methods("GET")
 	api.Handle("/about", fragment.AboutFragment()).Methods("GET")
 	api.Handle("/contact", fragment.ContactFragment()).Methods("GET")
-
 	api.Handle("/gen", handler.GeneratePolyForecasts(reg.ForecastService)).Methods("POST")
 
+	// Not found
 	router.NotFoundHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		http.Error(w, "", http.StatusNotFound)
+		http.Error(w, "404 page not found", http.StatusNotFound)
 	})
 
 	return router

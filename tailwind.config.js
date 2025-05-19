@@ -20,6 +20,7 @@ module.exports = {
         'fade-slide-in': 'fadeSlideIn 1.5s ease-out forwards',
         'letter-slide-in': 'letterSlideIn 0.5s ease-out forwards',
         'spin-slow': 'rotation 15s linear infinite',
+        'shake': 'shake 0.4s ease',
       },
       keyframes: {
         fadeSlideIn: {
@@ -46,12 +47,16 @@ module.exports = {
           from: { transform: 'rotate(0deg)' },
           to: { transform: 'rotate(359deg)' },
         },
+        shake: {
+          '0%, 100%': { transform: 'translateX(0)' },
+          '20%, 60%': { transform: 'translateX(-5px)' },
+          '40%, 80%': { transform: 'translateX(5px)' },
+        },
       },
       backgroundImage: {
-        // Custom diagonal fade gradient
         'fade-to-black': 'linear-gradient(to bottom right, rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0.7) 80%, rgba(0, 0, 0, 1) 100%)',
       },
-    },
+    }
   },
   plugins: [],
 };

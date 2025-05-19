@@ -11,6 +11,7 @@ import (
 )
 
 type Registry struct {
+	AuthService       *service.AuthService
 	ForecastService   *service.ForecastService
 	ReplicateService  *replicate.Service
 	NewsAPIService    *newsapi.Service
@@ -18,6 +19,8 @@ type Registry struct {
 }
 
 func NewRegistry(c *config.SystemConfig, db *sqlx.DB) *Registry {
+	authService := service.NewAuthService(c.EnvConfig.AuthSecret)
+
 	forecastRepository := repository.NewForecastRepository(db)
 
 	replicateService := replicate.NewReplicateService(c.HTTPClient, c.PromptTemplate, c.EnvConfig.ExternalServiceConfig.ReplicateModel, c.EnvConfig.ExternalServiceConfig.ReplicateAPIKey)
@@ -29,6 +32,7 @@ func NewRegistry(c *config.SystemConfig, db *sqlx.DB) *Registry {
 	forecastService := service.NewForecastService(forecastRepository, replicateService, newsAPIService, marketService)
 
 	return &Registry{
+		AuthService:       authService,
 		ForecastService:   forecastService,
 		ReplicateService:  replicateService,
 		NewsAPIService:    newsAPIService,

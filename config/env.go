@@ -3,6 +3,7 @@ package config
 import "os"
 
 type EnvConfig struct {
+	AuthSecret            string
 	DatabaseConfig        *DatabaseConfig
 	ExternalServiceConfig *ExternalServiceConfig
 }
@@ -17,6 +18,7 @@ type ExternalServiceConfig struct {
 
 func NewEnvConfig() *EnvConfig {
 	return &EnvConfig{
+		AuthSecret: os.Getenv("AUTH_SECRET"),
 		DatabaseConfig: &DatabaseConfig{
 			Host:     os.Getenv("DB_HOST"),
 			User:     os.Getenv("DB_USER"),
