@@ -1,17 +1,18 @@
-version: '3.8'
 services:
   app:
-    build: .
-    container_name: evedict
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ghcr.io/qoentz/evedict:latest
+    container_name: evedict-app
     ports:
       - "8080:8080"
     depends_on:
       - db
+    env_file:
+      - .env
     environment:
-      - DB_HOST=db  # The service name of the Postgres container
-      - DB_USER=${DB_USER}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - DB_NAME=${DB_NAME}
+      - DB_HOST=db
     volumes:
       - .:/app
     networks:
@@ -19,15 +20,17 @@ services:
 
   db:
     image: postgres:latest
-    container_name: postgres_db
+    container_name: evedict-db
     ports:
-      - "5433:5432"  # Maps Postgres' port to localhost
-    volumes:
-      - evedict_db_data:/var/lib/postgresql/data
+      - "5433:5432"
+    env_file:
+      - .env
     environment:
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
       - POSTGRES_DB=${DB_NAME}
+    volumes:
+      - evedict_db_data:/var/lib/postgresql/data
     networks:
       - evedict_network
 

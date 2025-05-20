@@ -1,6 +1,8 @@
 module github.com/qoentz/evedict
 
-go 1.23
+go 1.23.0
+
+toolchain go1.23.2
 
 require (
 	github.com/gorilla/mux v1.8.1
@@ -9,7 +11,7 @@ require (
 )
 
 require (
-	github.com/a-h/templ v0.2.778
+	github.com/a-h/templ v0.3.865
 	github.com/lib/pq v1.10.9
 )
 

@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/joho/godotenv"
 	"github.com/qoentz/evedict/internal/promptgen"
-	"log"
 	"net/http"
+	"os"
 	"time"
 )
 
@@ -16,9 +16,8 @@ type SystemConfig struct {
 }
 
 func ConfigureSystem() (*SystemConfig, error) {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatalf("Error loading .env file: %v", err)
+	if _, err := os.Stat(".env"); err == nil {
+		_ = godotenv.Load()
 	}
 
 	envConfig := NewEnvConfig()

@@ -1,24 +1,48 @@
-# Use the official Go image for the build
-FROM golang:1.21.1-alpine
+# === Assets Stage ===
+FROM node:20 AS assets
 
-# Set the working directory inside the container to /evedict
 WORKDIR /evedict
 
-# Copy the entire project into the container
-COPY . .
+RUN apt-get update && apt-get install -y git
 
-# Download dependencies
+COPY package.json ./
+RUN npm install
+
+COPY tailwind.config.js ./
+COPY internal/view/css/input.css ./internal/view/css/input.css
+
+RUN npx tailwindcss -i ./internal/view/css/input.css -o ./dist/styles.css --minify
+
+# === Go binary ===
+FROM golang:1.23-alpine AS builder
+
+WORKDIR /evedict
+
+COPY go.mod go.sum ./
 RUN go mod download
 
-# Build the Go app from the /evedict/cmd directory and place the output binary in /evedict
-RUN go build -o /evedict/main /evedict/cmd/app/main.go
+COPY . .
 
-# Expose port 8080
+RUN go install github.com/a-h/templ/cmd/templ@latest
+RUN templ generate
+
+COPY internal/promptgen/prompts.yaml ./internal/promptgen/prompts.yaml
+
+RUN go build -o /evedict/main ./cmd/app/main.go
+
+# === Runtime image ===
+FROM alpine:latest AS final
+
+WORKDIR /evedict
+
+COPY --from=builder /evedict/main ./main
+COPY --from=builder /evedict/internal/promptgen/prompts.yaml ./internal/promptgen/prompts.yaml
+COPY --from=assets /evedict/dist/styles.css ./static/css/styles.css
+COPY static ./static
+
 EXPOSE 8080
 
-# Run the compiled binary from /evedict
-CMD ["/evedict/main"]
-
+CMD ["./main"]
 
 
 
