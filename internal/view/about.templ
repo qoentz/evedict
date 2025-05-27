@@ -1,49 +1,27 @@
 package view
 
 templ AboutPage() {
-    @Base() {
-        @AboutFragment()
-    }
+	@Base() {
+		@AboutFragment()
+	}
 }
 
 templ AboutFragment() {
-  @AuxiliaryView() {
-    <h2 class="mb-3" style="font-size: 3rem; font-weight: 700;">
-      Tracing the Trajectory of World Affairs
-    </h2>
-
-    <div
-      style="
+	@AuxiliaryView() {
+		<h2 class="mb-3" style="font-size: 3rem; font-weight: 700;">
+			Tracing the Trajectory of World Affairs
+		</h2>
+		<div
+			style="
         width: 60%;
         max-width: 500px;
         height: 2px;
         background: linear-gradient(to right, transparent 0%, grey 50%, transparent 100%);
         margin: 1rem auto 2rem auto;
       "
-    ></div>
-
-    <p style="font-size: 1.25rem; line-height: 1.8;">
-      Evedict synthesizes news in real time from a broad array of external sources, leveraging AI to interpret the shifting dynamics of global events. By tracing patterns and emerging trends across headlines, it seeks to illuminate potential outcomes and surface narratives before they fully take shape.
-    </p>
-  }
+		></div>
+		<p style="font-size: 1.25rem; line-height: 1.8;">
+			Evedict synthesizes news in real time from a broad array of external sources, leveraging AI to interpret the shifting dynamics of global events. By tracing patterns and emerging trends across headlines, it seeks to illuminate potential outcomes and surface narratives before they fully take shape.
+		</p>
+	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

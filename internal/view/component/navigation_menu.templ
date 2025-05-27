@@ -1,26 +1,27 @@
 package component
 
 templ NavigationMenu() {
-  @NavigationLogic() {
-    <!-- Categories Group -->
-    <div class="flex items-center space-x-6 border-r border-gray-600 pr-6">
-      @NavigationOption("Politics", "politics", "/api/forecasts?limit=9&offset=0&category=Politics", "/?category=Politics")
-      @NavigationOption("Economy", "economy", "/api/forecasts?limit=9&offset=0&category=Economy", "/?category=Economy")
-      @NavigationOption("Technology", "technology", "/api/forecasts?limit=9&offset=0&category=Technology", "/?category=Technology")
-      @NavigationOption("Culture", "culture", "/api/forecasts?limit=9&offset=0&category=Culture", "/?category=Culture")
-    </div>
-
-    <!-- Static Pages Group -->
-    <div class="flex items-center space-x-6 pl-6">
-      @NavigationOption("About", "about", "/api/about", "/about")
-      @NavigationOption("Contact", "contact", "/api/contact", "/contact")
-    </div>
-  }
+	@NavigationLogic() {
+		<!-- Categories Group -->
+		<div class="flex items-center space-x-6 border-r border-gray-600 pr-6">
+			@NavigationOption("Politics", "politics", "/api/forecasts?limit=9&offset=0&category=Politics", "/?category=Politics")
+			@NavigationOption("Economy", "economy", "/api/forecasts?limit=9&offset=0&category=Economy", "/?category=Economy")
+			@NavigationOption("Technology", "technology", "/api/forecasts?limit=9&offset=0&category=Technology", "/?category=Technology")
+			@NavigationOption("Culture", "culture", "/api/forecasts?limit=9&offset=0&category=Culture", "/?category=Culture")
+		</div>
+		<!-- Static Pages Group -->
+		<div class="flex items-center space-x-6 pl-6">
+			@NavigationOption("About", "about", "/api/about", "/about")
+			@NavigationOption("Contact", "contact", "/api/contact", "/contact")
+		</div>
+	}
 }
 
 templ NavigationLogic() {
-  <nav id="nav-menu" class="flex items-center mt-4 lg:mt-0"
-       x-data="{
+	<nav
+		id="nav-menu"
+		class="flex items-center mt-4 lg:mt-0"
+		x-data="{
          activeNav: '',
          isTouch: ('ontouchstart' in window || navigator.maxTouchPoints > 0),
 
@@ -57,35 +58,32 @@ templ NavigationLogic() {
            }
          }
        }"
-       x-init="
+		x-init="
          updateActiveNav();
          window.setActiveNav = setActiveNav;
        "
-  >
-    { children... }
-  </nav>
+	>
+		{ children... }
+	</nav>
 }
 
 templ NavigationOption(display string, param string, url string, pushUrl string) {
-  <a href="#"
-     data-nav={ param }
-     hx-get={ url }
-     hx-target="#forecast-feed"
-     hx-swap="innerHTML"
-     hx-push-url={ pushUrl }
-     hx-indicator="#loading-indicator"
-     @click={ "setActiveNav('" + param + "')" }
-     class="relative group text-gray-300 hover:text-white text-base font-palatino transition-colors px-3 py-2"
-     x-bind:class={ "activeNav === '" + param + "' ? 'text-white' : 'text-gray-300 hover:text-white'" }>
-    {display}
-    <span class="absolute left-0 right-0 bottom-0 h-0.5 bg-white scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-center"
-          x-bind:class={ "activeNav === '" + param + "' ? 'scale-x-100' : 'scale-x-0'" }>
-    </span>
-  </a>
+	<a
+		href="#"
+		data-nav={ param }
+		hx-get={ url }
+		hx-target="#forecast-feed"
+		hx-swap="innerHTML"
+		hx-push-url={ pushUrl }
+		hx-indicator="#loading-indicator"
+		@click={ "setActiveNav('" + param + "')" }
+		class="relative group text-gray-300 hover:text-white text-base font-palatino transition-colors px-3 py-2"
+		x-bind:class={ "activeNav === '" + param + "' ? 'text-white' : 'text-gray-300 hover:text-white'" }
+	>
+		{ display }
+		<span
+			class="absolute left-0 right-0 bottom-0 h-0.5 bg-white scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-center"
+			x-bind:class={ "activeNav === '" + param + "' ? 'scale-x-100' : 'scale-x-0'" }
+		></span>
+	</a>
 }
-
-
-
-
-
-

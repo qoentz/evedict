@@ -1,41 +1,28 @@
 package view
 
-import (
-    "github.com/qoentz/evedict/internal/util"
-)
+import "github.com/qoentz/evedict/internal/util"
 
 templ Home(category *util.Category) {
-    @Base() {
-        <!-- Forecast Feed -->
-        if category != nil {
-           <div
-                hx-get={"/api/forecasts?limit=9&offset=0&category=" + string(*category)}
-                hx-trigger="load"
-                hx-target="#forecast-feed"
-                hx-indicator="#loading-indicator"
-                hx-push-url={"/?category=" + string(*category)}
-                hx-swap="innerHTML">
-           </div>
-        } else {
-             <div
-                hx-get="/api/forecasts?limit=9&offset=0"
-                hx-trigger="load"
-                hx-target="#forecast-feed"
-                hx-indicator="#loading-indicator"
-                hx-push-url={"/"}
-                hx-swap="innerHTML">
-             </div>
-        }
-    }
+	@Base() {
+		<!-- Forecast Feed -->
+		if category != nil {
+			<div
+				hx-get={ "/api/forecasts?limit=9&offset=0&category=" + string(*category) }
+				hx-trigger="load"
+				hx-target="#forecast-feed"
+				hx-indicator="#loading-indicator"
+				hx-push-url={ "/?category=" + string(*category) }
+				hx-swap="innerHTML"
+			></div>
+		} else {
+			<div
+				hx-get="/api/forecasts?limit=9&offset=0"
+				hx-trigger="load"
+				hx-target="#forecast-feed"
+				hx-indicator="#loading-indicator"
+				hx-push-url={ "/" }
+				hx-swap="innerHTML"
+			></div>
+		}
+	}
 }
-
-
-
-
-
-
-
-
-
-
-

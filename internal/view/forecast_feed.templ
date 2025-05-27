@@ -1,156 +1,162 @@
 package view
 
 import (
-    "fmt"
-    "github.com/qoentz/evedict/internal/api/dto"
-    "github.com/qoentz/evedict/internal/view/component"
+	"fmt"
+	"github.com/qoentz/evedict/internal/api/dto"
+	"github.com/qoentz/evedict/internal/view/component"
 )
 
 templ ForecastFeed(forecasts []dto.Forecast) {
-    @ViewContainer() {
-        <!-- Highlighted Slider -->
-        <div class="highlighted-slider">
-            @Carousel(forecasts)
-        </div>
-        <!-- Bottom Forecasts Section -->
-        @BottomSection(forecasts)
-    }
+	@ViewContainer() {
+		<!-- Highlighted Slider -->
+		<div class="highlighted-slider">
+			@Carousel(forecasts)
+		</div>
+		<!-- Bottom Forecasts Section -->
+		@BottomSection(forecasts)
+	}
 }
 
 templ Carousel(forecasts []dto.Forecast) {
-    if len(forecasts) == 0 {
-        <div class="flex items-center justify-center h-64 bg-gray-800 text-gray-500">
-            No data available
-        </div>
-    }
-
-    <div id="slider-container" class="relative w-full h-auto md:h-[600px] bg-gray-800 rounded-lg shadow-md flex flex-col md:flex-row">
-        <!-- Main Highlighted Slide -->
-        <div class="w-full lg:w-7/10 bg-gray-700 relative shadow-md flex p-6 md:p-14 overflow-hidden">
-            <div class="relative w-full h-full">
-                for i, p := range forecasts {
-                    if i == 0 {
-                        <div class="highlight-slide top-0 left-0 w-full h-full flex transition-all duration-700 ease-in-out">
-                            @CarouselHighlightedCard(p)
-                        </div>
-                    } else if i <= 4 {
-                        <div class="highlight-slide absolute top-0 left-0 w-full h-full flex translate-x-full opacity-0 pointer-events-none transition-all duration-700 ease-in-out">
-                            @CarouselHighlightedCard(p)
-                        </div>
-                    }
-                }
-
-                <!-- Navigation Arrows -->
-                <button id="prevSlide" aria-label="Previous Slide"
-                    class="carousel-btn absolute -left-4 md:-left-12 top-1/2 transform -translate-y-1/2
-                    bg-gray-800 hover:bg-gray-600 active:bg-gray-600 text-white p-1 md:p-2 rounded-full shadow-md z-20">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 md:h-6 w-4 md:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                    </svg>
-                </button>
-
-                <button id="nextSlide" aria-label="Next Slide"
-                    class="carousel-btn absolute -right-4 md:-right-12 top-1/2 transform -translate-y-1/2
-                    bg-gray-800 hover:bg-gray-600 active:bg-gray-600 text-white p-1 md:p-2 rounded-full shadow-md z-20">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 md:h-6 w-4 md:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                    </svg>
-                </button>
-
-                <!-- Slide Indicator Dots -->
-                <div id="slideDots" class="absolute -bottom-8 md:-bottom-12 left-0 w-full flex justify-center space-x-2 md:space-x-4 z-30 pb-4">
-                    for i, _ := range forecasts {
-                        if i <= 4 {
-                            if i == 0 {
-                                <span class="dot block w-2 md:w-3 h-2 md:h-3 rounded-full bg-white transition-all duration-300"></span>
-                            } else {
-                                <span class="dot block w-2 md:w-3 h-2 md:h-3 rounded-full bg-gray-400 transition-all duration-300"></span>
-                            }
-                        }
-                    }
-                </div>
-            </div>
-        </div>
-
-        <!-- Tiny Stacked Cards -->
-        <div id="tinyCardsContainer" class="hidden lg:flex w-full md:w-3/10 bg-gray-900 p-4 pt-14 flex-col space-y-4 items-center overflow-hidden snap-start">
-            for i, f := range forecasts {
-                if i != 0 && i <= 4 {
-                    @CarouselSideCard(f)
-                }
-            }
-        </div>
-    </div>
+	if len(forecasts) == 0 {
+		<div class="flex items-center justify-center h-64 bg-gray-800 text-gray-500">
+			No data available
+		</div>
+	}
+	<div id="slider-container" class="relative w-full h-auto md:h-[600px] bg-gray-800 rounded-lg shadow-md flex flex-col md:flex-row">
+		<!-- Main Highlighted Slide -->
+		<div class="w-full lg:w-7/10 bg-gray-700 relative shadow-md flex p-6 md:p-14 overflow-hidden">
+			<div class="relative w-full h-full">
+				for i, p := range forecasts {
+					if i == 0 {
+						<div class="highlight-slide top-0 left-0 w-full h-full flex transition-all duration-700 ease-in-out">
+							@CarouselHighlightedCard(p)
+						</div>
+					} else if i <= 4 {
+						<div class="highlight-slide absolute top-0 left-0 w-full h-full flex translate-x-full opacity-0 pointer-events-none transition-all duration-700 ease-in-out">
+							@CarouselHighlightedCard(p)
+						</div>
+					}
+				}
+				<!-- Navigation Arrows -->
+				<button
+					id="prevSlide"
+					aria-label="Previous Slide"
+					class="carousel-btn absolute -left-4 md:-left-12 top-1/2 transform -translate-y-1/2
+                    bg-gray-800 hover:bg-gray-600 active:bg-gray-600 text-white p-1 md:p-2 rounded-full shadow-md z-20"
+				>
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-4 md:h-6 w-4 md:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+					</svg>
+				</button>
+				<button
+					id="nextSlide"
+					aria-label="Next Slide"
+					class="carousel-btn absolute -right-4 md:-right-12 top-1/2 transform -translate-y-1/2
+                    bg-gray-800 hover:bg-gray-600 active:bg-gray-600 text-white p-1 md:p-2 rounded-full shadow-md z-20"
+				>
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-4 md:h-6 w-4 md:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+					</svg>
+				</button>
+				<!-- Slide Indicator Dots -->
+				<div id="slideDots" class="absolute -bottom-8 md:-bottom-12 left-0 w-full flex justify-center space-x-2 md:space-x-4 z-30 pb-4">
+					for i, _ := range forecasts {
+						if i <= 4 {
+							if i == 0 {
+								<span class="dot block w-2 md:w-3 h-2 md:h-3 rounded-full bg-white transition-all duration-300"></span>
+							} else {
+								<span class="dot block w-2 md:w-3 h-2 md:h-3 rounded-full bg-gray-400 transition-all duration-300"></span>
+							}
+						}
+					}
+				</div>
+			</div>
+		</div>
+		<!-- Tiny Stacked Cards -->
+		<div id="tinyCardsContainer" class="hidden lg:flex w-full md:w-3/10 bg-gray-900 p-4 pt-14 flex-col space-y-4 items-center overflow-hidden snap-start">
+			for i, f := range forecasts {
+				if i != 0 && i <= 4 {
+					@CarouselSideCard(f)
+				}
+			}
+		</div>
+	</div>
 }
 
 templ CarouselHighlightedCard(p dto.Forecast) {
-  <div x-data={ fmt.Sprintf(`{
+	<div
+		x-data={ fmt.Sprintf(`{
     category: new URLSearchParams(window.location.search).get('category') || '',
     detailUrl: '/forecasts/%v' + (new URLSearchParams(window.location.search).get('category') ? '?category=' + new URLSearchParams(window.location.search).get('category') : ''),
     apiUrl: '/api/forecasts/%v' + (new URLSearchParams(window.location.search).get('category') ? '?category=' + new URLSearchParams(window.location.search).get('category') : '')
-  }`, p.ID, p.ID) }>
-    <div x-bind:hx-get="apiUrl"
-         hx-trigger="click"
-         hx-target="#forecast-feed"
-         hx-swap="innerHTML show:window:top"
-         x-bind:hx-push-url="detailUrl"
-         class="cursor-pointer relative w-full h-full flex bg-gray-800 rounded-lg overflow-hidden group">
-      <!-- Image Background with Bottom Gradient -->
-      <div class="absolute inset-0 w-full h-full rounded-lg overflow-hidden">
-        <img src={p.ImageURL} alt="" loading="lazy" class="w-full h-full object-cover object-center rounded-lg" />
-        <div class="absolute inset-0 bg-gradient-to-t from-black to-transparent"></div>
-      </div>
-
-      <!-- Content Overlay -->
-      <div class="relative z-10 flex flex-col justify-end w-full h-full p-4 md:p-6 space-y-2 md:space-y-4">
-        <h2 class="text-xl md:text-4xl font-bold text-white leading-tight group-hover:text-gray-300">
-          {p.Headline}
-        </h2>
-        <div class="h-[1px] w-12 md:w-16 bg-gray-600"></div>
-        <p class="text-xs md:text-sm text-gray-300 leading-relaxed line-clamp-3 group-hover:text-gray-400">
-          {p.Summary}
-        </p>
-      </div>
-    </div>
-  </div>
+  }`, p.ID, p.ID) }
+	>
+		<div
+			x-bind:hx-get="apiUrl"
+			hx-trigger="click"
+			hx-target="#forecast-feed"
+			hx-swap="innerHTML show:window:top"
+			x-bind:hx-push-url="detailUrl"
+			class="cursor-pointer relative w-full h-full flex bg-gray-800 rounded-lg overflow-hidden group"
+		>
+			<!-- Image Background with Bottom Gradient -->
+			<div class="absolute inset-0 w-full h-full rounded-lg overflow-hidden">
+				<img src={ p.ImageURL } alt="" loading="lazy" class="w-full h-full object-cover object-center rounded-lg"/>
+				<div class="absolute inset-0 bg-gradient-to-t from-black to-transparent"></div>
+			</div>
+			<!-- Content Overlay -->
+			<div class="relative z-10 flex flex-col justify-end w-full h-full p-4 md:p-6 space-y-2 md:space-y-4">
+				<h2 class="text-xl md:text-4xl font-bold text-white leading-tight group-hover:text-gray-300">
+					{ p.Headline }
+				</h2>
+				<div class="h-[1px] w-12 md:w-16 bg-gray-600"></div>
+				<p class="text-xs md:text-sm text-gray-300 leading-relaxed line-clamp-3 group-hover:text-gray-400">
+					{ p.Summary }
+				</p>
+			</div>
+		</div>
+	</div>
 }
 
 templ CarouselSideCard(f dto.Forecast) {
-  <div x-data={ fmt.Sprintf(`{
+	<div
+		x-data={ fmt.Sprintf(`{
     category: new URLSearchParams(window.location.search).get("category") || "",
     detailUrl: "/forecasts/%v" + (new URLSearchParams(window.location.search).get("category") ? "?category=" + new URLSearchParams(window.location.search).get("category") : ""),
     apiUrl: "/api/forecasts/%v" + (new URLSearchParams(window.location.search).get("category") ? "?category=" + new URLSearchParams(window.location.search).get("category") : "")
     }`, f.ID, f.ID) }
-      x-bind:hx-get="apiUrl"
-      hx-trigger="click"
-      hx-target="#forecast-feed"
-      hx-swap="innerHTML show:window:top"
-      x-bind:hx-push-url="detailUrl"
-      class="cursor-pointer relative w-full h-28 bg-gray-800 rounded-lg overflow-hidden shadow-md group snap-start">
-      <!-- Image -->
-      <img src={f.ImageURL} alt="" class="w-full h-full object-cover opacity-70 group-hover:opacity-50 transition-opacity" />
-      <!-- Headline Overlay -->
-      <div class="absolute inset-0 flex items-center justify-center p-2">
-         <p class="text-white text-sm font-bold text-center leading-tight">
-            {f.Headline}
-         </p>
-      </div>
-  </div>
+		x-bind:hx-get="apiUrl"
+		hx-trigger="click"
+		hx-target="#forecast-feed"
+		hx-swap="innerHTML show:window:top"
+		x-bind:hx-push-url="detailUrl"
+		class="cursor-pointer relative w-full h-28 bg-gray-800 rounded-lg overflow-hidden shadow-md group snap-start"
+	>
+		<!-- Image -->
+		<img src={ f.ImageURL } alt="" class="w-full h-full object-cover opacity-70 group-hover:opacity-50 transition-opacity"/>
+		<!-- Headline Overlay -->
+		<div class="absolute inset-0 flex items-center justify-center p-2">
+			<p class="text-white text-sm font-bold text-center leading-tight">
+				{ f.Headline }
+			</p>
+		</div>
+	</div>
 }
 
 templ BottomSection(forecasts []dto.Forecast) {
-  <div class="p-6 md:px-4 md:py-8 bg-gray-800">
-    <!-- Grid Layout -->
-    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-      for i, p := range forecasts {
-        if i >= 5 && i <= 8 {
-          if i == 8 {
-            @component.TileCard(p, "shadow-md group md:hidden lg:block")
-          } else {
-            @component.TileCard(p, "shadow-md group")
-          }
-        }
-      }
-    </div>
-  </div>
+	<div class="p-6 md:px-4 md:py-8 bg-gray-800">
+		<!-- Grid Layout -->
+		<div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+			for i, p := range forecasts {
+				if i >= 5 && i <= 8 {
+					if i == 8 {
+						@component.TileCard(p, "shadow-md group md:hidden lg:block")
+					} else {
+						@component.TileCard(p, "shadow-md group")
+					}
+				}
+			}
+		</div>
+	</div>
 }

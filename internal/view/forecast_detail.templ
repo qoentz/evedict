@@ -1,245 +1,227 @@
 package view
 
 import (
-    "fmt"
-    "github.com/qoentz/evedict/internal/api/dto"
-    "github.com/qoentz/evedict/internal/view/component"
+	"fmt"
+	"github.com/qoentz/evedict/internal/api/dto"
+	"github.com/qoentz/evedict/internal/view/component"
 )
 
 templ ForecastDetailPage(f *dto.Forecast) {
-    @Base() {
-        @ViewContainer() {
-              @ForecastDetailFragment(f)
-        }
-    }
+	@Base() {
+		@ViewContainer() {
+			@ForecastDetailFragment(f)
+		}
+	}
 }
 
 templ ForecastDetailFragment(f *dto.Forecast) {
-    @ViewContainer() {
-        @component.BackButton()
-        @DetailHeader(f)
-        @DetailContent(f)
-    }
+	@ViewContainer() {
+		@component.BackButton()
+		@DetailHeader(f)
+		@DetailContent(f)
+	}
 }
 
 templ DetailHeader(f *dto.Forecast) {
-  <div class="relative w-full h-[300px] overflow-hidden bg-gray-800">
-    <!-- Inner container: 260px tall, bottom aligned, centered content -->
-    <div class="absolute bottom-0 left-0 w-full h-[260px] flex items-center justify-center z-10">
-      <!-- Image wrapper with rounded corners -->
-      <div class="w-[70%] rounded-lg overflow-hidden" style="border-radius: 1rem;">
-        <img
-          src={f.ImageURL}
-          alt=""
-          loading="lazy"
-          class="w-full object-cover block" />
-      </div>
-    </div>
-
-    <!-- Gradient overlay above the image -->
-    <div class="absolute inset-0 pointer-events-none bg-gradient-to-t from-black/70 to-transparent z-[15]"></div>
-
-    <!-- Headline container (sits above everything) -->
-    <div class="absolute bottom-4 left-4 max-w-[800px] px-2 z-20">
-      <h1 class="text-2xl md:text-4xl font-bold text-white">{f.Headline}</h1>
-      <p class="mt-2 text-xs md:text-sm text-gray-300">
-        {f.Timestamp.Format("Jan 2, 2006 at 3:04pm")}
-      </p>
-    </div>
-  </div>
+	<div class="relative w-full h-[300px] overflow-hidden bg-gray-800">
+		<!-- Inner container: 260px tall, bottom aligned, centered content -->
+		<div class="absolute bottom-0 left-0 w-full h-[260px] flex items-center justify-center z-10">
+			<!-- Image wrapper with rounded corners -->
+			<div class="w-[70%] rounded-lg overflow-hidden" style="border-radius: 1rem;">
+				<img
+					src={ f.ImageURL }
+					alt=""
+					loading="lazy"
+					class="w-full object-cover block"
+				/>
+			</div>
+		</div>
+		<!-- Gradient overlay above the image -->
+		<div class="absolute inset-0 pointer-events-none bg-gradient-to-t from-black/70 to-transparent z-[15]"></div>
+		<!-- Headline container (sits above everything) -->
+		<div class="absolute bottom-4 left-4 max-w-[800px] px-2 z-20">
+			<h1 class="text-2xl md:text-4xl font-bold text-white">{ f.Headline }</h1>
+			<p class="mt-2 text-xs md:text-sm text-gray-300">
+				{ f.Timestamp.Format("Jan 2, 2006 at 3:04pm") }
+			</p>
+		</div>
+	</div>
 }
 
 templ DetailContent(f *dto.Forecast) {
-  <div class="max-w-screen-xl mx-auto">
-    <div class="bg-gray-800 shadow-md p-8">
-
-      <!-- Mobile Layout -->
-      <div class="block md:hidden space-y-6 mb-6"> <!-- Reduced space-y-6 -->
-        @Summary(f)
-        @Outcomes(f)
-        @RelatedSectionMobile(f.Related)
-        <div class="space-y-0">
-            @FurtherReadTitle()
-            @FurtherRead(f)
-        </div>
-      </div>
-
-      <!-- Desktop/iPad Layout -->
-      <div class="hidden md:grid grid-cols-2 gap-6 mb-6 items-stretch"> <!-- Reduced gap-6 -->
-        <!-- Left Column -->
-        <div class="space-y-6"> <!-- Reduced space-y-6 -->
-          @Summary(f)
-          @MarketSentiment(f.Market)
-          @RelatedSectionDesktop(f)
-        </div>
-        <!-- Right Column -->
-        <div class="relative h-full overflow-hidden">
-          <!-- This absolute container fills the right column -->
-          <div class="absolute inset-0 flex flex-col">
-            <!-- Outcomes takes natural height -->
-            <div>
-              @Outcomes(f)
-            </div>
-            @FurtherReadTitle()
-            <!-- Further read fills remaining space and scrolls if needed -->
-            <div class="flex-1 overflow-y-auto">
-              @FurtherRead(f)
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </div>
+	<div class="max-w-screen-xl mx-auto">
+		<div class="bg-gray-800 shadow-md p-8">
+			<!-- Mobile Layout -->
+			<div class="block md:hidden space-y-6 mb-6">
+				<!-- Reduced space-y-6 -->
+				@Summary(f)
+				@Outcomes(f)
+				@RelatedSectionMobile(f.Related)
+				<div class="space-y-0">
+					@FurtherReadTitle()
+					@FurtherRead(f)
+				</div>
+			</div>
+			<!-- Desktop/iPad Layout -->
+			<div class="hidden md:grid grid-cols-2 gap-6 mb-6 items-stretch">
+				<!-- Reduced gap-6 -->
+				<!-- Left Column -->
+				<div class="space-y-6">
+					<!-- Reduced space-y-6 -->
+					@Summary(f)
+					@MarketSentiment(f.Market)
+					@RelatedSectionDesktop(f)
+				</div>
+				<!-- Right Column -->
+				<div class="relative h-full overflow-hidden">
+					<!-- This absolute container fills the right column -->
+					<div class="absolute inset-0 flex flex-col">
+						<!-- Outcomes takes natural height -->
+						<div>
+							@Outcomes(f)
+						</div>
+						@FurtherReadTitle()
+						<!-- Further read fills remaining space and scrolls if needed -->
+						<div class="flex-1 overflow-y-auto">
+							@FurtherRead(f)
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 }
 
 templ Summary(f *dto.Forecast) {
-  <div>
-    <p class="text-base md:text-lg text-white">{f.Summary}</p>
-  </div>
+	<div>
+		<p class="text-base md:text-lg text-white">{ f.Summary }</p>
+	</div>
 }
 
 templ MarketSentiment(m *dto.Market) {
-    if m == nil {
-        <div></div>
-    } else {
-        <!-- Section Title (Outside the Card) -->
-        <h2 class="text-xl font-semibold text-white border-b border-gray-600 pb-2">
-            Market Outlook
-        </h2>
-
-        <!-- Market Sentiment Card (Force it up) -->
-        <div class="mt-[-20px]">
-            @component.MarketCard(m)
-        </div>
-    }
+	if m == nil {
+		<div></div>
+	} else {
+		<!-- Section Title (Outside the Card) -->
+		<h2 class="text-xl font-semibold text-white border-b border-gray-600 pb-2">
+			Market Outlook
+		</h2>
+		<!-- Market Sentiment Card (Force it up) -->
+		<div class="mt-[-20px]">
+			@component.MarketCard(m)
+		</div>
+	}
 }
 
-
 templ Outcomes(f *dto.Forecast) {
-  <div>
-    <!-- Section Heading -->
-    <div class="mb-4">
-      <h2 class="text-xl font-semibold text-white border-b border-gray-600 pb-2">
-        Forecast
-      </h2>
-    </div>
-
-    <!-- Outcomes Grid -->
-    <div class="mt-4 grid grid-cols-1 gap-8">
-      for _, o := range f.Outcomes {
-        <div class="bg-gray-700 rounded-lg p-6 shadow">
-          <p class="text-base font-libre font-semibold leading-relaxed text-white">
-            {o.Content}
-          </p>
-          @component.ProgressBar(&o)
-        </div>
-      }
-    </div>
-  </div>
+	<div>
+		<!-- Section Heading -->
+		<div class="mb-4">
+			<h2 class="text-xl font-semibold text-white border-b border-gray-600 pb-2">
+				Forecast
+			</h2>
+		</div>
+		<!-- Outcomes Grid -->
+		<div class="mt-4 grid grid-cols-1 gap-8">
+			for _, o := range f.Outcomes {
+				<div class="bg-gray-700 rounded-lg p-6 shadow">
+					<p class="text-base font-libre font-semibold leading-relaxed text-white">
+						{ o.Content }
+					</p>
+					@component.ProgressBar(&o)
+				</div>
+			}
+		</div>
+	</div>
 }
 
 templ RelatedSectionMobile(related []dto.Forecast) {
-  <div>
-    <div class="mb-4">
-      <h2 class="text-xl font-semibold text-white border-b border-gray-600 pb-2">Related</h2>
-    </div>
-    <div class="mt-4 grid grid-cols-1 gap-4">
-      for i, r := range related {
-        if i < 2 {
-          <div hx-get={"/api/forecasts/" + fmt.Sprintf("%v", r.ID)}
-               hx-trigger="click"
-               hx-target="#forecast-feed"
-               hx-swap="innerHTML show:window:top"
-               hx-push-url={"/forecasts/" + fmt.Sprintf("%v", r.ID)}
-               class="cursor-pointer bg-gray-600 rounded-lg shadow-md overflow-hidden group">
-            <img src={r.ImageURL}
-                 alt={r.Headline}
-                 class="w-full h-28 md:h-40 object-cover" />
-            <div class="p-2 md:p-4">
-              <h3 class="text-sm md:text-lg font-semibold text-white mb-1 md:mb-2 group-hover:text-gray-300">
-                {r.Headline}
-              </h3>
-              <p class="text-gray-300 text-xs md:text-sm line-clamp-3 group-hover:text-gray-400">
-                {r.Summary}
-              </p>
-            </div>
-          </div>
-        }
-      }
-    </div>
-  </div>
+	<div>
+		<div class="mb-4">
+			<h2 class="text-xl font-semibold text-white border-b border-gray-600 pb-2">Related</h2>
+		</div>
+		<div class="mt-4 grid grid-cols-1 gap-4">
+			for i, r := range related {
+				if i < 2 {
+					<div
+						hx-get={ "/api/forecasts/" + fmt.Sprintf("%v", r.ID) }
+						hx-trigger="click"
+						hx-target="#forecast-feed"
+						hx-swap="innerHTML show:window:top"
+						hx-push-url={ "/forecasts/" + fmt.Sprintf("%v", r.ID) }
+						class="cursor-pointer bg-gray-600 rounded-lg shadow-md overflow-hidden group"
+					>
+						<img
+							src={ r.ImageURL }
+							alt={ r.Headline }
+							class="w-full h-28 md:h-40 object-cover"
+						/>
+						<div class="p-2 md:p-4">
+							<h3 class="text-sm md:text-lg font-semibold text-white mb-1 md:mb-2 group-hover:text-gray-300">
+								{ r.Headline }
+							</h3>
+							<p class="text-gray-300 text-xs md:text-sm line-clamp-3 group-hover:text-gray-400">
+								{ r.Summary }
+							</p>
+						</div>
+					</div>
+				}
+			}
+		</div>
+	</div>
 }
 
 templ RelatedSectionDesktop(f *dto.Forecast) {
-  <div>
-    <div class="mb-4">
-      <h2 class="text-xl font-semibold text-white border-b border-gray-600 pb-2">
-        Related:
-        if len(f.Tags) > 0 {
-          for i, r := range f.Tags {
-            if i > 0 {
-              <em>,</em>
-            }
-            <em>{r.Name}</em>
-          }
-        }
-      </h2>
-    </div>
-    <div class="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
-      for i, r := range f.Related {
-        if i >= 2 {
-          @component.TileCard(r, "shadow-md group hidden lg:block")
-        } else {
-          @component.TileCard(r, "shadow-md group")
-        }
-      }
-    </div>
-  </div>
+	<div>
+		<div class="mb-4">
+			<h2 class="text-xl font-semibold text-white border-b border-gray-600 pb-2">
+				Related:
+				if len(f.Tags) > 0 {
+					for i, r := range f.Tags {
+						if i > 0 {
+							<em>,</em>
+						}
+						<em>{ r.Name }</em>
+					}
+				}
+			</h2>
+		</div>
+		<div class="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
+			for i, r := range f.Related {
+				if i >= 2 {
+					@component.TileCard(r, "shadow-md group hidden lg:block")
+				} else {
+					@component.TileCard(r, "shadow-md group")
+				}
+			}
+		</div>
+	</div>
 }
 
 templ FurtherReadTitle() {
-   <div class="mt-8 mb-4">
-     <h2 class="text-xl font-semibold text-white border-b border-gray-600 pb-2">Further Read</h2>
-   </div>
+	<div class="mt-8 mb-4">
+		<h2 class="text-xl font-semibold text-white border-b border-gray-600 pb-2">Further Read</h2>
+	</div>
 }
 
 templ FurtherRead(f *dto.Forecast) {
-  <div>
-    <ul class="space-y-4">
-      for _, s := range f.Sources {
-        <li class="relative rounded-lg shadow overflow-hidden border border-gray-600" style="height:6.5rem;">
-          <img src={ s.ImageURL } alt="" class="absolute inset-0 w-full h-full object-cover filter brightness-75" />
-          <div class="absolute inset-0 bg-gradient-to-r from-transparent to-black"></div>
-          <div class="relative z-10 p-4 flex flex-col md:flex-row items-center justify-between h-full">
-            <div class="flex-1 min-h-[3rem]">
-              <p class="font-bold font-libre text-white text-sm">{s.Name}</p>
-              <p class="text-sm text-gray-300">{s.Title}</p>
-            </div>
-            <a href={ templ.URL(s.URL) } target="_blank" rel="noopener" class="mt-2 md:mt-0 text-blue-300 hover:underline text-2xl">
-              <i class="fa fa-external-link"></i>
-            </a>
-          </div>
-        </li>
-      }
-    </ul>
-  </div>
+	<div>
+		<ul class="space-y-4">
+			for _, s := range f.Sources {
+				<li class="relative rounded-lg shadow overflow-hidden border border-gray-600" style="height:6.5rem;">
+					<img src={ s.ImageURL } alt="" class="absolute inset-0 w-full h-full object-cover filter brightness-75"/>
+					<div class="absolute inset-0 bg-gradient-to-r from-transparent to-black"></div>
+					<div class="relative z-10 p-4 flex flex-col md:flex-row items-center justify-between h-full">
+						<div class="flex-1 min-h-[3rem]">
+							<p class="font-bold font-libre text-white text-sm">{ s.Name }</p>
+							<p class="text-sm text-gray-300">{ s.Title }</p>
+						</div>
+						<a href={ templ.URL(s.URL) } target="_blank" rel="noopener" class="mt-2 md:mt-0 text-blue-300 hover:underline text-2xl">
+							<i class="fa fa-external-link"></i>
+						</a>
+					</div>
+				</li>
+			}
+		</ul>
+	</div>
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
