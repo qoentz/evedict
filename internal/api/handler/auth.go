@@ -21,6 +21,7 @@ func SubmitPassword(auth *service.AuthService) http.HandlerFunc {
 		}
 
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		w.WriteHeader(http.StatusUnauthorized)
 		_ = view.LoginForm(true).Render(r.Context(), w)
 	}
 }
