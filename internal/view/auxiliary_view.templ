@@ -2,33 +2,31 @@ package view
 
 templ AuxiliaryView() {
   @ViewContainer() {
-    <div
-      class="relative w-full text-white"
-      style="
-        background-color: #1f2937;
-        background-image: url('/static/images/conn.png');
-        background-repeat: no-repeat;
-        background-size: cover;
-        background-position: center top;
-        min-height: calc(100vh - 9rem);
-      "
-    >
-      <!-- Gradient Overlay -->
-      <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent pointer-events-none"></div>
+    <div class="relative w-full text-white"
+         style="
+           background:#1f2937;
+           min-height:calc(100vh - 9rem);
+           overflow:auto;
+         ">
 
-      <div
-        class="relative z-10 text-center animate-fade-slide-in"
-        style="
-          padding-top: 8vh;
-          padding-left: 2rem;
-          padding-right: 2rem;
-          max-width: 740px;
-          margin-left: auto;
-          margin-right: auto;
-        "
-      >
+      <!--  WebGL canvas -->
+      <canvas id="network-sphere"
+              class="absolute inset-0 w-full h-full pointer-events-none">
+      </canvas>
+
+      <!--  Overlay -->
+      <div class="absolute inset-0 bg-gradient-to-t
+                  from-black/70 to-transparent pointer-events-none"></div>
+
+      <!--  Content -->
+      <div class="relative z-10 text-center animate-fade-slide-in"
+           style="padding-top:8vh;padding-inline:2rem;
+                  max-width:740px;margin-inline:auto;">
         { children... }
       </div>
     </div>
   }
 }
+
+
+
