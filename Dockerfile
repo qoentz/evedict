@@ -5,13 +5,19 @@ WORKDIR /evedict
 
 RUN apt-get update && apt-get install -y git
 
-COPY package.json ./
+COPY package.json package-lock.json* ./
 RUN npm install
 
 COPY tailwind.config.js ./
 COPY internal/view/css/input.css ./internal/view/css/input.css
 
+# Build Tailwind CSS
 RUN npx tailwindcss -i ./internal/view/css/input.css -o ./dist/styles.css --minify
+
+# Copy necessary three.js files to /dist for static serving
+RUN mkdir -p ./dist/js && \
+    cp ./node_modules/three/build/three.module.js ./dist/js/ && \
+    cp ./node_modules/three/examples/jsm/controls/OrbitControls.js ./dist/js/
 
 # === Go binary ===
 FROM golang:1.23-alpine AS builder
@@ -37,7 +43,8 @@ WORKDIR /evedict
 
 COPY --from=builder /evedict/main ./main
 COPY --from=builder /evedict/internal/promptgen/prompts.yaml ./internal/promptgen/prompts.yaml
-COPY --from=assets /evedict/dist/styles.css ./static/css/styles.css
+
+COPY --from=assets /evedict/dist ./static
 COPY static ./static
 
 EXPOSE 8080

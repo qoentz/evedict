@@ -40,8 +40,8 @@ templ ControlPanelForm() {
 				category: 'general',
 				get url() {
 					return this.mode === 'default'
-						? '/invoke/forecast/default?category=' + encodeURIComponent(this.category)
-						: '/invoke/forecast/poly';
+						? '/vault/invoke/forecast/default?category=' + encodeURIComponent(this.category)
+						: '/vault/invoke/forecast/poly';
 				},
 				submitForm() {
 					const indicator = document.querySelector('#loading-indicator');
