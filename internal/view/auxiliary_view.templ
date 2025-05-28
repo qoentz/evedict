@@ -7,7 +7,6 @@ templ AuxiliaryView() {
 			style="
 				background: #1f2937;
 				min-height: calc(100vh - 9rem);
-				overflow: auto;
 			"
 		>
 			<!--  WebGL canvas -->
@@ -15,12 +14,10 @@ templ AuxiliaryView() {
 				id="network-sphere"
 				class="absolute inset-0 w-full h-full pointer-events-none"
 			></canvas>
-
 			<!--  Overlay -->
 			<div
 				class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent pointer-events-none"
 			></div>
-
 			<!--  Content -->
 			<div
 				class="relative z-10 text-center animate-fade-slide-in"
@@ -37,4 +34,3 @@ templ AuxiliaryView() {
 		</div>
 	}
 }
-

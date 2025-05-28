@@ -16,7 +16,7 @@ func SubmitPassword(auth *service.AuthService) http.HandlerFunc {
 
 		if r.FormValue("password") == auth.AuthSecret {
 			auth.IssueToken(w)
-			w.Header().Set("HX-Redirect", "/")
+			w.Header().Set("HX-Redirect", "/vault/workspace")
 			return
 		}
 

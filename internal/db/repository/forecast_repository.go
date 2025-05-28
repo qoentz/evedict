@@ -21,7 +21,7 @@ func NewForecastRepository(db *sqlx.DB) *ForecastRepository {
 	}
 }
 
-func (r *ForecastRepository) GetForecasts(limit int, offset int, category *util.Category) ([]model.Forecast, error) {
+func (r *ForecastRepository) GetForecasts(limit int, offset int, category *util.Category, isApproved bool) ([]model.Forecast, error) {
 	var forecasts []model.Forecast
 	var err error
 
@@ -30,18 +30,20 @@ func (r *ForecastRepository) GetForecasts(limit int, offset int, category *util.
 			SELECT id, headline, summary, image_url, timestamp 
 			FROM forecast
 			WHERE category = $1
+			AND is_approved = $4
 			ORDER BY timestamp DESC
 			LIMIT $2 OFFSET $3
 		`
-		err = r.DB.Select(&forecasts, query, *category, limit, offset)
+		err = r.DB.Select(&forecasts, query, *category, limit, offset, isApproved)
 	} else {
 		query := `
 			SELECT id, headline, summary, image_url, timestamp 
 			FROM forecast
+			WHERE is_approved = $3
 			ORDER BY timestamp DESC
 			LIMIT $1 OFFSET $2
 		`
-		err = r.DB.Select(&forecasts, query, limit, offset)
+		err = r.DB.Select(&forecasts, query, limit, offset, isApproved)
 	}
 
 	if err != nil {
@@ -101,27 +103,30 @@ func (r *ForecastRepository) GetRelatedForecastsByTagAndCategory(
 	// We'll define matched_by_tag with a boolean literal in each SELECT.
 	// The final ORDER BY puts matched_by_tag = TRUE first, then newest to oldest.
 
-	unionQuery := `
-    SELECT *
+	unionQuery := `SELECT *
+FROM (
+    SELECT DISTINCT ON (id) id, headline, summary, image_url, timestamp, matched_by_tag
     FROM (
-        SELECT DISTINCT ON (id) id, headline, summary, image_url, timestamp, matched_by_tag
-        FROM (
-            SELECT f.id, f.headline, f.summary, f.image_url, f.timestamp, TRUE AS matched_by_tag
-            FROM forecast f
-            JOIN forecast_tag ft ON ft.forecast_id = f.id
-            JOIN tag t2 ON t2.id = ft.tag_id
-            WHERE f.id <> $1
-              AND t2.name = ANY($2)
-            UNION ALL
-            SELECT f.id, f.headline, f.summary, f.image_url, f.timestamp, FALSE AS matched_by_tag
-            FROM forecast f
-            WHERE f.id <> $1
-              AND f.category = $3
-        ) AS unioned
-        ORDER BY id, matched_by_tag DESC, timestamp DESC
-    ) AS deduped
-    ORDER BY matched_by_tag DESC, timestamp DESC
-    LIMIT $4
+        -- Tag-matched forecasts
+        SELECT f.id, f.headline, f.summary, f.image_url, f.timestamp, TRUE AS matched_by_tag
+        FROM forecast f
+        JOIN forecast_tag ft ON ft.forecast_id = f.id
+        JOIN tag t2 ON t2.id = ft.tag_id
+        WHERE f.id <> $1
+          AND t2.name = ANY($2)
+
+        UNION ALL
+
+        -- Category-matched forecasts
+        SELECT f.id, f.headline, f.summary, f.image_url, f.timestamp, FALSE AS matched_by_tag
+        FROM forecast f
+        WHERE f.id <> $1
+          AND f.category = $3
+    ) AS unioned
+    ORDER BY id, matched_by_tag DESC, timestamp DESC
+) AS deduped
+ORDER BY matched_by_tag DESC, timestamp DESC
+LIMIT $4;
 `
 
 	var related []model.RelatedForecast
@@ -446,6 +451,15 @@ func (r *ForecastRepository) SaveForecasts(forecasts []model.Forecast) error {
 	return nil
 }
 
+func (r *ForecastRepository) MarkForecastApproved(forecastID uuid.UUID) error {
+	_, err := r.DB.Exec(`
+		UPDATE forecast
+		SET is_approved = true
+		WHERE id = $1
+	`, forecastID)
+	return err
+}
+
 func (r *ForecastRepository) getOutcomesByForecastID(forecastID uuid.UUID) ([]model.Outcome, error) {
 	var outcomes []model.Outcome
 	err := r.DB.Select(&outcomes, `SELECT id, forecast_id, content, confidence_level FROM outcome WHERE forecast_id = $1`, forecastID)
@@ -508,7 +522,7 @@ func (r *ForecastRepository) getMarketByForecastID(forecastID uuid.UUID) (*model
 
 func (r *ForecastRepository) CheckImageURL(imageURL string) (bool, error) {
 	var exists bool
-	query := `SELECT EXISTS (SELECT 1 FROM forecast WHERE image_url = $1)`
+	query := `SELECT EXISTS (SELECT 1 FROM forecast WHERE image_url = $1 AND is_approved = TRUE)`
 	err := r.DB.QueryRow(query, imageURL).Scan(&exists)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {

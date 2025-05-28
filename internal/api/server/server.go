@@ -41,7 +41,16 @@ func InitRouter(reg *registry.Registry) *mux.Router {
 	api.Handle("/forecasts/{forecastId}", fragment.GetForecastFragment(reg.ForecastService)).Methods("GET")
 	api.Handle("/about", fragment.AboutFragment()).Methods("GET")
 	api.Handle("/contact", fragment.ContactFragment()).Methods("GET")
-	api.Handle("/gen", handler.GenerateForecasts(reg.ForecastService)).Methods("POST")
+
+	// Admin endpoints
+	vault := protected.PathPrefix("/vault").Subrouter()
+	vault.HandleFunc("/workspace", page.WorkSpace()).Methods("GET")
+	vault.HandleFunc("/workspace/pending", fragment.GetPendingForecastsFragment(reg.ForecastService))
+	vault.HandleFunc("/forecasts/{forecastId}", handler.ApproveForecast(reg.ForecastService)).Methods("PATCH")
+
+	invoke := vault.PathPrefix("/invoke").Subrouter()
+	invoke.Handle("/forecast/default", handler.GenerateForecasts(reg.ForecastService)).Methods("POST")
+	invoke.Handle("/forecast/poly", handler.GeneratePolyForecasts(reg.ForecastService)).Methods("POST")
 
 	// Not found
 	router.NotFoundHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

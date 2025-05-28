@@ -165,7 +165,7 @@ func (s *ForecastService) attachMetadata(mainArticle newsapi.Article, forecast *
 }
 
 func (s *ForecastService) GetForecasts(limit int, offset int, category *util.Category) ([]dto.Forecast, error) {
-	forecasts, err := s.ForecastRepository.GetForecasts(limit, offset, category)
+	forecasts, err := s.ForecastRepository.GetForecasts(limit, offset, category, true)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get forecasts: %v", err)
 	}
@@ -177,6 +177,27 @@ func (s *ForecastService) GetForecasts(limit int, offset int, category *util.Cat
 	}
 
 	return result, nil
+}
+
+func (s *ForecastService) GetPendingForecasts(limit, offset int, category *util.Category) ([]dto.Forecast, bool, error) {
+	// Fetch one extra to check if there are more
+	forecasts, err := s.ForecastRepository.GetForecasts(limit+1, offset, category, false)
+	if err != nil {
+		return nil, false, fmt.Errorf("failed to get forecasts: %v", err)
+	}
+
+	hasMore := len(forecasts) > limit
+	if hasMore {
+		forecasts = forecasts[:limit]
+	}
+
+	var result []dto.Forecast
+	for _, forecast := range forecasts {
+		dtoForecast := s.convertToDTO(&forecast)
+		result = append(result, *dtoForecast)
+	}
+
+	return result, hasMore, nil
 }
 
 func (s *ForecastService) GetForecast(forecastID uuid.UUID) (*dto.Forecast, error) {
@@ -241,6 +262,10 @@ func (s *ForecastService) SaveForecast(forecast *dto.Forecast) error {
 		return fmt.Errorf("failed to save forecast: %v", err)
 	}
 	return nil
+}
+
+func (s *ForecastService) ApproveForecast(forecastID uuid.UUID) error {
+	return s.ForecastRepository.MarkForecastApproved(forecastID)
 }
 
 func (s *ForecastService) convertToDTO(forecast *model.Forecast) *dto.Forecast {
