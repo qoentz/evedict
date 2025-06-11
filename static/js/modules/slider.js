@@ -206,7 +206,7 @@ function updateTinyCards(slides, tinyCardsContainer, totalSlides, visibleTinyCar
                         }
                     }
                 }
-            }, 150); // Delay the reflection appearance
+            }, 130); // Delay the reflection appearance
         }
     }, 800);
 }

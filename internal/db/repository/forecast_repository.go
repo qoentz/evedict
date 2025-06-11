@@ -39,7 +39,8 @@ func (r *ForecastRepository) GetForecasts(limit int, offset int, category *util.
 		query := `
 			SELECT id, headline, summary, image_url, timestamp 
 			FROM forecast
-			WHERE is_approved = $3
+			WHERE category IN ('Politics', 'Economy', 'Technology')
+			AND is_approved = $3
 			ORDER BY timestamp DESC
 			LIMIT $1 OFFSET $2
 		`
