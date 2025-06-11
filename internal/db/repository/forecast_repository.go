@@ -114,6 +114,7 @@ FROM (
         JOIN tag t2 ON t2.id = ft.tag_id
         WHERE f.id <> $1
           AND t2.name = ANY($2)
+    		AND is_approved = true
 
         UNION ALL
 
@@ -122,6 +123,7 @@ FROM (
         FROM forecast f
         WHERE f.id <> $1
           AND f.category = $3
+          AND is_approved = true
     ) AS unioned
     ORDER BY id, matched_by_tag DESC, timestamp DESC
 ) AS deduped
