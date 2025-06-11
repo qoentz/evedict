@@ -6,6 +6,10 @@ import { initSlider } from './modules/slider.js';
 import { initBall, initLogoHistoryRestore } from './modules/logo.js';
 import { initNetworkSphere, initAmbientBackground } from "./modules/auxiliary.js";
 
+function isMainPage() {
+    return window.location.pathname === '/' || window.location.pathname === '';
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     function setFullViewportHeight() {
         const vh = window.innerHeight * 0.01;
@@ -14,8 +18,10 @@ document.addEventListener('DOMContentLoaded', () => {
     setFullViewportHeight();
     window.addEventListener('resize', setFullViewportHeight);
 
-    initNetworkSphere();
-    initAmbientBackground();
+    if (!isMainPage()) {
+        initNetworkSphere();
+        initAmbientBackground();
+    }
 
     initHeader();
     initBall();
@@ -24,21 +30,26 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function handlePageChange() {
-    setTimeout(() => {
-        initNetworkSphere();
-        initAmbientBackground();
-        convertTimestampsToLocal();
+    initNetworkSphere();
+    convertTimestampsToLocal();
 
-        if (document.querySelector('#slider-container')) {
-            initSlider();
-        }
-    }, 50);
+    if (document.querySelector('#slider-container')) {
+        initSlider();
+    }
 }
 
 document.addEventListener('htmx:afterSwap', (event) => {
+    initAmbientBackground();
     handlePageChange();
 });
 
 window.addEventListener('htmx:historyRestore', () => {
     handlePageChange();
+    if (document.querySelector('#progress-bar-container')) {
+        setTimeout(() => {
+            initAmbientBackground();
+        }, 50);
+    } else {
+        initAmbientBackground();
+    }
 });
