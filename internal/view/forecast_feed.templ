@@ -133,64 +133,63 @@ templ CarouselHighlightedCard(p dto.Forecast) {
 }
 
 templ CarouselSideCardWithReflection(f dto.Forecast, position string) {
-	<div class="relative w-full">
-		// Top reflection
-		if position == "top" {
-			<div class="absolute -top-12 left-0 w-full h-12 overflow-hidden pointer-events-none z-0">
-				<div class="relative w-full h-full scale-y-[-1] opacity-10">
-					<img src={ f.ImageURL } alt="" class="w-full h-full object-cover blur-sm"/>
-					<div
-						class="absolute inset-0"
-						style="
-            			     background: radial-gradient(circle at center,
-            			                                  rgba(0, 0, 0, 0.0) 30%,
-            			                                  rgba(0, 0, 0, 0.2) 60%,
-            			                                  rgba(31, 41, 55, 1) 100%);
-            			     mix-blend-mode: multiply;
-            			     pointer-events: none;"
-					></div>
-				</div>
-			</div>
-		}
-		<!-- Actual Card -->
-		<div
-			x-data={ fmt.Sprintf(`{
-				category: new URLSearchParams(window.location.search).get("category") || "",
-				detailUrl: "/forecasts/%v" + (new URLSearchParams(window.location.search).get("category") ? "?category=" + new URLSearchParams(window.location.search).get("category") : ""),
-				apiUrl: "/api/forecasts/%v" + (new URLSearchParams(window.location.search).get("category") ? "?category=" + new URLSearchParams(window.location.search).get("category") : "")
-			}`, f.ID, f.ID) }
-			x-bind:hx-get="apiUrl"
-			hx-trigger="click"
-			hx-target="#forecast-feed"
-			hx-swap="innerHTML show:window:top"
-			x-bind:hx-push-url="detailUrl"
-			class="relative z-10 cursor-pointer w-full h-28 bg-gray-800 rounded-lg overflow-hidden shadow-md group snap-start"
-		>
-			<img src={ f.ImageURL } alt="" class="w-full h-full object-cover opacity-70 group-hover:opacity-50 transition-opacity"/>
-			<div class="absolute inset-0 flex items-center justify-center p-2">
-				<p class="text-white text-sm font-bold text-center leading-tight">{ f.Headline }</p>
-			</div>
-		</div>
-		// Bottom reflection
-		if position == "bottom" {
-			<div class="absolute -bottom-12 left-0 w-full h-12 overflow-hidden pointer-events-none z-0">
-				<div class="relative w-full h-full scale-y-[-1] opacity-10">
-					<img src={ f.ImageURL } alt="" class="w-full h-full object-cover blur-sm"/>
-					<div
-						class="absolute inset-0"
-						style="
-            			     background: radial-gradient(circle at center,
-            			                                  rgba(0, 0, 0, 0.0) 30%,
-            			                                  rgba(0, 0, 0, 0.2) 60%,
-            			                                  rgba(31, 41, 55, 1) 100%
-);
-            			     mix-blend-mode: multiply;
-            			     pointer-events: none;"
-					></div>
-				</div>
-			</div>
-		}
-	</div>
+    <div class="relative w-full">
+       // Top reflection
+       if position == "top" {
+          <div class="absolute -top-16 -left-4 w-[calc(100%+2rem)] h-16 overflow-visible pointer-events-none z-0">
+             <div
+                class="relative w-full h-full scale-y-[-1] opacity-8"
+                style="
+                       mask: radial-gradient(ellipse 150% 120% at center bottom,
+                                            rgba(0,0,0,0.9) 0%,
+                                            rgba(0,0,0,0.6) 20%,
+                                            rgba(0,0,0,0.3) 40%,
+                                            rgba(0,0,0,0.1) 60%,
+                                            rgba(0,0,0,0) 80%);
+                       "
+             >
+                <img src={ f.ImageURL } alt="" class="w-full h-full object-cover blur-md scale-110"/>
+             </div>
+          </div>
+       }
+       <!-- Actual Card -->
+       <div
+          x-data={ fmt.Sprintf(`{
+             category: new URLSearchParams(window.location.search).get("category") || "",
+             detailUrl: "/forecasts/%v" + (new URLSearchParams(window.location.search).get("category") ? "?category=" + new URLSearchParams(window.location.search).get("category") : ""),
+             apiUrl: "/api/forecasts/%v" + (new URLSearchParams(window.location.search).get("category") ? "?category=" + new URLSearchParams(window.location.search).get("category") : "")
+          }`, f.ID, f.ID) }
+          x-bind:hx-get="apiUrl"
+          hx-trigger="click"
+          hx-target="#forecast-feed"
+          hx-swap="innerHTML show:window:top"
+          x-bind:hx-push-url="detailUrl"
+          class="relative z-10 cursor-pointer w-full h-28 bg-gray-800 rounded-lg overflow-hidden shadow-md group snap-start"
+       >
+          <img src={ f.ImageURL } alt="" class="w-full h-full object-cover opacity-70 group-hover:opacity-50 transition-opacity"/>
+          <div class="absolute inset-0 flex items-center justify-center p-2">
+             <p class="text-white text-sm font-bold text-center leading-tight">{ f.Headline }</p>
+          </div>
+       </div>
+       // Bottom reflection
+       if position == "bottom" {
+          <div class="absolute -bottom-16 -left-4 w-[calc(100%+2rem)] h-16 overflow-visible pointer-events-none z-0">
+             <div
+                class="relative w-full h-full scale-y-[-1] opacity-8"
+                style="
+                       mask: radial-gradient(ellipse 150% 120% at center top,
+                                            rgba(0,0,0,0.9) 0%,
+                                            rgba(0,0,0,0.6) 20%,
+                                            rgba(0,0,0,0.3) 40%,
+                                            rgba(0,0,0,0.1) 60%,
+                                            rgba(0,0,0,0) 80%);
+                       "
+             >
+                <img src={ f.ImageURL } alt="" class="w-full h-full object-cover blur-md scale-110"/>
+             </div>
+          </div>
+       }
+    </div>
 }
 
 templ CarouselSideCard(f dto.Forecast) {

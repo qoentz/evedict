@@ -33,14 +33,33 @@ export function initSlider() {
     });
 
     // Use the onclick property to ensure only one event listener is bound
-    prevButton.onclick = showPrevSlide;
-    nextButton.onclick = showNextSlide;
+    prevButton.onclick = () => {
+        showPrevSlide();
+        resetAutoSlideTimer(); // Reset timer on manual navigation
+    };
+    nextButton.onclick = () => {
+        showNextSlide();
+        resetAutoSlideTimer(); // Reset timer on manual navigation
+    };
 
     // Initialize the dots indicator based on the new state
     updateDots();
 
     // Start the automatic slide interval
+    startAutoSlideTimer();
+}
+
+function startAutoSlideTimer() {
     slideInterval = setInterval(showNextSlide, 15000);
+}
+
+function resetAutoSlideTimer() {
+    // Clear existing interval
+    if (slideInterval !== null) {
+        clearInterval(slideInterval);
+    }
+    // Start a new interval
+    startAutoSlideTimer();
 }
 
 function showNextSlide() {
@@ -101,13 +120,36 @@ function updateDots() {
 
 function updateTinyCards(slides, tinyCardsContainer, totalSlides, visibleTinyCardsCount, direction) {
     const tinyCards = Array.from(tinyCardsContainer.children);
-    tinyCards.forEach((card) => {
-        if (direction === 'next') {
-            card.style.transform = 'translateY(-100%)';
-        } else if (direction === 'prev') {
-            card.style.transform = 'translateY(100%)';
+
+    tinyCards.forEach((cardWrapper) => {
+        const reflection = cardWrapper.querySelector('.absolute.-bottom-16');
+        if (reflection) {
+            reflection.style.opacity = '0';
         }
-        card.style.transition = 'transform 0.5s ease-in-out';
+    });
+
+    tinyCards.forEach((card, index) => {
+        if (direction === 'next') {
+            if (index === 0) {
+                // Top card exits faster
+                card.style.transition = 'transform 0.7s ease-in-out';
+                card.style.transform = 'translateY(-145%)';
+            } else {
+                // Middle cards keep the smooth speed
+                card.style.transition = 'transform 0.7s ease-in-out';
+                card.style.transform = 'translateY(-115%)';
+            }
+        } else if (direction === 'prev') {
+            if (index === tinyCards.length - 1) {
+                // Bottom card exits faster
+                card.style.transition = 'transform 0.7s ease-in-out';
+                card.style.transform = 'translateY(145%)';
+            } else {
+                // Middle cards keep the smooth speed
+                card.style.transition = 'transform 0.7s ease-in-out';
+                card.style.transform = 'translateY(115%)';
+            }
+        }
     });
 
     setTimeout(() => {
@@ -122,7 +164,20 @@ function updateTinyCards(slides, tinyCardsContainer, totalSlides, visibleTinyCar
                 (direction === 'prev' && i === 0) ||
                 (direction === 'next' && i === visibleTinyCardsCount - 1);
 
-            const newCard = createTinyCard(slides[tinyIndex], isSlidingCard);
+            // Always add reflection to the bottom card (index 3)
+            const isBottomCard = i === 3;
+            const newCard = createTinyCard(slides[tinyIndex], isBottomCard);
+
+            // Hide reflection initially for bottom card when going previous
+            if (direction === 'prev' && isBottomCard) {
+                const reflection = newCard.querySelector('.absolute.-bottom-16');
+                if (reflection) {
+                    const reflectionDiv = reflection.querySelector('div');
+                    if (reflectionDiv) {
+                        reflectionDiv.style.setProperty('opacity', '0', 'important');
+                    }
+                }
+            }
 
             if (isSlidingCard) {
                 newCard.style.transform = direction === 'prev' ? 'translateY(-100%)' : 'translateY(100%)';
@@ -136,7 +191,24 @@ function updateTinyCards(slides, tinyCardsContainer, totalSlides, visibleTinyCar
 
             tinyCardsContainer.appendChild(newCard);
         }
-    }, 500); // Match the animation duration
+
+        // Delayed reflection for bottom card when going previous
+        if (direction === 'prev') {
+            setTimeout(() => {
+                const bottomCard = tinyCardsContainer.children[3]; // Bottom card is at index 3
+                if (bottomCard) {
+                    const reflection = bottomCard.querySelector('.absolute.-bottom-16');
+                    if (reflection) {
+                        const reflectionDiv = reflection.querySelector('div');
+                        if (reflectionDiv) {
+                            reflectionDiv.style.transition = 'opacity 0.4s ease-in-out';
+                            reflectionDiv.style.setProperty('opacity', '0.8', 'important');
+                        }
+                    }
+                }
+            }, 150); // Delay the reflection appearance
+        }
+    }, 800);
 }
 
 function createTinyCard(slide, addReflection = false) {
@@ -168,22 +240,16 @@ function createTinyCard(slide, addReflection = false) {
     // Add bottom reflection if requested
     if (addReflection) {
         const reflection = document.createElement('div');
-        reflection.className = 'absolute -bottom-12 left-0 w-full h-12 overflow-hidden pointer-events-none z-0';
-        reflection.innerHTML = `
-            <div class="relative w-full h-full scale-y-[-1] opacity-10">
-                <img src="${imgSrc}" alt="" class="w-full h-full object-cover blur-sm"/>
-                <div
-                    class="absolute inset-0"
-                    style="
-                        background: radial-gradient(circle at center,
-                                                     rgba(0, 0, 0, 0.0) 30%,
-                                                     rgba(0, 0, 0, 0.2) 60%,
-                                                     rgba(31, 41, 55, 1) 100%);
-                        mix-blend-mode: multiply;
-                        pointer-events: none;">
-                </div>
-            </div>
-        `;
+        reflection.className = 'absolute -bottom-16 -left-4 w-[calc(100%+2rem)] h-16 overflow-visible pointer-events-none z-0';
+        const reflectionDiv = document.createElement('div');
+        reflectionDiv.className = 'relative w-full h-full scale-y-[-1] opacity-8';
+
+        // Set mask property using setProperty to handle vendor prefixes properly
+        reflectionDiv.style.setProperty('mask', 'radial-gradient(ellipse 150% 120% at center top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.6) 20%, rgba(0,0,0,0.3) 40%, rgba(0,0,0,0.1) 60%, rgba(0,0,0,0) 80%)');
+
+        reflectionDiv.innerHTML = `<img src="${imgSrc}" alt="" class="w-full h-full object-cover blur-md scale-110"/>`;
+
+        reflection.appendChild(reflectionDiv);
         cardWrapper.appendChild(reflection);
     }
 
@@ -197,7 +263,6 @@ function createTinyCard(slide, addReflection = false) {
     return cardWrapper;
 }
 
-
 function updateSlidePointerEvents(slides, activeIndex) {
     slides.forEach((slide, index) => {
         if (index === activeIndex) {
@@ -207,6 +272,3 @@ function updateSlidePointerEvents(slides, activeIndex) {
         }
     });
 }
-
-
-
