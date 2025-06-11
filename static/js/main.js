@@ -14,41 +14,31 @@ document.addEventListener('DOMContentLoaded', () => {
     setFullViewportHeight();
     window.addEventListener('resize', setFullViewportHeight);
 
-    // Initialize both scenes
-    initNetworkSphere();      // For pages with globe
-    initAmbientBackground();  // For carousel/pages without globe
+    initNetworkSphere();
+    initAmbientBackground();
 
     initHeader();
     initBall();
     initLogoHistoryRestore();
     convertTimestampsToLocal();
+});
 
-    // Handle HTMX page swaps to reinitialize scenes
-    document.body.addEventListener('htmx:afterSwap', (e) => {
+function handlePageChange() {
+    setTimeout(() => {
         initNetworkSphere();
         initAmbientBackground();
-    });
-});
+        convertTimestampsToLocal();
 
-// Handle window resize for both scenes
-window.addEventListener('resize', () => {
-    // The individual fit() functions are called automatically by each scene's resize listeners
-});
+        if (document.querySelector('#slider-container')) {
+            initSlider();
+        }
+    }, 50);
+}
 
 document.addEventListener('htmx:afterSwap', (event) => {
-    initNetworkSphere();
-    initAmbientBackground();
-    convertTimestampsToLocal();
-    const target = event.detail.target;
-    if (target && target.querySelector('#slider-container')) {
-        initSlider();
-    }
+    handlePageChange();
 });
 
 window.addEventListener('htmx:historyRestore', () => {
-    initNetworkSphere();
-    initAmbientBackground();
-    if (document.querySelector('#slider-container')) {
-        initSlider();
-    }
+    handlePageChange();
 });
