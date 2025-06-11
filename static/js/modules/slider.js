@@ -137,7 +137,7 @@ function updateTinyCards(slides, tinyCardsContainer, totalSlides, visibleTinyCar
             } else {
                 // Middle cards keep the smooth speed
                 card.style.transition = 'transform 0.7s ease-in-out';
-                card.style.transform = 'translateY(-115%)';
+                card.style.transform = 'translateY(-114%)';
             }
         } else if (direction === 'prev') {
             if (index === tinyCards.length - 1) {
@@ -147,7 +147,7 @@ function updateTinyCards(slides, tinyCardsContainer, totalSlides, visibleTinyCar
             } else {
                 // Middle cards keep the smooth speed
                 card.style.transition = 'transform 0.7s ease-in-out';
-                card.style.transform = 'translateY(115%)';
+                card.style.transform = 'translateY(114%)';
             }
         }
     });
