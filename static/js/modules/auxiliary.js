@@ -280,8 +280,8 @@ function animate({ renderer, scene, camera, canvas, globe, dust }) {
     const nodeHigh   = 1.4;
 
     // Original network scene colors
-    const hueBase    = 0.55;
-    const hueSpread  = 0.04;
+    const hueBase    = 0.57;  // Shifted away from turquoise
+    const hueSpread  = 0.025; // Reduced range to avoid turquoise tones
     const satBase    = 0.70;
     const satPulse   = 0.07;
     const lightBase  = 0.53;

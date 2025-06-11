@@ -38,6 +38,7 @@ window.addEventListener('resize', () => {
 document.addEventListener('htmx:afterSwap', (event) => {
     initNetworkSphere();
     initAmbientBackground();
+    convertTimestampsToLocal();
     const target = event.detail.target;
     if (target && target.querySelector('#slider-container')) {
         initSlider();
