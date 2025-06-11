@@ -117,18 +117,15 @@ function updateTinyCards(slides, tinyCardsContainer, totalSlides, visibleTinyCar
 
         for (let i = 0; i < visibleTinyCardsCount; i++) {
             const tinyIndex = (startIndex + i) % totalSlides;
-            const newCard = createTinyCard(slides[tinyIndex]);
 
-            if (direction === 'prev' && i === 0) {
-                newCard.style.transform = 'translateY(-100%)';
-                newCard.style.opacity = '0';
-                newCard.style.transition = 'transform 0.4s ease-in-out, opacity 0.5s ease-in-out';
-                setTimeout(() => {
-                    newCard.style.transform = 'translateY(0)';
-                    newCard.style.opacity = '1';
-                }, 50);
-            } else if (direction === 'next' && i === visibleTinyCardsCount - 1) {
-                newCard.style.transform = 'translateY(100%)';
+            const isSlidingCard =
+                (direction === 'prev' && i === 0) ||
+                (direction === 'next' && i === visibleTinyCardsCount - 1);
+
+            const newCard = createTinyCard(slides[tinyIndex], isSlidingCard);
+
+            if (isSlidingCard) {
+                newCard.style.transform = direction === 'prev' ? 'translateY(-100%)' : 'translateY(100%)';
                 newCard.style.opacity = '0';
                 newCard.style.transition = 'transform 0.4s ease-in-out, opacity 0.5s ease-in-out';
                 setTimeout(() => {
@@ -142,18 +139,20 @@ function updateTinyCards(slides, tinyCardsContainer, totalSlides, visibleTinyCar
     }, 500); // Match the animation duration
 }
 
-function createTinyCard(slide) {
-    // Get the same URL from the original clickable element in the slide.
+function createTinyCard(slide, addReflection = false) {
     const clickableEl = slide.querySelector('[hx-get]');
     const hxGet = clickableEl ? clickableEl.getAttribute('hx-get') : '';
     const imgSrc = slide.querySelector('img').src;
     const headline = slide.querySelector('h2').textContent;
 
+    const cardWrapper = document.createElement('div');
+    cardWrapper.className = 'relative w-full';
+
     const card = document.createElement('div');
     card.className =
-        'cursor-pointer relative w-full h-28 bg-gray-700 rounded-lg overflow-hidden shadow-md group snap-start';
+        'cursor-pointer relative w-full h-28 bg-gray-700 rounded-lg overflow-hidden shadow-md group snap-start z-10';
 
-    // Set HTMX attributes so the card behaves like the original.
+    // Set HTMX attributes
     card.setAttribute('hx-get', hxGet);
     card.setAttribute('hx-trigger', 'click');
     card.setAttribute('hx-target', '#forecast-feed');
@@ -166,16 +165,38 @@ function createTinyCard(slide) {
         </div>
     `;
 
-    // Explicitly reset any inline transforms.
-    card.style.transform = 'translateY(0)';
+    // Add bottom reflection if requested
+    if (addReflection) {
+        const reflection = document.createElement('div');
+        reflection.className = 'absolute -bottom-12 left-0 w-full h-12 overflow-hidden pointer-events-none z-0';
+        reflection.innerHTML = `
+            <div class="relative w-full h-full scale-y-[-1] opacity-10">
+                <img src="${imgSrc}" alt="" class="w-full h-full object-cover blur-sm"/>
+                <div
+                    class="absolute inset-0"
+                    style="
+                        background: radial-gradient(circle at center,
+                                                     rgba(0, 0, 0, 0.0) 30%,
+                                                     rgba(0, 0, 0, 0.2) 60%,
+                                                     rgba(31, 41, 55, 1) 100%);
+                        mix-blend-mode: multiply;
+                        pointer-events: none;">
+                </div>
+            </div>
+        `;
+        cardWrapper.appendChild(reflection);
+    }
 
-    // Re-process the card with HTMX so that its hx-* attributes are bound.
+    cardWrapper.appendChild(card);
+
+    // Re-process HTMX
     if (window.htmx) {
         htmx.process(card);
     }
 
-    return card;
+    return cardWrapper;
 }
+
 
 function updateSlidePointerEvents(slides, activeIndex) {
     slides.forEach((slide, index) => {

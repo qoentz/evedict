@@ -9,6 +9,7 @@ import (
 	"github.com/qoentz/evedict/internal/api/handler/page"
 	"github.com/qoentz/evedict/internal/api/middleware"
 	"github.com/qoentz/evedict/internal/registry"
+	"github.com/qoentz/evedict/internal/view"
 	"log"
 	"net"
 	"net/http"
@@ -54,7 +55,13 @@ func InitRouter(reg *registry.Registry) *mux.Router {
 
 	// Not found
 	router.NotFoundHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		http.Error(w, "404 page not found", http.StatusNotFound)
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+
+		err := view.NotFound().Render(r.Context(), w)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Error rendering template: %v", err), http.StatusInternalServerError)
+			return
+		}
 	})
 
 	return router

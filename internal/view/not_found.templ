@@ -1,0 +1,27 @@
+package view
+
+templ NotFound() {
+	@Base() {
+		@NotFoundFragment()
+	}
+}
+
+templ NotFoundFragment() {
+	@AuxiliaryView() {
+		<h2 class="mb-3" style="font-size: 3rem; font-weight: 700;">
+			404
+		</h2>
+		<div
+			style="
+				width: 60%;
+				max-width: 500px;
+				height: 2px;
+				background: linear-gradient(to right, transparent 0%, grey 50%, transparent 100%);
+				margin: 1rem auto 2rem auto;
+			"
+		></div>
+		<p style="font-size: 1.25rem; line-height: 1.8; margin-bottom: 1.5rem;">
+			Page not found
+		</p>
+	}
+}

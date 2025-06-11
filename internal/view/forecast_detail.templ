@@ -24,6 +24,10 @@ templ ForecastDetailFragment(f *dto.Forecast) {
 
 templ DetailHeader(f *dto.Forecast) {
 	<div class="relative w-full h-[300px] overflow-hidden bg-gray-800">
+		<canvas
+			id="ambient-background"
+			class="absolute inset-0 w-full h-full pointer-events-none z-0"
+		></canvas>
 		<!-- Inner container: 260px tall, bottom aligned, centered content -->
 		<div class="absolute bottom-0 left-0 w-full h-[260px] flex items-center justify-center z-10">
 			<!-- Image wrapper with rounded corners -->

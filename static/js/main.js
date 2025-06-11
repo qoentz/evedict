@@ -4,7 +4,7 @@ import { initHeader } from './modules/header.js';
 import { convertTimestampsToLocal } from './modules/timestamps.js';
 import { initSlider } from './modules/slider.js';
 import { initBall, initLogoHistoryRestore } from './modules/logo.js';
-import { initNetworkSphere } from "./modules/auxiliary.js";
+import { initNetworkSphere, initAmbientBackground } from "./modules/auxiliary.js";
 
 document.addEventListener('DOMContentLoaded', () => {
     function setFullViewportHeight() {
@@ -14,15 +14,30 @@ document.addEventListener('DOMContentLoaded', () => {
     setFullViewportHeight();
     window.addEventListener('resize', setFullViewportHeight);
 
-    initNetworkSphere();
+    // Initialize both scenes
+    initNetworkSphere();      // For pages with globe
+    initAmbientBackground();  // For carousel/pages without globe
+
     initHeader();
     initBall();
     initLogoHistoryRestore();
     convertTimestampsToLocal();
+
+    // Handle HTMX page swaps to reinitialize scenes
+    document.body.addEventListener('htmx:afterSwap', (e) => {
+        initNetworkSphere();
+        initAmbientBackground();
+    });
+});
+
+// Handle window resize for both scenes
+window.addEventListener('resize', () => {
+    // The individual fit() functions are called automatically by each scene's resize listeners
 });
 
 document.addEventListener('htmx:afterSwap', (event) => {
     initNetworkSphere();
+    initAmbientBackground();
     const target = event.detail.target;
     if (target && target.querySelector('#slider-container')) {
         initSlider();
@@ -31,6 +46,7 @@ document.addEventListener('htmx:afterSwap', (event) => {
 
 window.addEventListener('htmx:historyRestore', () => {
     initNetworkSphere();
+    initAmbientBackground();
     if (document.querySelector('#slider-container')) {
         initSlider();
     }
