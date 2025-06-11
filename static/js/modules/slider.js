@@ -109,11 +109,11 @@ function updateDots() {
     const dots = dotContainer.children;
     for (let i = 0; i < dots.length; i++) {
         if (i === slideIndex) {
-            dots[i].classList.remove('bg-gray-400');
+            dots[i].classList.remove('bg-gray-600');
             dots[i].classList.add('bg-white');
         } else {
             dots[i].classList.remove('bg-white');
-            dots[i].classList.add('bg-gray-400');
+            dots[i].classList.add('bg-gray-600');
         }
     }
 }

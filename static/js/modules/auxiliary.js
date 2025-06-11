@@ -278,12 +278,23 @@ function animate({ renderer, scene, camera, canvas, globe, dust }) {
     const clock      = new THREE.Clock();
     const nodeLow    = 0.25;
     const nodeHigh   = 1.4;
+
+    // Original network scene colors
     const hueBase    = 0.55;
     const hueSpread  = 0.04;
     const satBase    = 0.70;
     const satPulse   = 0.07;
     const lightBase  = 0.53;
     const lightPulse = 0.06;
+
+    // Fixed blue for ambient background - no color shifting
+    const ambientHueBase    = 0.57;  // Fixed to the good blue hue
+    const ambientHueSpread  = 0;     // NO hue variation - completely consistent
+    const ambientSatBase    = 0.68;  // Fixed saturation level
+    const ambientSatPulse   = 0;     // NO saturation variation
+    const ambientLightBase  = 0.50;  // Fixed lightness level
+    const ambientLightPulse = 0;     // NO lightness variation
+
     const hueSpeed   = 0.06;
     const spinSpeed  = 0.018;
 
@@ -302,13 +313,37 @@ function animate({ renderer, scene, camera, canvas, globe, dust }) {
         requestAnimationFrame(loop);
         const t = clock.getElapsedTime();
 
-        const hue  = hueBase + hueSpread * Math.sin(t * hueSpeed);
-        const sat   = satBase  + satPulse  * Math.sin(t * 1.0);
-        const light = lightBase + lightPulse * Math.sin(t * 0.8);
-        const base  = new THREE.Color().setHSL(hue, sat, light);
+        // Choose color scheme based on globe visibility
+        let hue, sat, light, base;
 
-        orbLight.color.copy(base);
-        getContainer().style.backgroundColor = `hsl(${hue * 360}deg 38% 9%)`;
+        if (globe.visible) {
+            // Original network scene colors
+            hue = hueBase + hueSpread * Math.sin(t * hueSpeed);
+            sat = satBase + satPulse * Math.sin(t * 1.0);
+            light = lightBase + lightPulse * Math.sin(t * 0.8);
+            base = new THREE.Color().setHSL(hue, sat, light);
+
+            // Original background color for network scene
+            getContainer().style.backgroundColor = `hsl(${hue * 360}deg 38% 9%)`;
+        } else {
+            // Light blue ambient background colors
+            hue = ambientHueBase + ambientHueSpread * Math.sin(t * hueSpeed);
+            sat = ambientSatBase + ambientSatPulse * Math.sin(t * 1.0);
+            light = ambientLightBase + ambientLightPulse * Math.sin(t * 0.8);
+            base = new THREE.Color().setHSL(hue, sat, light);
+
+            // NetworkSphere background style for ambient scene
+            getContainer().style.backgroundColor = `hsl(${hue * 360}deg 38% 9%)`;
+        }
+
+        // Adjust orbLight intensity based on mode
+        if (globe.visible) {
+            orbLight.color.copy(base);
+        } else {
+            // Dimmer light for ambient mode to reduce dust flickering
+            const dimmedBase = base.clone().multiplyScalar(0.4);
+            orbLight.color.copy(dimmedBase);
+        }
 
         const a = t * 0.45;
         orbLight.position.set(Math.sin(a) * 6, Math.cos(a * 0.7) * 5, Math.cos(a) * 6);
