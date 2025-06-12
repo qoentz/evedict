@@ -27,11 +27,18 @@ templ NavigationLogic() {
 
          updateActiveNav() {
            let category = new URLSearchParams(window.location.search).get('category')?.toLowerCase() || '';
-           let page = window.location.pathname.replace('/', '');
+           let pathname = window.location.pathname;
+           let page = '';
+
+           if (pathname === '/about') {
+             page = 'about';
+           } else if (pathname === '/contact') {
+             page = 'contact';
+           }
 
            if (category) {
              this.setActiveNav(category);
-           } else if (page === 'about' || page === 'contact') {
+           } else if (page) {
              this.setActiveNav(page);
            } else {
              this.setActiveNav('');
@@ -61,6 +68,12 @@ templ NavigationLogic() {
 		x-init="
          updateActiveNav();
          window.setActiveNav = setActiveNav;
+
+         document.addEventListener('htmx:afterRequest', (event) => {
+           setTimeout(() => {
+             updateActiveNav();
+           }, 50);
+         });
        "
 	>
 		{ children... }

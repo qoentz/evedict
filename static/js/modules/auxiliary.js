@@ -4,38 +4,39 @@
    Unified Three.js scene that can render with or without globe
 ------------------------------------------------------------------ */
 
-let scene = null;  // singleton holder for the unified scene
+let networkScene = null;
+let ambientScene = null;
 
 // Initialize scene with globe
 export function initNetworkSphere() {
     const targetCanvas = document.getElementById('network-sphere');
     if (!targetCanvas) return;
 
-    if (!scene) {
-        scene = buildScene(targetCanvas, { showGlobe: true });
+    if (!networkScene) {
+        networkScene = buildScene(targetCanvas, { showGlobe: true });
         return;
     }
 
-    if (scene.canvas.isConnected) return;
-    targetCanvas.replaceWith(scene.canvas);
-    scene.setGlobeVisibility(true);
-    scene.fit();
+    if (networkScene.canvas.isConnected) return;
+    targetCanvas.replaceWith(networkScene.canvas);
+    networkScene.setGlobeVisibility(true);
+    networkScene.fit();
 }
 
 // Initialize scene without globe (ambient background)
 export function initAmbientBackground() {
     const targetCanvas = document.getElementById('ambient-background');
-    if (!targetCanvas) return;
+    if (!targetCanvas) return;  // <- This was missing!
 
-    if (!scene) {
-        scene = buildScene(targetCanvas, { showGlobe: false });
+    if (!ambientScene) {
+        ambientScene = buildScene(targetCanvas, { showGlobe: false });
         return;
     }
 
-    if (scene.canvas.isConnected) return;
-    targetCanvas.replaceWith(scene.canvas);
-    scene.setGlobeVisibility(false);
-    scene.fit();
+    if (ambientScene.canvas.isConnected) return;
+    targetCanvas.replaceWith(ambientScene.canvas);
+    ambientScene.setGlobeVisibility(false);
+    ambientScene.fit();
 }
 
 /* ====================================================================
