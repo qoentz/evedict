@@ -26,6 +26,9 @@ func InitRouter(reg *registry.Registry) *mux.Router {
 		http.ServeFile(w, r, "./static/favicon.ico")
 	}).Methods("GET")
 
+	// Mail
+	router.HandleFunc("/contact", handler.Contact(reg.MailService)).Methods("POST")
+
 	// Full page endpoints
 	router.HandleFunc("/", page.Home()).Methods("GET")
 	router.HandleFunc("/forecasts/{forecastId}", page.GetForecast(reg.ForecastService)).Methods("GET")

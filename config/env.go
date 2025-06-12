@@ -6,6 +6,7 @@ type EnvConfig struct {
 	AuthSecret            string
 	DatabaseConfig        *DatabaseConfig
 	ExternalServiceConfig *ExternalServiceConfig
+	AWSConfig             *AWSConfig
 }
 
 type ExternalServiceConfig struct {
@@ -14,6 +15,12 @@ type ExternalServiceConfig struct {
 	NewsAPIURL        string
 	NewsAPIKey        string
 	PolyMarketBaseURL string
+}
+
+type AWSConfig struct {
+	SESAccessKey       string
+	SESSecretAccessKey string
+	Region             string
 }
 
 func NewEnvConfig() *EnvConfig {
@@ -32,6 +39,11 @@ func NewEnvConfig() *EnvConfig {
 			NewsAPIURL:        os.Getenv("NEWS_API_URL"),
 			NewsAPIKey:        os.Getenv("NEWS_API_KEY"),
 			PolyMarketBaseURL: os.Getenv("POLYMARKET_BASE_URL"),
+		},
+		AWSConfig: &AWSConfig{
+			SESAccessKey:       os.Getenv("AWS_SES_ACCESS_KEY"),
+			SESSecretAccessKey: os.Getenv("AWS_SES_SECRET_ACCESS_KEY"),
+			Region:             os.Getenv("AWS_REGION"),
 		},
 	}
 }

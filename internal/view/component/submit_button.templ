@@ -1,0 +1,36 @@
+package component
+
+import "fmt"
+
+templ SubmitButton(showSuccess bool) {
+    <div id="submit-area" style="text-align: center; padding-top: 1.5rem; display: flex; align-items: center; justify-content: center; gap: 10px;">
+        <button
+            type="submit"
+            if showSuccess {
+                disabled
+            }
+            class="px-8 py-3 font-semibold rounded-lg transition-all duration-200"
+            style={
+                fmt.Sprintf("background-color: %s; color: %s; font-size: 1rem; border: none; cursor: %s; box-shadow: 0 2px 4px rgba(0,0,0,0.1);",
+                    templ.SafeCSS(func() string {
+                        if showSuccess { return "#9ca3af" }
+                        return "#d1d5db"
+                    }()),
+                    templ.SafeCSS(func() string {
+                        if showSuccess { return "#6b7280" }
+                        return "#374151"
+                    }()),
+                    templ.SafeCSS(func() string {
+                        if showSuccess { return "not-allowed" }
+                        return "pointer"
+                    }()),
+                )
+            }
+        >
+            Submit
+        </button>
+        if showSuccess {
+            <span style="color: #10b981; font-size: 1.5rem;">✓</span>
+        }
+    </div>
+}

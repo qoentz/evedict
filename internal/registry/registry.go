@@ -8,6 +8,7 @@ import (
 	"github.com/qoentz/evedict/internal/eventfeed/polymarket"
 	"github.com/qoentz/evedict/internal/llm/replicate"
 	"github.com/qoentz/evedict/internal/service"
+	"log"
 )
 
 type Registry struct {
@@ -16,6 +17,7 @@ type Registry struct {
 	ReplicateService  *replicate.Service
 	NewsAPIService    *newsapi.Service
 	PolyMarketService *polymarket.Service
+	MailService       *service.MailService
 }
 
 func NewRegistry(c *config.SystemConfig, db *sqlx.DB) *Registry {
@@ -31,11 +33,17 @@ func NewRegistry(c *config.SystemConfig, db *sqlx.DB) *Registry {
 	marketService := service.NewMarketService(polyMarketService, replicateService)
 	forecastService := service.NewForecastService(forecastRepository, replicateService, newsAPIService, marketService)
 
+	mailService, err := service.NewMailService(c.EnvConfig.AWSConfig.SESAccessKey, c.EnvConfig.AWSConfig.SESSecretAccessKey, c.EnvConfig.AWSConfig.Region)
+	if err != nil {
+		log.Println("Failed to init AWS SES Config")
+	}
+
 	return &Registry{
 		AuthService:       authService,
 		ForecastService:   forecastService,
 		ReplicateService:  replicateService,
 		NewsAPIService:    newsAPIService,
 		PolyMarketService: polyMarketService,
+		MailService:       mailService,
 	}
 }

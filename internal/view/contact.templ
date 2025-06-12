@@ -1,5 +1,10 @@
 package view
 
+import (
+	"github.com/qoentz/evedict/internal/view/component"
+)
+
+
 templ ContactPage() {
 	@Base() {
 		@ContactForm()
@@ -24,10 +29,11 @@ templ ContactForm() {
         <div id="contact-form-container">
             <form
                 method="POST"
-                action="/contact"
                 hx-post="/contact"
-                hx-target="#contact-form-container"
+                hx-target="#submit-area"
                 hx-swap="outerHTML"
+                hx-trigger="htmx-submit"
+                @submit.prevent="validateForm() && htmx.trigger($el, 'htmx-submit')"
                 @click.away="error = false"
                 x-data="{
                     error: false,
@@ -73,7 +79,6 @@ templ ContactForm() {
                     }
                 }"
                 x-bind:class="error ? 'animate-shake' : ''"
-                @submit.prevent="validateForm() && $el.submit()"
                 class="space-y-6 text-left transition-all duration-300"
                 style="max-width: 500px; margin-left: auto; margin-right: auto;"
             >
@@ -155,30 +160,7 @@ templ ContactForm() {
                 </div>
 
                 <!-- Submit Button -->
-                <div style="text-align: center; padding-top: 1.5rem;">
-                    <button
-                        type="submit"
-                        class="px-8 py-3 font-semibold rounded-lg transition-all duration-200"
-                        style="
-                            background-color: #d1d5db;
-                            color: #374151;
-                            font-size: 1rem;
-                            border: none;
-                            cursor: pointer;
-                            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-                        "
-                        onmouseover="
-                            this.style.backgroundColor='#e5e7eb';
-                            this.style.transform='translateX(1px)';
-                        "
-                        onmouseout="
-                            this.style.backgroundColor='#d1d5db';
-                            this.style.transform='translateX(0px)';
-                        "
-                    >
-                        Submit
-                    </button>
-                </div>
+                @component.SubmitButton(false)
 
                 <p style="text-align: center; font-size: 0.9rem; color: #9ca3af; margin-top: 1rem;">
                     * Required fields

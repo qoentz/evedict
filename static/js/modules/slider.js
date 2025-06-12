@@ -10,7 +10,6 @@ export function initSlider() {
     const slides = document.querySelectorAll('.highlight-slide');
 
     if (!prevButton || !nextButton || !tinyCardsContainer || slides.length === 0) {
-        console.error("Slider elements not found or no slides available!");
         return;
     }
 
