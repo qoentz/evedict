@@ -4,6 +4,11 @@ module.exports = {
   safelist: [
     'htmx-indicator',
     'htmx-request',
+    'animate-shake',
+    'border-red-400',
+    'focus:ring-red-400',
+    'border-gray-600',
+    'focus:ring-gray-400',
   ],
   theme: {
     extend: {
