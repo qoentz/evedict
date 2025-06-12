@@ -12,12 +12,12 @@ func AuthShield(auth *service.AuthService) mux.MiddlewareFunc {
 			cookie, err := r.Cookie("auth")
 			if err != nil || !auth.ValidateToken(cookie.Value) {
 				if r.Header.Get("HX-Request") != "" {
-					w.Header().Set("HX-Redirect", "/login")
+					w.Header().Set("HX-Redirect", "/vault/login")
 					w.WriteHeader(http.StatusUnauthorized)
 					return
 				}
 
-				http.Redirect(w, r, "/login", http.StatusSeeOther)
+				http.Redirect(w, r, "/vault/login", http.StatusSeeOther)
 				return
 			}
 			next.ServeHTTP(w, r)

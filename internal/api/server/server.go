@@ -19,8 +19,8 @@ func InitRouter(reg *registry.Registry) *mux.Router {
 	router := mux.NewRouter().StrictSlash(true)
 
 	// Public routes — no auth
-	router.HandleFunc("/login", page.Login()).Methods("GET")
-	router.HandleFunc("/login", handler.SubmitPassword(reg.AuthService)).Methods("POST")
+	router.HandleFunc("/vault/login", page.Login()).Methods("GET")
+	router.HandleFunc("/vault/login", handler.SubmitPassword(reg.AuthService)).Methods("POST")
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static/"))))
 	router.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "./static/favicon.ico")
