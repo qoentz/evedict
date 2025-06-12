@@ -29,7 +29,7 @@ RUN go mod download
 
 COPY . .
 
-RUN go install github.com/a-h/templ/cmd/templ@latest
+RUN go install github.com/a-h/templ/cmd/templ@v0.3.865
 RUN templ generate
 
 COPY internal/promptgen/prompts.yaml ./internal/promptgen/prompts.yaml
