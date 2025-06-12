@@ -26,27 +26,27 @@ func InitRouter(reg *registry.Registry) *mux.Router {
 		http.ServeFile(w, r, "./static/favicon.ico")
 	}).Methods("GET")
 
-	// Protected subrouter
-	protected := router.NewRoute().Subrouter()
-	protected.Use(middleware.AuthShield(reg.AuthService)) // <- wrap everything below
-
 	// Full page endpoints
-	protected.HandleFunc("/", page.Home()).Methods("GET")
-	protected.HandleFunc("/forecasts/{forecastId}", page.GetForecast(reg.ForecastService)).Methods("GET")
-	protected.HandleFunc("/about", page.About()).Methods("GET")
-	protected.HandleFunc("/contact", page.Contact()).Methods("GET")
+	router.HandleFunc("/", page.Home()).Methods("GET")
+	router.HandleFunc("/forecasts/{forecastId}", page.GetForecast(reg.ForecastService)).Methods("GET")
+	router.HandleFunc("/about", page.About()).Methods("GET")
+	router.HandleFunc("/contact", page.Contact()).Methods("GET")
 
 	// API endpoints for htmx partial updates
-	api := protected.PathPrefix("/api").Subrouter()
+	api := router.PathPrefix("/api").Subrouter()
 	api.Handle("/forecasts", fragment.GetForecastsFragment(reg.ForecastService)).Methods("GET")
 	api.Handle("/forecasts/{forecastId}", fragment.GetForecastFragment(reg.ForecastService)).Methods("GET")
 	api.Handle("/about", fragment.AboutFragment()).Methods("GET")
 	api.Handle("/contact", fragment.ContactFragment()).Methods("GET")
 
+	// Protected subrouter
+	protected := router.NewRoute().Subrouter()
+	protected.Use(middleware.AuthShield(reg.AuthService)) // <- wrap everything below
+
 	// Admin endpoints
 	vault := protected.PathPrefix("/vault").Subrouter()
 	vault.HandleFunc("/workspace", page.WorkSpace()).Methods("GET")
-	vault.HandleFunc("/workspace/pending", fragment.GetPendingForecastsFragment(reg.ForecastService))
+	vault.HandleFunc("/workspace/pending", fragment.GetPendingForecastsFragment(reg.ForecastService)).Methods("GET")
 	vault.HandleFunc("/forecasts/{forecastId}", handler.ApproveForecast(reg.ForecastService)).Methods("PATCH")
 
 	invoke := vault.PathPrefix("/invoke").Subrouter()
