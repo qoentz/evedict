@@ -21,29 +21,38 @@ func NewForecastRepository(db *sqlx.DB) *ForecastRepository {
 	}
 }
 
-func (r *ForecastRepository) GetForecasts(limit int, offset int, category *util.Category, isApproved bool) ([]model.Forecast, error) {
+func (r *ForecastRepository) GetForecasts(limit int, offset int, category *util.Category, isApproved bool, mainFeed bool) ([]model.Forecast, error) {
 	var forecasts []model.Forecast
 	var err error
 
 	if category != nil {
 		query := `
-			SELECT id, headline, summary, image_url, timestamp 
-			FROM forecast
-			WHERE category = $1
-			AND is_approved = $4
-			ORDER BY timestamp DESC
-			LIMIT $2 OFFSET $3
-		`
+            SELECT id, headline, summary, image_url, timestamp 
+            FROM forecast
+            WHERE category = $1
+            AND is_approved = $4
+            ORDER BY timestamp DESC
+            LIMIT $2 OFFSET $3
+        `
 		err = r.DB.Select(&forecasts, query, *category, limit, offset, isApproved)
+	} else if mainFeed {
+		query := `
+            SELECT id, headline, summary, image_url, timestamp 
+            FROM forecast
+            WHERE category IN ('Politics', 'Economy', 'Technology')
+            AND is_approved = $3
+            ORDER BY timestamp DESC
+            LIMIT $1 OFFSET $2
+        `
+		err = r.DB.Select(&forecasts, query, limit, offset, isApproved)
 	} else {
 		query := `
-			SELECT id, headline, summary, image_url, timestamp 
-			FROM forecast
-			WHERE category IN ('Politics', 'Economy', 'Technology')
-			AND is_approved = $3
-			ORDER BY timestamp DESC
-			LIMIT $1 OFFSET $2
-		`
+            SELECT id, headline, summary, image_url, timestamp 
+            FROM forecast
+            WHERE is_approved = $3
+            ORDER BY timestamp DESC
+            LIMIT $1 OFFSET $2
+        `
 		err = r.DB.Select(&forecasts, query, limit, offset, isApproved)
 	}
 

@@ -10,8 +10,6 @@ import (
 
 func GenerateForecasts(s *service.ForecastService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-
 		category := r.URL.Query().Get("category")
 		if category == "" {
 			category = "general"

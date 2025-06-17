@@ -165,7 +165,7 @@ func (s *ForecastService) attachMetadata(mainArticle newsapi.Article, forecast *
 }
 
 func (s *ForecastService) GetForecasts(limit int, offset int, category *util.Category) ([]dto.Forecast, error) {
-	forecasts, err := s.ForecastRepository.GetForecasts(limit, offset, category, true)
+	forecasts, err := s.ForecastRepository.GetForecasts(limit, offset, category, true, true)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get forecasts: %v", err)
 	}
@@ -181,7 +181,7 @@ func (s *ForecastService) GetForecasts(limit int, offset int, category *util.Cat
 
 func (s *ForecastService) GetPendingForecasts(limit, offset int, category *util.Category) ([]dto.Forecast, bool, error) {
 	// Fetch one extra to check if there are more
-	forecasts, err := s.ForecastRepository.GetForecasts(limit+1, offset, category, false)
+	forecasts, err := s.ForecastRepository.GetForecasts(limit+1, offset, category, false, false)
 	if err != nil {
 		return nil, false, fmt.Errorf("failed to get forecasts: %v", err)
 	}
