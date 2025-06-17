@@ -1,49 +1,77 @@
 package config
 
-import "os"
+import (
+	"fmt"
+	"os"
+	"reflect"
+	"strings"
+)
 
 type EnvConfig struct {
-	AuthSecret            string
+	AuthSecret            string `env:"AUTH_SECRET,required"`
 	DatabaseConfig        *DatabaseConfig
 	ExternalServiceConfig *ExternalServiceConfig
 	AWSConfig             *AWSConfig
 }
 
 type ExternalServiceConfig struct {
-	ReplicateModel    string
-	ReplicateAPIKey   string
-	NewsAPIURL        string
-	NewsAPIKey        string
-	PolyMarketBaseURL string
+	ReplicateModel    string `env:"REPLICATE_MODEL,required"`
+	ReplicateAPIKey   string `env:"REPLICATE_KEY,required"`
+	NewsAPIURL        string `env:"NEWS_API_URL,required"`
+	NewsAPIKey        string `env:"NEWS_API_KEY,required"`
+	PolyMarketBaseURL string `env:"POLYMARKET_BASE_URL,required"`
 }
 
 type AWSConfig struct {
-	SESAccessKey       string
-	SESSecretAccessKey string
-	Region             string
+	SESAccessKey       string `env:"AWS_SES_ACCESS_KEY,required"`
+	SESSecretAccessKey string `env:"AWS_SES_SECRET_ACCESS_KEY,required"`
+	Region             string `env:"AWS_REGION,required"`
 }
 
-func NewEnvConfig() *EnvConfig {
-	return &EnvConfig{
-		AuthSecret: os.Getenv("AUTH_SECRET"),
-		DatabaseConfig: &DatabaseConfig{
-			Host:     os.Getenv("DB_HOST"),
-			User:     os.Getenv("DB_USER"),
-			Password: os.Getenv("DB_PASSWORD"),
-			Name:     os.Getenv("DB_NAME"),
-			Port:     os.Getenv("DB_PORT"),
-		},
-		ExternalServiceConfig: &ExternalServiceConfig{
-			ReplicateModel:    os.Getenv("REPLICATE_MODEL"),
-			ReplicateAPIKey:   os.Getenv("REPLICATE_KEY"),
-			NewsAPIURL:        os.Getenv("NEWS_API_URL"),
-			NewsAPIKey:        os.Getenv("NEWS_API_KEY"),
-			PolyMarketBaseURL: os.Getenv("POLYMARKET_BASE_URL"),
-		},
-		AWSConfig: &AWSConfig{
-			SESAccessKey:       os.Getenv("AWS_SES_ACCESS_KEY"),
-			SESSecretAccessKey: os.Getenv("AWS_SES_SECRET_ACCESS_KEY"),
-			Region:             os.Getenv("AWS_REGION"),
-		},
+func NewEnvConfig() (*EnvConfig, error) {
+	config := &EnvConfig{
+		DatabaseConfig:        &DatabaseConfig{},
+		ExternalServiceConfig: &ExternalServiceConfig{},
+		AWSConfig:             &AWSConfig{},
 	}
+
+	if err := loadEnvVars(config); err != nil {
+		return nil, err
+	}
+
+	return config, nil
+}
+
+func loadEnvVars(config interface{}) error {
+	v := reflect.ValueOf(config).Elem()
+	t := v.Type()
+
+	for i := 0; i < v.NumField(); i++ {
+		field := v.Field(i)
+		fieldType := t.Field(i)
+
+		envTag := fieldType.Tag.Get("env")
+		if envTag == "" {
+			// Handle nested structs recursively
+			if field.Kind() == reflect.Ptr && field.Elem().Kind() == reflect.Struct {
+				if err := loadEnvVars(field.Interface()); err != nil {
+					return err
+				}
+			}
+			continue
+		}
+
+		parts := strings.Split(envTag, ",")
+		envKey := parts[0]
+		required := len(parts) > 1 && parts[1] == "required"
+
+		value := os.Getenv(envKey)
+		if required && value == "" {
+			return fmt.Errorf("required environment variable %s is not set", envKey)
+		}
+
+		field.SetString(value)
+	}
+
+	return nil
 }

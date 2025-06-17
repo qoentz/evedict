@@ -20,7 +20,10 @@ func ConfigureSystem() (*SystemConfig, error) {
 		_ = godotenv.Load()
 	}
 
-	envConfig := NewEnvConfig()
+	envConfig, err := NewEnvConfig()
+	if err != nil {
+		return nil, fmt.Errorf("error loading .env: %v", err)
+	}
 
 	promptTemplate, err := promptgen.LoadPromptTemplate("internal/promptgen/prompts.yaml")
 	if err != nil {

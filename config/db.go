@@ -6,11 +6,11 @@ import (
 )
 
 type DatabaseConfig struct {
-	Host     string
-	User     string
-	Password string
-	Name     string
-	Port     string
+	Host     string `env:"DB_HOST,required"`
+	User     string `env:"DB_USER,required"`
+	Password string `env:"DB_PASSWORD,required"`
+	Name     string `env:"DB_NAME,required"`
+	Port     string `env:"DB_PORT,required"`
 }
 
 type DSNFormat int
