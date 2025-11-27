@@ -3,7 +3,7 @@
 </p>
 
 # Evedict
-Evedict synthesises real-time news from a wide network of global sources, offering a visual passage into the current information landscape. Crafted to cultivate curiosity, it leverages AI to speculate on where developments may lead.
+*Evedict synthesises real-time news from a wide network of global sources, offering a visual passage into the current information landscape. Crafted to cultivate curiosity, it leverages AI to speculate on where developments may lead.*
 
 Visit the live application at: **[https://evedict.com](https://evedict.com)**
 
