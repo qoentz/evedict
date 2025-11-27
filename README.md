@@ -1,7 +1,8 @@
-![Logo](static/images/logo.png)
+<p align="center">
+  <img src="static/images/logo.png" alt="Logo" width="400">
+</p>
 
 # Evedict
-
 Evedict synthesises real-time news from a wide network of global sources, offering a visual passage into the current information landscape. Crafted to cultivate curiosity, it leverages AI to speculate on where developments may lead.
 
 Visit the live application at: **[https://evedict.com](https://evedict.com)**
@@ -9,7 +10,6 @@ Visit the live application at: **[https://evedict.com](https://evedict.com)**
 ---
 
 ## Tech Stack
-
 ### Backend
 - **Go (Golang)** — core application logic and HTTP server
 - **HTMX** — server-driven dynamic UI updates with minimal client-side complexity
@@ -28,6 +28,5 @@ Visit the live application at: **[https://evedict.com](https://evedict.com)**
 ---
 
 ## License
-
-This project is licensed under the MIT License. 
+This project is licensed under the MIT License.  
 See the [LICENSE](LICENSE) file for details.
