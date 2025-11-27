@@ -42,3 +42,5 @@ tmp/
 static/css/styles.css
 
 .DS_Store
+
+internal/promptgen/prompts.yaml

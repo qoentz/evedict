@@ -3,6 +3,9 @@ package service
 import (
 	"encoding/json"
 	"fmt"
+	"log"
+	"time"
+
 	"github.com/google/uuid"
 	"github.com/qoentz/evedict/internal/api/dto"
 	"github.com/qoentz/evedict/internal/db/model"
@@ -13,8 +16,6 @@ import (
 	"github.com/qoentz/evedict/internal/llm/replicate"
 	"github.com/qoentz/evedict/internal/promptgen"
 	"github.com/qoentz/evedict/internal/util"
-	"log"
-	"time"
 )
 
 type ForecastService struct {

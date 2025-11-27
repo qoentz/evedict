@@ -2,16 +2,17 @@ package main
 
 import (
 	"context"
-	"github.com/jmoiron/sqlx"
-	"github.com/qoentz/evedict/config"
-	"github.com/qoentz/evedict/internal/api/server"
-	"github.com/qoentz/evedict/internal/db"
-	"github.com/qoentz/evedict/internal/registry"
 	"log"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/jmoiron/sqlx"
+	"github.com/qoentz/evedict/config"
+	"github.com/qoentz/evedict/internal/api/server"
+	"github.com/qoentz/evedict/internal/db"
+	"github.com/qoentz/evedict/internal/registry"
 )
 
 func main() {
