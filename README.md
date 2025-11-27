@@ -7,8 +7,6 @@ Evedict synthesises real-time news from a wide network of global sources, offeri
 
 Visit the live application at: **[https://evedict.com](https://evedict.com)**
 
----
-
 ## Tech Stack
 ### Backend
 - **Go (Golang)** — core application logic and HTTP server
@@ -24,8 +22,6 @@ Visit the live application at: **[https://evedict.com](https://evedict.com)**
 ### Infrastructure & Tooling
 - **AWS EC2** — hosting and deployment of the application
 - **Docker & docker-compose** — containerized deployment
-
----
 
 ## License
 This project is licensed under the MIT License.  
