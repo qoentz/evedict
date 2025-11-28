@@ -1,8 +1,8 @@
-<div style="text-align: center;">
+<p align="center">
   <a href="https://evedict.com">
     <img src="static/images/logo.png" alt="Evedict Logo" width="400">
   </a>
-</div>
+</p>
 
 # Evedict
 *Evedict synthesises real-time news from a wide network of global sources, offering a visual passage into the current information landscape. Crafted to cultivate curiosity, it leverages AI to speculate on where developments may lead.*
